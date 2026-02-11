@@ -39,7 +39,7 @@ module.exports = {
         try {
             // Royal crown reaction
             await sock.sendMessage(m.chat, { 
-                react: { text: "👑", key: m.key } 
+                react: { text: "👀", key: m.key } 
             });
 
             const userName = m.pushName || "Noble User";
@@ -53,14 +53,14 @@ module.exports = {
 `✨ *${config.settings.title} is Watching Over You* ✨
 
 ╔═══════════════════
-║  🏰 *ROYAL STATUS*
+║  🏰 *CRYSN⚉VA AI STATUS*
 ╠═══════════════════
 ║ ♕ *User:* ${userName}
-║ ⏳ *Uptime:* ${botUptime}
-║ 💾 *Memory:* ${usedMemory}MB / ${totalMemory}GB
-║ ⚡ *Speed:* ${ping}ms
-║ 🖥️ *Platform:* ${host}
-║ 📜 *Creator:* ${config.owner}
+║ 𓉤 *Uptime:* ${botUptime}
+║ ✪ *Memory:* ${usedMemory}MB / ${totalMemory}GB
+║ ☬ *Speed:* ${ping}ms
+║ 亗 *Platform:* ${host}
+║ 𓄄 *Creator:* ${config.owner}
 ╚═══════════════════
 
 *"A queen never sleeps, and neither do I"*
@@ -69,7 +69,7 @@ module.exports = {
 📜 Developed by: ${config.settings.author}
 
 🎭 *Join the Royal Court:*
-https://whatsapp.com/channel/0029Va8YUl50bIdtVMYnYd0E`;
+https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38`;
 
             await sock.sendMessage(m.chat, {
                 image: { url: config.thumbUrl },
@@ -77,10 +77,10 @@ https://whatsapp.com/channel/0029Va8YUl50bIdtVMYnYd0E`;
                 contextInfo: {
                     mentionedJid: [m.sender],
                     externalAdReply: {
-                        title: `👑 ${config.settings.title} - Royal Bot`,
+                        title: ` 𓉤${config.settings.title} - Royal Bot`,
                         body: config.settings.description,
                         thumbnailUrl: config.thumbUrl,
-                        sourceUrl: "https://whatsapp.com/channel/0029Va8YUl50bIdtVMYnYd0E",
+                        sourceUrl: "https://github.com/crysnovax/CRYSNOVA_AI",
                         mediaType: 1,
                         renderLargerThumbnail: true
                     }
