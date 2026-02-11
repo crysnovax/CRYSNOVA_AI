@@ -63,7 +63,7 @@ module.exports = {
 *"Magic flows through every command I cast"*
 
 🪄 *Channel Your Magic:*
-https://whatsapp.com/channel/0029Va8YUl50bIdtVMYnYd0E
+https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38
 
 ${config.settings.footer}`;
 
@@ -76,7 +76,7 @@ ${config.settings.footer}`;
                         title: `🧙‍♀️ ${config.settings.title}`,
                         body: config.settings.description,
                         thumbnailUrl: config.thumbUrl,
-                        sourceUrl: "https://www.github.com/OfficialKango",
+                        sourceUrl: "https://github.com/crysnovax/CRYSNOVA_AI",
                         mediaType: 1
                     }
                 }
