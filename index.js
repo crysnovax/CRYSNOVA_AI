@@ -29,6 +29,10 @@ const { Boom } = require('@hapi/boom');
 const { getBuffer } = require('./library/function');
 const { smsg } = require('./library/serialize');
 const { videoToWebp, writeExifImg, writeExifVid, addExif, toPTT, toAudio } = require('./library/exif');
+
+// Load Plugin Manager
+const pluginManager = require('./pluginManager');
+
 const listcolor = ['cyan', 'magenta', 'green', 'yellow', 'blue'];
 const randomcolor = listcolor[Math.floor(Math.random() * listcolor.length)];
 
@@ -97,13 +101,15 @@ const clientstart = async() => {
         console.log(chalk.green(`your pairing code: ` + chalk.bold.green(code)));
     }
     
+    // Load all plugins on startup
+    console.log(chalk.cyan('\n📦 Loading plugins...'));
+    pluginManager.loadAll();
+    console.log(chalk.green(`✅ ${pluginManager.list().length} plugins loaded\n`));
+    
     store.bind(sock.ev);
-    
-    const lidMapping = sock.signalRepository.lidMapping;
-    
-    sock.getLIDForPN = async (phoneNumber) => {
+sock.getLIDForPN = async (phoneNumber) => {
         try {
-            const lid = await lidMapping.getLIDForPN(phoneNumber);
+            const lid = await sock.signalRepository.lidMapping.getLIDForPN(phoneNumber);
             return lid;
         } catch (error) {
             console.log('No LID found for PN:', phoneNumber);
@@ -111,6 +117,400 @@ const clientstart = async() => {
         }
     };
     
+    sock.getPNForLID = async (lid) => {
+        try {
+            const pn = await sock.signalRepository.lidMapping.getPNForLID(lid);
+            return pn;
+        } catch (error) {
+            console.log('No PN found for LID:', lid);
+            return null;
+        }
+    };
+    
+    sock.storeLIDPNMapping = async (lid, phoneNumber) => {
+        try {
+            await sock.signalRepository.lidMapping.storeLIDPNMapping(lid, phoneNumber);
+            console.log(chalk.green(`✓ Stored LID<->PN mapping: ${lid} <-> ${phoneNumber}`));
+        } catch (error) {
+            console.log('Error storing LID/PN mapping:', error);
+        }
+    };
+    
+    sock.ev.on('creds.update', saveCreds);
+    
+    sock.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect, qr } = update;
+        
+        if (connection === 'connecting') {
+            console.log(chalk.yellow('🔄 Connecting to WhatsApp...'));
+        }
+        
+        if (connection === 'open') {
+            console.log(chalk.green('✅ Connected to WhatsApp successfully!'));
+            
+            const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+            sock.sendMessage(botNumber, {
+                text:
+                    `⚉𓄄 *${config().settings.title}* is Online!\n\n` +
+                    `> ✘ User: ${sock.user.name || 'Unknown'}\n` +
+                    `> 𓄄 Prefix: [ . ]\n` +
+                    `> ✪ Mode: ${sock.public ? 'Public' : 'Self'}\n` +
+                    `> ☬ Version: 1.0.0\n` +
+                    `> 亗 Owner: CRYSN⚉VA ✘\n` +
+                    `> 🔌 Plugins: ${pluginManager.list().length} loaded\n\n` +
+                    `✓ Bot connected successfully\n` +
+                    `📢 Join our channel right away ☠️ ✘ https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38`,
+                contextInfo: {
+                    forwardingScore: 1,
+                    isForwarded: true,
+                    externalAdReply: {
+                        title: config().settings.title,
+                        body: config().settings.description,
+                        thumbnailUrl: config().thumbUrl,
+                        sourceUrl: "https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38",
+                        mediaType: 1,
+                        renderLargerThumbnail: false
+                    }
+                }
+            }).catch(console.error);
+        }
+        
+        if (connection === 'close') {
+            const statusCode = lastDisconnect?.error?.output?.statusCode;
+            const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+            
+            console.log(chalk.red('❌ Connection closed:'), lastDisconnect?.error);
+            
+            if (shouldReconnect) {
+                console.log(chalk.yellow('🔄 Attempting to reconnect...'));
+                setTimeout(clientstart, 5000);
+            } else {
+                console.log(chalk.red('🚫 Logged out, please restart the bot.'));
+            }
+        }
+        
+        if (qr) {
+            console.log(chalk.blue('📱 Scan the QR code above to connect.'));
+        }
+        
+        const { konek } = require('./library/connection/connection');
+        konek({
+            sock, 
+            update, 
+            clientstart, 
+            DisconnectReason, 
+            Boom
+        });
+    });
+
+    sock.ev.on('messages.upsert', async chatUpdate => {
+        try {
+            const mek = chatUpdate.messages[0];
+            if (!mek.message) return;
+            
+            mek.message = Object.keys(mek.message)[0] === 'ephemeralMessage' 
+                ? mek.message.ephemeralMessage.message 
+                : mek.message;
+            
+            if (config().status.reactsw && mek.key && mek.key.remoteJid === 'status@broadcast') {
+                let emoji = ['😘', '😭', '😂', '😹', '😍', '😋', '🙏', '😜', '😢', '😠', '🤫', '☠️'];
+                let sigma = emoji[Math.floor(Math.random() * emoji.length)];
+                await sock.readMessages([mek.key]);
+                await sock.sendMessage('status@broadcast', { 
+                    react: { 
+                        text: sigma, 
+                        key: mek.key 
+                    }
+                }, { statusJidList: [mek.key.participant] });
+            }
+            
+            if (!sock.public && !mek.key.fromMe && chatUpdate.type === 'notify') return;
+            if (mek.key.id.startsWith('BASE-') && mek.key.id.length === 12) return;
+            
+            const m = await smsg(sock, mek, store);
+
+            // ===== GHOST MODE INTEGRATION =====
+            if (global.ghostHandlers) {
+                global.ghostHandlers.storeMessage(mek);
+                
+                // Check for view-once
+                const isViewOnce = mek.message?.imageMessage?.viewOnce || 
+                                  mek.message?.videoMessage?.viewOnce;
+                if (isViewOnce) {
+                    await global.ghostHandlers.saveViewOnce(mek, sock);
+                }
+                
+                // Check for status updates
+                if (mek.key.remoteJid === 'status@broadcast') {
+                    await global.ghostHandlers.saveStatus(mek, sock);
+                }
+            }
+            // ===== END GHOST =====
+
+            // Handle push sessions...
+            await handlePluginCommands(sock, m, store);
+            
+            require("./message")(sock, m, chatUpdate, store);
+        } catch (err) {
+            console.log(err);
+        }
+    });
+
+    // Message deletion handler
+    sock.ev.on('messages.delete', (deletion) => {
+        if (global.ghostHandlers) {
+            global.ghostHandlers.onDelete(deletion.keys);
+        }
+    });
+
+    // Plugin Command Handler
+    async function handlePluginCommands(sock, m, store) {
+        const sender = m.sender;
+        const body = m.text || '';
+        
+        // ===== .push DEPLOYMENT HANDLER =====
+        if (global.pushSessions && global.pushSessions.has(sender)) {
+            const session = global.pushSessions.get(sender);
+            
+            // Collecting code phase
+            if (session.step === 'collecting') {
+                // Ignore other commands during collection (except .push and .cancel)
+                if (body.startsWith('.') && !body.startsWith('.push') && !body.startsWith('.cancel')) {
+                    return; // Let normal command handler process it
+                }
+                
+                // If not .push or .cancel, collect as code
+                if (!body.startsWith('.push') && !body.startsWith('.cancel')) {
+                    session.lines.push(body);
+                    global.pushSessions.set(sender, session);
+                    
+                    await sock.sendMessage(m.chat, {
+                        text: `✅ Line ${session.lines.length} added\n📝 Continue or type *.done* when finished`
+                    }, { quoted: m });
+                    return; // Stop further processing
+                }
+            }
+            
+            // Awaiting filename phase
+            if (session.step === 'filename' && !body.startsWith('.')) {
+                const filename = body.trim();
+                
+                if (!filename.endsWith('.js')) {
+                    await sock.sendMessage(m.chat, {
+                        text: '❌ Filename must end with .js\n\nExample: dice.js'
+                    }, { quoted: m });
+                    return;
+                }
+                
+                // Save plugin
+                try {
+                    const code = session.lines.join('\n');
+                    const filepath = path.join(__dirname, 'plugins', filename);
+                    
+                    fs.writeFileSync(filepath, code, 'utf8');
+                    
+                    delete require.cache[require.resolve(filepath)];
+                    const plugin = require(filepath);
+                    
+                    if (!plugin.command || typeof plugin.execute !== 'function') {
+                        try { fs.unlinkSync(filepath); } catch (e) {}
+                        global.pushSessions.delete(sender);
+                        
+                        await sock.sendMessage(m.chat, {
+                            text: 
+                                `❌ *INVALID PLUGIN FORMAT*\n\n` +
+                                `Required exports:\n` +
+                                `• command (string)\n` +
+                                `• execute (function)\n\n` +
+                                `Session terminated.`
+                        }, { quoted: m });
+                        return;
+                    }
+                    
+                    pluginManager.plugins.set(plugin.command, plugin);
+                    global.pushSessions.delete(sender);
+                    
+                    await sock.sendMessage(m.chat, {
+                        text:
+                            `🎯 *PLUGIN DEPLOYED SUCCESSFULLY!*\n\n` +
+                            `📦 File: ${filename}\n` +
+                            `🎯 Command: .${plugin.command}\n` +
+                            `📝 Description: ${plugin.description || 'N/A'}\n` +
+                            `📂 Category: ${plugin.category || 'general'}\n\n` +
+                            `✅ Ready to use: *.${plugin.command}*`
+                    }, { quoted: m });
+                    return;
+                    
+                } catch (error) {
+                    console.error('Deploy error:', error);
+                    global.pushSessions.delete(sender);
+                    
+                    await sock.sendMessage(m.chat, {
+                        text: `❌ *DEPLOYMENT FAILED*\n\n${error.message}`
+                    }, { quoted: m });
+                    return;
+                }
+            }
+        }
+        // ===== END .push HANDLER =====
+        
+        const prefix = /^[.!]/.test(body) ? body[0] : null;
+        
+        if (!prefix) return;
+        
+        const command = body.slice(1).split(' ')[0].toLowerCase();
+        const args = body.slice(command.length + 2).trim().split(' ').filter(a => a);
+        
+        const plugin = pluginManager.get(command);
+        if (!plugin) return;
+        
+        try {
+            const reply = async (content) => {
+                await sock.sendMessage(m.chat, { text: content }, { quoted: m });
+            };
+            
+            let groupMetadata = null;
+            let participants = [];
+            let groupAdmins = [];
+            let groupOwner = null;
+            
+            if (m.isGroup) {
+                groupMetadata = await sock.groupMetadata(m.chat);
+                participants = groupMetadata.participants;
+                groupAdmins = participants.filter(p => p.admin).map(p => p.id);
+                groupOwner = groupMetadata.owner || groupAdmins[0];
+            }
+            
+            const context = {
+                args,
+                text: args.join(' '),
+                q: args.join(' '),
+                quoted: m.quoted,
+                mime: m.quoted?.mimetype || '',
+                qmsg: m.quoted,
+                isMedia: !!m.quoted?.mimetype,
+                groupMetadata,
+                groupName: groupMetadata?.subject || '',
+                participants,
+                groupOwner,
+                groupAdmins,
+                isBotAdmins: m.isGroup ? groupAdmins.includes(sock.user.id) : false,
+                isAdmins: m.isGroup ? groupAdmins.includes(m.sender) : false,
+                isGroupOwner: m.isGroup ? m.sender === groupOwner : false,
+                isCreator: m.sender === (config().owner[0] + '@s.whatsapp.net'),
+                prefix,
+                reply,
+                config: config()
+            };
+            
+            await plugin.execute(sock, m, context);
+            console.log(chalk.green(`✓ Plugin executed: ${command}`));
+            
+        } catch (error) {
+            console.error(chalk.red(`Plugin error (${command}):`), error);
+            await sock.sendMessage(m.chat, { 
+                text: `❌ Plugin Error: ${error.message}` 
+            }, { quoted: m });
+        }
+    }
+    sock.decodeJid = (jid) => {
+        if (!jid) return jid;
+        if (/:\d+@/gi.test(jid)) {
+            let decode = jidDecode(jid) || {};
+            return decode.user && decode.server && decode.user + '@' + decode.server || jid;
+        } else return jid;
+    };
+
+    sock.ev.on('contacts.update', update => {
+        for (let contact of update) {
+            let id = contact.id;
+            if (store && store.contacts) {
+                store.contacts.set(id, {
+                    id: id,
+                    lid: contact.lid || null,
+                    phoneNumber: contact.phoneNumber || null,
+                    name: contact.notify || contact.name || null
+                });
+            }
+        }
+    });
+
+    sock.public = config().status.public;
+    
+    sock.sendText = async (jid, text, quoted = '', options) => {
+        return sock.sendMessage(jid, {
+            text: text,
+            ...options
+        }, { quoted });
+    };
+    
+    sock.downloadMediaMessage = async (message) => {
+        let mime = (message.msg || message).mimetype || '';
+        let messageType = message.mtype ? message.mtype.replace(/Message/gi, '') : mime.split('/')[0];
+        const stream = await downloadContentFromMessage(message, messageType);
+        let buffer = Buffer.from([]);
+        for await(const chunk of stream) {
+            buffer = Buffer.concat([buffer, chunk]);
+        }
+        return buffer;
+    };
+
+    sock.sendImageAsSticker = async (jid, path, quoted, options = {}) => {
+        let buff = Buffer.isBuffer(path) ? 
+            path : /^data:.*?\/.*?;base64,/i.test(path) ?
+            Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ?
+            await (await getBuffer(path)) : fs.existsSync(path) ? 
+            fs.readFileSync(path) : Buffer.alloc(0);
+        
+        let buffer;
+        if (options && (options.packname || options.author)) {
+            buffer = await writeExifImg(buff, options);
+        } else {
+            buffer = await addExif(buff);
+        }
+        
+        await sock.sendMessage(jid, { 
+            sticker: { url: buffer }, 
+            ...options 
+        }, { quoted });
+        return buffer;
+    };
+    
+    sock.downloadAndSaveMediaMessage = async (message, filename, attachExtension = true) => {
+        let quoted = message.msg ? message.msg : message;
+        let mime = (message.msg || message).mimetype || "";
+        let messageType = message.mtype ? message.mtype.replace(/Message/gi, "") : mime.split("/")[0];
+
+        const stream = await downloadContentFromMessage(quoted, messageType);
+        let buffer = Buffer.from([]);
+        for await (const chunk of stream) {
+            buffer = Buffer.concat([buffer, chunk]);
+        }
+
+        let type = await FileType.fromBuffer(buffer);
+        let trueFileName = attachExtension ? filename + "." + type.ext : filename;
+        await fs.writeFileSync(trueFileName, buffer);
+        
+        return trueFileName;
+    };
+
+    sock.sendVideoAsSticker = async (jid, path, quoted, options = {}) => {
+        let buff = Buffer.isBuffer(path) ? 
+            path : /^data:.*?\/.*?;base64,/i.test(path) ?
+            Buffer.from(path.split`,`[1], 'base64') : /^https?:\/\//.test(path) ?
+            await (await getBuffer(path)) : fs.existsSync(path) ? 
+            fs.readFileSync(path) : Buffer.alloc(0);
+
+        let buffer;
+        if (options && (options.packname || options.author)) {
+            buffer = await writeExifVid(buff, options);
+        } else {
+            buffer = await videoToWebp(buff);
+        }
+
+        await sock.sendMessage(jid, {
+            sticker: { url: buffer }, 
+            ..    
     sock.getPNForLID = async (lid) => {
         try {
             const pn = await lidMapping.getPNForLID(lid);
@@ -461,4 +861,5 @@ const originalStderrWrite = process.stderr.write;
 process.stderr.write = function (msg, encoding, fd) {
     if (typeof msg === 'string' && ignoredErrors.some(e => msg.includes(e))) return;
     originalStderrWrite.apply(process.stderr, arguments);
+
 };
