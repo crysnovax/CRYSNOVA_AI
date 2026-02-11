@@ -29,7 +29,7 @@ module.exports = {
     }) => {
         try {
             if (!text) {
-                return await reply("❌ Please provide a song name!\nExample: `.play Lilly Alan Walker`");
+                return await reply("✘ Please provide a song name!\nExample: `.play Lilly Alan Walker`");
             }
 
             // Add initial reaction
@@ -68,7 +68,7 @@ module.exports = {
                 await sock.sendMessage(m.chat, { 
                     react: { text: "❌", key: m.key } 
                 });
-                return await reply("🚫 Download failed. Try again later.");
+                return await reply("✘ Download failed. Try again later.");
             }
 
             // Success reaction
@@ -88,7 +88,7 @@ module.exports = {
             await sock.sendMessage(m.chat, { 
                 react: { text: "❌", key: m.key } 
             });
-            await reply("❌ Download failed. Please try again later.");
+            await reply("✘ Download failed. Please try again later.");
         }
     }
 };
