@@ -39,7 +39,7 @@ module.exports = {
         try {
             // Tech reaction
             await sock.sendMessage(m.chat, { 
-                react: { text: "⚡", key: m.key } 
+                react: { text: "🚀", key: m.key } 
             });
 
             const userName = m.pushName || "User";
@@ -52,7 +52,7 @@ module.exports = {
             const cpu = os.cpus()[0].model;
 
             const aliveMessage = 
-`🤖 *${config.settings.title} - SYSTEM STATUS*
+`👌 *${config.settings.title} - SYSTEM STATUS*
 
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 👤 **USER**: ${userName}
@@ -68,7 +68,7 @@ module.exports = {
 💬 **DESCRIPTION**: ${config.settings.description}
 
 🔗 **OFFICIAL CHANNEL**:
-https://whatsapp.com/channel/0029Va8YUl50bIdtVMYnYd0E
+https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38
 
 ${config.settings.footer}`;
 
@@ -81,7 +81,7 @@ ${config.settings.footer}`;
                         title: `🤖 ${config.settings.title}`,
                         body: "System Online & Operational",
                         thumbnailUrl: config.thumbUrl,
-                        sourceUrl: "https://www.github.com/OfficialKango",
+                        sourceUrl: "https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax?mode=gi_t",
                         mediaType: 1
                     }
                 }
