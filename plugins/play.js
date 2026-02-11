@@ -29,7 +29,7 @@ module.exports = {
     }) => {
         try {
             if (!text) {
-                return await reply(`🎧 *QUEEN RIAM MUSIC*\n\n┌─❖\n│ ✦ Need a song name!\n│ ✦ Example: ${prefix}play faded alan walker\n└───────────────◉\n\n🎶 Your personal music downloader`);
+                return await reply(`🎧 *CRYSN⚉VA AI MUSIC*\n\n┌─❖\n│ ✦ Need a song name!\n│ ✦ Example: ${prefix}play faded alan walker\n└───────────────◉\n\n🎶 Your personal music downloader`);
             }
 
             // Initial reaction - music note
@@ -47,7 +47,7 @@ module.exports = {
                     react: { text: "😔", key: m.key } 
                 });
                 await sock.sendMessage(m.chat, { 
-                    text: "❌ *No Results Found*\n\nI couldn't find any songs with that name.\n💡 Try different keywords or check spelling!" 
+                    text: "✘ *No Results Found*\n\nI couldn't find any songs with that name.\n💡 Try different keywords or check spelling!" 
                 }, { quoted: m });
                 return;
             }
@@ -61,7 +61,7 @@ module.exports = {
 
             // Update message to found
             await sock.sendMessage(m.chat, { 
-                text: `✅ *Song Found!*\n\n🎵 *${video.title}*\n⏱️ ${video.timestamp} | 👁️ ${video.views}\n\n⬇️ Starting download...` ,
+                text: `✓ *Song Found!*\n\n🎵 *${video.title}*\n⏱️ ${video.timestamp} | 👁️ ${video.views}\n\n⬇️ Starting download...` ,
                 edit: processingMsg.key
             });
 
@@ -79,7 +79,7 @@ module.exports = {
                     react: { text: "😢", key: m.key } 
                 });
                 await sock.sendMessage(m.chat, { 
-                    text: "🚫 *Download Failed*\n\nThe audio service is currently unavailable.\n⚡ Try again in a few minutes!" 
+                    text: "✘ *Download Failed*\n\nThe audio service is currently unavailable.\n⚡ Try again in a few minutes!" 
                 }, { quoted: m });
                 return;
             }
@@ -91,7 +91,7 @@ module.exports = {
 
             // Final update before sending audio
             await sock.sendMessage(m.chat, { 
-                text: `🎉 *Ready to Play!*\n\n🎵 ${data.title || video.title}\n✅ Download successful!\n\n🎶 Sending audio now...` ,
+                text: `🎉 *Ready to Play!*\n\n🎵 ${data.title || video.title}\n✓ Download successful!\n\n🎶 Sending audio now...` ,
                 edit: processingMsg.key
             });
 
@@ -103,10 +103,10 @@ module.exports = {
                 contextInfo: {
                     mentionedJid: [sender],
                     externalAdReply: {
-                        title: "🎧 Queen Riam Music",
+                        title: "🎧 CRYSN⚉VA AI Music",
                         body: "Click here for more music!",
                         thumbnailUrl: video.thumbnail,
-                        sourceUrl: "https://whatsapp.com/channel/0029Va8YUl50bIdtVMYnYd0E",
+                        sourceUrl: "https://github.com/crysnovax/CRYSNOVA_AI",
                         mediaType: 1
                     }
                 }
@@ -122,7 +122,7 @@ module.exports = {
             await sock.sendMessage(m.chat, { 
                 react: { text: "💀", key: m.key } 
             });
-            await reply("💥 *Oops! Something broke*\n\n❌ An unexpected error occurred\n🔧 Our team has been notified\n💫 Try again in a few minutes");
+            await reply("⚉ *Oops! Something broke*\n\n✘ An unexpected error occurred\n🔧 Our team has been notified\n💫 Try again in a few minutes");
         }
     }
 };
