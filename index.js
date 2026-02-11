@@ -692,7 +692,7 @@ async function handlePluginCommands(sock, m, store) {
     };
     
     return sock;
-};
+}
 
 clientstart();
 
@@ -728,3 +728,4 @@ process.stderr.write = function (msg, encoding, fd) {
     if (typeof msg === 'string' && ignoredErrors.some(e => msg.includes(e))) return;
     originalStderrWrite.apply(process.stderr, arguments);
 };
+
