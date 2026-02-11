@@ -30,7 +30,7 @@ class PluginLoader {
         this.categories = new Map();
         this.pluginsDir = path.join(__dirname, 'plugins');
         this.defaultCategories = {
-            'ai': '🤖 AI MENU',
+            'ai': '⚉ CRYSNOVA AI MENU',
             'downloader': '📥 DOWNLOAD MENU',
             'fun': '🎮 FUN MENU',
             'general': '⚡ GENERAL MENU',
@@ -86,12 +86,12 @@ class PluginLoader {
                         this.plugins.set(plugin.command, plugin);
                         this.categories.get(plugin.category).push(plugin.command);
                         
-                        console.log(chalk.green(`✅ Loaded plugin: ${plugin.command} (${plugin.category})`));
+                        console.log(chalk.green(`✓ Loaded plugin: ${plugin.command} (${plugin.category})`));
                     } else {
                         console.log(chalk.yellow(`⚠️  Invalid plugin structure in: ${file}`));
                     }
                 } catch (error) {
-                    console.log(chalk.red(`❌ Failed to load plugin ${file}:`, error.message));
+                    console.log(chalk.red(`✘ Failed to load plugin ${file}:`, error.message));
                 }
             }
 
@@ -172,10 +172,10 @@ class PluginLoader {
             const sortedCommands = commands.sort();
             const commandList = sortedCommands.map(cmd => {
                 const plugin = this.plugins.get(cmd);
-                return `︱✗ ${cmd}${plugin.description ? ` - ${plugin.description}` : ''}`;
+                return `┃ ━┫.${cmd}${plugin.description ? ` - ${plugin.description}` : ''}`;
             }).join('\n');
             
-            sections.push(`╾─╼▣ ${categoryName}\n${commandList}\n╿─╼▣`);
+            sections.push(`┃ ╾─╼▣ ${categoryName}\n${commandList}\n╿┃ ─╼▣`);
         }
         
         return sections.join('\n\n');
@@ -234,7 +234,7 @@ module.exports = sock = async (sock, m, chatUpdate, store) => {
         const budy = (typeof m.text === 'string' ? m.text : '');
         const prefa = ["", "!", ".", ",", "🤖", "🗿"];
 
-        const prefixRegex = /^[°zZ#$@*+,.?=''():√%!¢£¥€π¤Ω Φ_&><`™©®Δ^βα~¦|/\\©^]/;
+        const prefixRegex = /^[°zZ#$@*+,.?=''():√%!¢£¥€‎π¤Ω Φ_&><`™©®Δ^βα~¦|/\\©^]/;
         const prefix = prefixRegex.test(body) ? body.match(prefixRegex)[0] : '.';
         const from = m.key.remoteJid;
         const isGroup = from.endsWith("@g.us");
@@ -329,17 +329,25 @@ module.exports = sock = async (sock, m, chatUpdate, store) => {
                 const totalCommands = pluginLoader.getPluginCount();
 
                 const K0MRAID = `
-╔〘 *WA-BASE-BOT* 
-║ 👑 *Owner:* Debraj 
-║ 🧩 *Prefix:* [ . ]
-║ 🖥️ *Host:* ${host}
-║ 🧠 *Commands:* ${totalCommands}
-║ ⚙️ *Mode:* ${mode}
-║ ⏱️ *Uptime:* ${uptime}
-║ ⚡ *Ping:* ${ping.toFixed(0)} ms
-║ 📊 *RAM Used:* ${usedMem.toFixed(2)} MB / ${totalMem.toFixed(2)} GB
-║ 🧬 *RAM:* [${ramBar}] ${memPercent.toFixed(2)}%
-╚═〘 *System Status*
+*┏━━━━━━━━━━━〔 ⚜ CRYSN⚉VA ✘ ⚜ 〕━━━━━━━━━━━┓
+┃
+┃   ⚉ 𝐎𝐖𝐍𝐄𝐑      » CRYSNOVA
+┃   ✘ 𝐏𝐑𝐄𝐅𝐈𝐗     » [ . ]
+┃   𓄄 𝐇𝐎𝐒𝐓       » ${host}
+┃   𓉤 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒    » ${totalCommands}
+┃
+┣━━━━━━━━━━━〔 ⚙ SYSTEM MATRIX ⚙ 〕━━━━━━━━━━━┫
+┃   ⚙️ 𝐌𝐎𝐃𝐄       » ${mode}
+┃   ⏱️ 𝐔𝐏𝐓𝐈𝐌𝐄     » ${uptime}
+┃   乂 𝐋𝐀𝐓𝐄𝐍𝐂𝐘    » ${ping.toFixed(0)} ms
+┃
+┣━━━━━━━━━━━〔 ☬ MEMORY CORE ☬ 〕━━━━━━━━━━━┫
+┃   ✪ 𝐔𝐒𝐄𝐃        » ${usedMem.toFixed(2)} MB
+┃   ☬ 𝐓𝐎𝐓𝐀𝐋       » ${totalMem.toFixed(2)} GB
+┃   ⚉ 𝐋𝐎𝐀𝐃        » ${memPercent.toFixed(2)}%
+┃   𓄄 𝐒𝐓𝐀𝐓𝐔𝐒      » [${ramBar}]
+┃
+┗━━━━━━━━━━━〔 𓉤 ELITE ENGINE ACTIVE ✘ 〕━━━━━━━━━━━┛*
 
 ${pluginMenuSections}`;
 
@@ -351,12 +359,12 @@ ${pluginMenuSections}`;
                         forwardingScore: 1,
                         isForwarded: false,
                         externalAdReply: {
-                            title: "Simple WA Base Bot",
-                            body: "Official Dev Account URL",
+                            title: "CRYSNOVA WA B⚉T",
+                            body: "CRYSNOVA AI URL",
                             mediaType: 3,
                             thumbnailUrl: config.thumbUrl,
-                            mediaUrl: "https://t.me/debrajzero",
-                            sourceUrl: "https://t.me/debrajzero",
+                            mediaUrl: "https://t.me/crysnovax",
+                            sourceUrl: "https://t.me/crysnovax",
                             showAdAttribution: true,
                             renderLargerThumbnail: false
                         }
@@ -368,7 +376,7 @@ ${pluginMenuSections}`;
             case 'reload': {
                 if (!isCreator) return; // Silent - don't respond
                 pluginLoader.reloadPlugins();
-                await reply(`✅ Plugins reloaded! Loaded ${pluginLoader.getPluginCount()} commands across ${pluginLoader.categories.size} categories.`);
+                await reply(`✓ Plugins reloaded! Loaded ${pluginLoader.getPluginCount()} commands across ${pluginLoader.categories.size} categories.`);
                 break;
             }
             
