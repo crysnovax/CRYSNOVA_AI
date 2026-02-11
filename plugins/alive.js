@@ -81,7 +81,7 @@ ${config.settings.footer}`;
                         title: `🤖 ${config.settings.title}`,
                         body: "System Online & Operational",
                         thumbnailUrl: config.thumbUrl,
-                        sourceUrl: "https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax?mode=gi_t",
+                        sourceUrl: "https://github.com/crysnovax/CRYSNOVA_AI",
                         mediaType: 1
                     }
                 }
