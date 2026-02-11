@@ -1,5 +1,5 @@
 {
-    "name": "WA-BASE-BOT",
+    "name": "✘⚉✘",
     "version": "1.2",
     "description": "A Simple Whatsapp Bot",
     "main": "index.js",
@@ -7,7 +7,7 @@
     "scripts": {
         "start": "node index.js"
     },
-    "author": "Debraj",
+    "author": "CRYSN⚉VA ✘",
     "license": "MIT",
     "dependencies": {
         "@adiwajshing/keyed-db": "^0.2.4",
