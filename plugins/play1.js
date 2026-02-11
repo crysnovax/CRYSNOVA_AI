@@ -29,7 +29,7 @@ module.exports = {
     }) => {
         try {
             if (!text) {
-                return await reply(`🎵 *Music Downloader*\n\n❌ Please provide a song name!\n📝 Example: ${prefix}play Lilly Alan Walker\n\n⚡ Powered by Queen Riam`);
+                return await reply(`🎵 *Music Downloader*\n\n✘ Please provide a song name!\n📝 Example: ${prefix}play Lilly Alan Walker\n\n𓄄> powered by CRYSNOVA AI`);
             }
 
             // Start processing reaction
@@ -55,7 +55,7 @@ module.exports = {
             // Send detailed info
             await sock.sendMessage(m.chat, {
                 image: { url: video.thumbnail },
-                caption: `🎵 *Track Details*\n\n📀 Title: ${video.title}\n⏱️ Duration: ${video.timestamp}\n👁️ Views: ${video.views}\n📅 Uploaded: ${video.ago}\n\n⬇️ Starting download...\n\n🎶 Powered by Queen Riam`
+                caption: `🎵 *Track Details*\n\n📀 Title: ${video.title}\n⏱️ Duration: ${video.timestamp}\n👁️ Views: ${video.views}\n📅 Uploaded: ${video.ago}\n\n⬇️ Starting download...\n\n🎶 > powered by CRYSNOVA AI`
             }, { quoted: m });
 
             // Downloading reaction
@@ -71,7 +71,7 @@ module.exports = {
                 await sock.sendMessage(m.chat, { 
                     react: { text: "❌", key: m.key } 
                 });
-                return await reply("🚫 *Download Failed*\n\n❌ Could not fetch audio file\n🔧 Please try again in a few minutes");
+                return await reply("✘ *Download Failed*\n\n✘ Could not fetch audio file\n🔧 Please try again in a few minutes");
             }
 
             // Success reaction
@@ -97,7 +97,7 @@ module.exports = {
 
             // Final success reaction
             await sock.sendMessage(m.chat, { 
-                react: { text: "✅", key: m.key } 
+                react: { text: "🚀", key: m.key } 
             });
 
         } catch (error) {
@@ -105,7 +105,7 @@ module.exports = {
             await sock.sendMessage(m.chat, { 
                 react: { text: "💥", key: m.key } 
             });
-            await reply("💥 *Error Occurred*\n\n❌ Something went wrong during download\n🔧 Please try again later");
+            await reply("💥 *Error Occurred*\n\n✘ Something went wrong during download\n🔧 Please try again later");
         }
     }
 };
