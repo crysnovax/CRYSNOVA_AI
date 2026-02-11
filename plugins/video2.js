@@ -29,7 +29,7 @@ module.exports = {
     }) => {
         try {
             if (!text) {
-                return await reply("❌ Please provide a video name or YouTube link!\nExample: `.video funny cats`");
+                return await reply("✘ Please provide a video name or YouTube link!\nExample: `.video funny cats`");
             }
 
             // Start processing reaction
@@ -64,7 +64,7 @@ module.exports = {
                 await sock.sendMessage(m.chat, { 
                     react: { text: "❌", key: m.key } 
                 });
-                return await reply("🚫 Invalid YouTube link provided!");
+                return await reply("⚉ Invalid YouTube link provided!");
             }
 
             // Downloading reaction
@@ -80,7 +80,7 @@ module.exports = {
                 await sock.sendMessage(m.chat, { 
                     react: { text: "❌", key: m.key } 
                 });
-                return await reply("🚫 Failed to fetch video from API. Try again later.");
+                return await reply("𓉤 Failed to fetch video from API. Try again later.");
             }
 
             const data = response.data;
@@ -92,7 +92,7 @@ module.exports = {
             // Send preview
             await sock.sendMessage(m.chat, {
                 image: { url: thumbnail },
-                caption: `🎬 *${title}*\n\n⬇️ Downloading video...\n🎥 Quality: 360p\n\n> Powered by Queen Aria`
+                caption: `🎬 *${title}*\n\n⬇️ Downloading video...\n🎥 Quality: 360p\n\n> Powered by CRYSNOVA`
             }, { quoted: m });
 
             // Send video
@@ -100,7 +100,7 @@ module.exports = {
                 video: { url: videoDownloadUrl },
                 mimetype: 'video/mp4',
                 fileName: filename,
-                caption: `🎬 *${title}*\n\n✅ Download Complete!\n🎥 Quality: 360p\n\n> 👑 Queen Aria Video Downloader`
+                caption: `🎬 *${title}*\n\n✓ Download Complete!\n🎥 Quality: 360p\n\n> CRYSNOVA Video Downloader`
             }, { quoted: m });
 
             // Success reaction
@@ -113,7 +113,7 @@ module.exports = {
             await sock.sendMessage(m.chat, { 
                 react: { text: "❌", key: m.key } 
             });
-            await reply("❌ Video download failed. Please try again later.");
+            await reply("❌ Video download failed. Please try again later. what else do you need from CRYSN⚉VA AI");
         }
     }
 };
