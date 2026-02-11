@@ -1,19 +1,10 @@
-const config = require("../settings/config");
-const os = require("os");
-
-function runtime(seconds) {
-    seconds = Number(seconds);
-    const d = Math.floor(seconds / (3600 * 24));
-    const h = Math.floor((seconds % (3600 * 24)) / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    return `${d}d ${h}h ${m}m ${s}s`;
-}
+const yts = require('yt-search');
+const axios = require('axios');
 
 module.exports = {
-    command: 'alive',
-    description: 'Check bot magical status',
-    category: 'general',
+    command: 'play',
+    description: 'Download high quality audio from YouTube',
+    category: 'downloader',
     execute: async (sock, m, {
         args,
         text,
@@ -33,66 +24,88 @@ module.exports = {
         isCreator,
         prefix,
         reply,
-        config: cmdConfig,
+        config,
         sender
     }) => {
         try {
-            // Magic sparkle reaction
+            if (!text) {
+                return await reply(`🎵 *Music Downloader*\n\n✘ Please provide a song name!\n📝 Example: ${prefix}play Lilly Alan Walker\n\n𓄄> powered by CRYSNOVA AI`);
+            }
+
+            // Start processing reaction
             await sock.sendMessage(m.chat, { 
-                react: { text: "🌟", key: m.key } 
+                react: { text: "⏳", key: m.key } 
             });
 
-            const userName = m.pushName || "Magical Being";
-            const botUptime = runtime(process.uptime());
-            const totalMemory = (os.totalmem() / (1024 * 1024 * 1024)).toFixed(2);
-            const usedMemory = (process.memoryUsage().heapUsed / (1024 * 1024)).toFixed(2);
-            const ping = Date.now() - m.messageTimestamp * 1000;
+            const { videos } = await yts(text);
+            if (!videos || videos.length === 0) {
+                await sock.sendMessage(m.chat, { 
+                    react: { text: "🔍", key: m.key } 
+                });
+                return await reply("🔍 *Search Results*\n\n⚠️ No songs found for your search query!\n💡 Try different keywords");
+            }
 
-            const aliveMessage = 
-`🧙‍♀️ *${config.settings.title} - The Magical Assistant* 🪄
+            const video = videos[0];
+            
+            // Searching reaction
+            await sock.sendMessage(m.chat, { 
+                react: { text: "🔍", key: m.key } 
+            });
 
-┌─✦ *ENCHANTED STATUS*
-│✨ *Sorcerer:* ${userName}
-│⏳ *Active Time:* ${botUptime}
-│💫 *Magic Power:* ${usedMemory}MB
-│⚡ *Spell Speed:* ${ping}ms
-│📚 *Library:* ${config.settings.author}
-│👑 *Archmage:* ${config.owner}
-└─✦────────────◉
-
-*"Magic flows through every command I cast"*
-
-🪄 *Channel Your Magic:*
-https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38
-
-${config.settings.footer}`;
-
+            // Send detailed info
             await sock.sendMessage(m.chat, {
-                image: { url: config.thumbUrl },
-                caption: aliveMessage,
+                image: { url: video.thumbnail },
+                caption: `🎵 *Track Details*\n\n📀 Title: ${video.title}\n⏱️ Duration: ${video.timestamp}\n👁️ Views: ${video.views}\n📅 Uploaded: ${video.ago}\n\n⬇️ Starting download...\n\n🎶 > powered by CRYSNOVA AI`
+            }, { quoted: m });
+
+            // Downloading reaction
+            await sock.sendMessage(m.chat, { 
+                react: { text: "⬇️", key: m.key } 
+            });
+
+            const apiUrl = `https://yt-dl.officialhectormanuel.workers.dev/?url=${encodeURIComponent(video.url)}`;
+            const response = await axios.get(apiUrl);
+            const data = response.data;
+
+            if (!data?.status || !data.audio) {
+                await sock.sendMessage(m.chat, { 
+                    react: { text: "❌", key: m.key } 
+                });
+                return await reply("✘ *Download Failed*\n\n✘ Could not fetch audio file\n🔧 Please try again in a few minutes");
+            }
+
+            // Success reaction
+            await sock.sendMessage(m.chat, { 
+                react: { text: "🎵", key: m.key } 
+            });
+
+            // Send audio with metadata
+            await sock.sendMessage(m.chat, {
+                audio: { url: data.audio },
+                mimetype: "audio/mpeg",
+                fileName: `${data.title || video.title}.mp3`.replace(/[<>:"/\\|?*]/g, ''),
                 contextInfo: {
-                    mentionedJid: [m.sender],
                     externalAdReply: {
-                        title: `🧙‍♀️ ${config.settings.title}`,
-                        body: config.settings.description,
-                        thumbnailUrl: config.thumbUrl,
-                        sourceUrl: "https://github.com/crysnovax/CRYSNOVA_AI",
-                        mediaType: 1
+                        title: "🎵 Download Complete!",
+                        body: `Click to play ${data.title || video.title}`,
+                        mediaType: 2,
+                        thumbnailUrl: video.thumbnail,
+                        sourceUrl: video.url
                     }
                 }
             }, { quoted: m });
 
-            // Magical success reaction
+            // Final success reaction
             await sock.sendMessage(m.chat, { 
-                react: { text: "🪄", key: m.key } 
+                react: { text: "🚀", key: m.key } 
             });
 
         } catch (error) {
-            console.error("Error in alive command:", error);
+            console.error('Error in play command:', error);
             await sock.sendMessage(m.chat, { 
                 react: { text: "💥", key: m.key } 
             });
-            await reply("💫 The magical connection was interrupted. Try again!");
+            await reply("💥 *Error Occurred*\n\n✘ Something went wrong during download\n🔧 Please try again later");
         }
     }
 };
