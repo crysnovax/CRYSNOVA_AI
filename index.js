@@ -516,7 +516,7 @@ async function handlePluginCommands(sock, m, store) {
             }
         }
     });
-sock.public = config().status.public;
+    sock.public = config().status.public;
     
     sock.sendText = async (jid, text, quoted = '', options) => {
         return sock.sendMessage(jid, {
