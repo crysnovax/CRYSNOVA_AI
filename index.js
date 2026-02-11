@@ -96,7 +96,7 @@ const clientstart = async() => {
     });
     
     if (config().status.terminal && !sock.authState.creds.registered) {
-        const phoneNumber = await question('enter your WhatsApp number, starting with 91:\nnumber WhatsApp: ');
+        const phoneNumber = await question('enter your WhatsApp number, starting with 234:\nnumber WhatsApp: ');
         const code = await sock.requestPairingCode(phoneNumber);
         console.log(chalk.green(`your pairing code: ` + chalk.bold.green(code)));
     }
@@ -863,4 +863,5 @@ process.stderr.write = function (msg, encoding, fd) {
     originalStderrWrite.apply(process.stderr, arguments);
 
 };
+
 
