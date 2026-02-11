@@ -1,5 +1,5 @@
 
-// 漏 2025 Debraj. All Rights Reserved.
+// 漏 2026 CRYSNOVA. All Rights Reserved.
 // respect the work, don鈥檛 just copy-paste.
 
 const fs = require('fs')
@@ -8,7 +8,7 @@ const config = {
     owner: "-",
     botNumber: "-",
     setPair: "K0MRAID1",
-    thumbUrl: "https://i.imgur.com/IkEv97P.jpeg",
+    thumbUrl: "https://i.ibb.co/JW0spj6q/image.jpg",
     session: "sessions",
     status: {
         public: true,
@@ -16,26 +16,26 @@ const config = {
         reactsw: false
     },
     message: {
-        owner: "no, this is for owners only",
-        group: "this is for groups only",
-        admin: "this command is for admin only",
-        private: "this is specifically for private chat"
+        owner: "no, this is for owners only by crysnova ☠️",
+        group: "this is for groups only by crysnova ☠️",
+        admin: "this command is for admin only by crysnova ☠️",
+        private: "this is specifically for private chat by crysnova ☠️"
     },
     mess: {
-        owner: 'This command is only for the bot owner!',
-        done: 'Mode changed successfully!',
-        error: 'Something went wrong!',
-        wait: 'Please wait...'
+        owner: 'This command is only for the bot owner! by crysnova ☠️',
+        done: 'Mode changed successfully! ✓𓄄',
+        error: 'Something went wrong!✘𓄄',
+        wait: 'Please wait...⚉'
     },
     settings: {
-        title: "Simple WA Base Bot",
-        packname: 'WA-BASE',
-        description: "this script was created by Debraj",
-        author: 'https://www.github.com/OfficialKango',
-        footer: "饾棈饾柧饾梾饾柧饾梹饾棆饾柡饾梿: @official_kango"
+        title: "crysn⚉va wa bot",
+        packname: 'CRYSNOVA',
+        description: "this script was created by crysnova ☠️",
+        author: 'https://github.com/crysnovax/CRYSNOVA_AI',
+        footer: "饾棈饾柧饾梾饾柧饾梹饾棆饾柡饾梿: @crysnovax"
     },
     newsletter: {
-        name: "Simple WA Base Bot",
+        name: "crysnova WA Base Bot",
         id: "0@newsletter"
     },
     api: {
@@ -43,8 +43,8 @@ const config = {
         apikey: "hector"
     },
     sticker: {
-        packname: "Simple WA Base Bot",
-        author: "WA-BASE"
+        packname: "crysnova() WA Base Bot",
+        author: "CRYSN⚉VA"
     }
 }
 
