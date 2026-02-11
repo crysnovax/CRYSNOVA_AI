@@ -1,4 +1,4 @@
-            }console.clear();
+console.clear();
 const config = () => require('./settings/config');
 process.on("uncaughtException", console.error);
 
@@ -863,5 +863,6 @@ process.stderr.write = function (msg, encoding, fd) {
     originalStderrWrite.apply(process.stderr, arguments);
 
 };
+
 
 
