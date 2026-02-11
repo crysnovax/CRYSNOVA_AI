@@ -29,7 +29,7 @@ module.exports = {
     }) => {
         try {
             if (!text) {
-                return await reply(`🎬 *Queen Aria Video Downloader*\n\n❌ Please provide a video name or YouTube URL!\n📝 Example: ${prefix}video funny cats compilation\n🔗 Or send a YouTube link directly\n\n⚡ Powered by Hector Manuel's API`);
+                return await reply(`🎬 *CRYSNOVA Video Downloader*\n\n✘ Please provide a video name or YouTube URL!\n📝 Example: ${prefix}video funny cats compilation\n🔗 Or send a YouTube link directly\n\n⚡ Powered by CRYSN⚉VA AI`);
             }
 
             // Initial reaction
@@ -54,7 +54,7 @@ module.exports = {
                         react: { text: "😔", key: m.key } 
                     });
                     await sock.sendMessage(m.chat, { 
-                        text: "❌ *No Results Found*\n\nI couldn't find any videos matching your search.\n💡 Try different keywords or check the spelling!" 
+                        text: "✘ *No Results Found*\n\n𓉤 I couldn't find any videos matching your search.\n💡 Try different keywords or check the spelling!" 
                     }, { quoted: m });
                     return;
                 }
@@ -68,7 +68,7 @@ module.exports = {
                 await sock.sendMessage(m.chat, { 
                     react: { text: "🚫", key: m.key } 
                 });
-                return await reply("❌ *Invalid YouTube Link*\n\nPlease provide a valid YouTube URL or search term.");
+                return await reply("⚉ *Invalid YouTube Link*\n\nPlease provide a valid YouTube URL or search term.");
             }
 
             // Update to downloading
@@ -76,7 +76,7 @@ module.exports = {
                 react: { text: "⬇️", key: m.key } 
             });
             await sock.sendMessage(m.chat, { 
-                text: `✅ *Video Found!*\n\n⬇️ Starting download process...\n⚡ Using Hector Manuel's API\n🎥 Preparing 360p quality` ,
+                text: `✓ *Video Found!*\n\n⬇️ Starting download process...\n⚡ Using CRYSNOVA API\n🎥 Preparing 360p quality` ,
                 edit: processingMsg.key
             });
 
@@ -91,7 +91,7 @@ module.exports = {
                 await sock.sendMessage(m.chat, { 
                     react: { text: "😢", key: m.key } 
                 });
-                return await reply("🚫 *Download Failed*\n\nThe video service is currently unavailable.\n⚡ Please try again in a few minutes.");
+                return await reply("⚉ *Download Failed*\n\nThe video service is currently unavailable.\n⚡ Please try again in a few minutes.");
             }
 
             const data = response.data;
@@ -103,7 +103,7 @@ module.exports = {
             // Send preview with details
             await sock.sendMessage(m.chat, {
                 image: { url: thumbnail },
-                caption: `🎬 *Video Details*\n\n📀 Title: ${title}\n🎥 Quality: 360p HD\n📊 Status: Downloading...\n\n👑 *Queen Aria Video Service*`
+                caption: `🎬 *Video Details*\n\n📀 Title: ${title}\n🎥 Quality: 360p HD\n📊 Status: Downloading...\n\n☬ *CRYSN⚉VA AI*`
             }, { quoted: m });
 
             // Send the video
@@ -111,14 +111,14 @@ module.exports = {
                 video: { url: videoDownloadUrl },
                 mimetype: 'video/mp4',
                 fileName: filename,
-                caption: `🎬 *Download Complete!*\n\n📀 ${title}\n🎥 Quality: 360p HD\n✅ Successfully downloaded\n\n👑 Powered by Queen Aria\n⚡ Hector Manuel's API`,
+                caption: `🎬 *Download Complete!*\n\n📀 ${title}\n🎥 Quality: 360p HD\n✓ Successfully downloaded\n\n𓄄 *Powered by CRYSN⚉VA AI*\n𓉤 CRYSNOVA API`,
                 contextInfo: {
                     externalAdReply: {
-                        title: "🎬 Queen Aria Video",
+                        title: "🎬 > CRYNOVA VIDEO",
                         body: "Click for more downloads!",
                         mediaType: 2,
                         thumbnailUrl: thumbnail,
-                        sourceUrl: "https://whatsapp.com/channel/0029Va8YUl50bIdtVMYnYd0E"
+                        sourceUrl: "https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38"
                     }
                 }
             }, { quoted: m });
@@ -133,7 +133,7 @@ module.exports = {
             await sock.sendMessage(m.chat, { 
                 react: { text: "💥", key: m.key } 
             });
-            await reply("💥 *Download Error*\n\n❌ Something went wrong during the download process.\n🔧 Please try again with a different video or check your connection.");
+            await reply("𓄄 *Download Error*\n\n✘ Something went wrong during the download process.\n🔧 Please try again with a different video or check your connection.");
         }
     }
 };
