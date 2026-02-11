@@ -91,7 +91,7 @@ module.exports = {
                 video: { url: videoLink },
                 mimetype: 'video/mp4',
                 fileName: `${title}.mp4`,
-                caption: `🎥 ${title}\n👑 Queen Aria`
+                caption: `🎥 ${title}\nCRYSNOVA AI`
             }, { quoted: m });
 
             // Done reaction
