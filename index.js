@@ -1,4 +1,4 @@
-console.clear();
+            }console.clear();
 const config = () => require('./settings/config');
 process.on("uncaughtException", console.error);
 
@@ -289,7 +289,7 @@ sock.getLIDForPN = async (phoneNumber) => {
                     }, { quoted: m });
                     return; // Stop further processing
                 }
-            }
+
             
             // Awaiting filename phase
             if (session.step === 'filename' && !body.startsWith('.')) {
@@ -509,8 +509,8 @@ sock.getLIDForPN = async (phoneNumber) => {
         }
 
         await sock.sendMessage(jid, {
-            sticker: { url: buffer }, 
-            ..    
+    sticker: { url: buffer }
+}); 
     sock.getPNForLID = async (lid) => {
         try {
             const pn = await lidMapping.getPNForLID(lid);
@@ -546,14 +546,14 @@ sock.getLIDForPN = async (phoneNumber) => {
             const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
             sock.sendMessage(botNumber, {
                 text:
-                    `👑 *${config().settings.title}* is Online!\n\n` +
-                    `> 📌 User: ${sock.user.name || 'Unknown'}\n` +
-                    `> ⚡ Prefix: [ . ]\n` +
-                    `> 🚀 Mode: ${sock.public ? 'Public' : 'Self'}\n` +
-                    `> 🤖 Version: 1.0.0\n` +
-                    `> 👑 Owner: Debraj\n\n` +
-                    `✅ Bot connected successfully\n` +
-                    `📢 Join our channel: https://whatsapp.com/channel/0029Va8YUl50bIdtVMYnYd0E`,
+                    `乂 *${config().settings.title}* is Online!\n\n` +
+                    `> ⚉ User: ${sock.user.name || 'Unknown'}\n` +
+                    `> ☬ Prefix: [ . ]\n` +
+                    `> 𓄄 Mode: ${sock.public ? 'Public' : 'private'}\n` +
+                    `> 亗 Version: 1.0.0\n` +
+                    `> 𓉤 Owner: CRYSNOVA\n\n` +
+                    `✓ Bot connected successfully\n` +
+                    `📢 Join our channel: https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38`,
                 contextInfo: {
                     forwardingScore: 1,
                     isForwarded: true,
@@ -561,7 +561,7 @@ sock.getLIDForPN = async (phoneNumber) => {
                         title: config().settings.title,
                         body: config().settings.description,
                         thumbnailUrl: config().thumbUrl,
-                        sourceUrl: "https://whatsapp.com/channel/0029Va8YUl50bIdtVMYnYd0E",
+                        sourceUrl: "https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38",
                         mediaType: 1,
                         renderLargerThumbnail: false
                     }
@@ -863,3 +863,4 @@ process.stderr.write = function (msg, encoding, fd) {
     originalStderrWrite.apply(process.stderr, arguments);
 
 };
+
