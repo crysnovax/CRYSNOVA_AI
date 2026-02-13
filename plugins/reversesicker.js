@@ -1,56 +1,71 @@
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
-const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
+const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+const sharp = require('sharp');
+const { exec } = require('child_process');
+const util = require('util');
+const execPromise = util.promisify(exec);
 
 module.exports = {
   command: 'r',
-  alias: ['sticker2img', 'st2img'],
-  description: 'Convert replied sticker back to image',
+  alias: ['unsticker', 'back'],
+  description: 'Convert sticker back to image or video',
   category: 'media',
 
   execute: async (sock, m, { reply }) => {
     try {
       const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-      if (!quoted) return reply('Reply to a sticker with .r');
+      if (!quoted) return reply('Reply to a sticker with .r to convert back');
 
       const type = Object.keys(quoted)[0];
-      if (type !== 'stickerMessage') return reply('Only stickers supported for .r');
+      if (!['stickerMessage'].includes(type)) {
+        return reply('Only stickers can be reverted (.r)');
+      }
 
-      // Reactions as requested (nice touch!)
-      const emojis = ['➕', '📦', '👌', '🚀', '✅'];
-      for (const emoji of emojis) {
+      // Reactions
+      for (const emoji of ['➕','📦','👌','🚀','✅']) {
         await sock.sendMessage(m.chat, { react: { text: emoji, key: m.key } });
       }
 
-      reply('Extracting image from sticker...');
+      // Ensure tmp folder exists
+      const tmpDir = path.join(__dirname, '../tmp');
+      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 
-      // Download sticker buffer
+      // Download sticker
       let buffer = Buffer.alloc(0);
       const stream = await downloadContentFromMessage(quoted[type], 'sticker');
-      for await (const chunk of stream) {
-        buffer = Buffer.concat([buffer, chunk]);
+      for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+      if (buffer.length === 0) return reply('Sticker data empty');
+
+      const isAnimated = quoted[type].isAnimated || false;
+      const tmpFile = path.join(tmpDir, `sticker_${Date.now()}`);
+      let outputFile = '';
+
+      if (isAnimated) {
+        fs.writeFileSync(tmpFile + '.webp', buffer);
+        outputFile = tmpFile + '.mp4';
+        await execPromise(`ffmpeg -y -i "${tmpFile}.webp" -movflags faststart -pix_fmt yuv420p -vf "scale=512:512:flags=lanczos" -t 5 "${outputFile}"`);
+      } else {
+        const webpBuffer = await sharp(buffer)
+          .resize(512, 512, { fit: 'contain', background: { r:0, g:0, b:0, alpha:0 } })
+          .png()
+          .toBuffer();
+        outputFile = tmpFile + '.png';
+        fs.writeFileSync(outputFile, webpBuffer);
       }
 
-      if (buffer.length === 0) {
-        return reply('Sticker buffer is empty — try another sticker');
-      }
+      await sock.sendMessage(m.chat, { 
+        [isAnimated ? 'video' : 'image']: { url: outputFile }, 
+        caption: '✅ Reverted sticker',
+        mimetype: isAnimated ? 'video/mp4' : 'image/png' 
+      }, { quoted: m });
 
-      // Convert WebP sticker → PNG with smart cropping + white background
-      const output = await sharp(buffer)
-        .trim()                                 // remove transparent padding
-        .resize({ width: 1024, height: 1024, fit: 'inside', withoutEnlargement: true }) // upscale if small, no stretch
-        .flatten({ background: { r: 255, g: 255, b: 255 } }) // white background (change to { r:0,g:0,b:0,a:0 } for transparent)
-        .png({ quality: 95 })                   // high quality PNG
-        .toBuffer();
-
-      await sock.sendMessage(m.chat, { image: output, caption: 'Sticker → Image' }, { quoted: m });
-
-      reply('Done! Image extracted from sticker ✅');
+      fs.unlinkSync(outputFile);
+      if (isAnimated) fs.unlinkSync(tmpFile + '.webp');
 
     } catch (err) {
-      console.error('st2img error:', err.message, err.stack?.substring(0, 200));
-      reply(`Error: ${err.message || 'Unknown error'}\nTry a different sticker.`);
+      console.error('Unsticker error:', err.message, err.stack?.substring(0, 200));
+      reply(`Error: ${err.message || 'Unknown'}\nTry a different sticker`);
     }
   }
 };
