@@ -8,7 +8,7 @@ const config = {
     owner: "-",
     botNumber: "-",
     setPair: "K0MRAID1",
-    thumbUrl: "https://i.ibb.co/xPFSshv/Meta-AI-20260205-101725.png",
+    thumbUrl: "https://i.ibb.co/pBrzZDQj/20260212-111751.jpg",
     session: "sessions",
     status: {
         public: true,
