@@ -1,15 +1,15 @@
 const { exec } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 
 module.exports = {
   command: 'update',
-  description: 'Update bot from GitHub safely, restore packages, and auto-restart',
+  description: 'Premium update: bootstrap git, restore packages & restart bot',
   category: 'owner',
   owner: true,
 
   execute: async (sock, m, { reply }) => {
     const botFolder = path.resolve(__dirname, '..');
-    const token = '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'; // your GitHub token
     const repo = 'https://github.com/crysnovax/CRYSNOVA-AI.git';
 
     const run = (cmd) =>
@@ -21,29 +21,42 @@ module.exports = {
       });
 
     try {
-      await reply('⚡ Fetching latest updates from GitHub...');
+      await reply('⚡ Starting premium update...');
+
+      // Step 0: Git bootstrap if missing
+      if (!fs.existsSync(path.join(botFolder, '.git'))) {
+        await reply('🛠 Git not initialized. Bootstrapping repository...');
+        await run('git init');
+        await run(`git remote add origin ${repo}`);
+        await run('git fetch origin');
+        await run('git checkout -b main origin/main || git checkout -b master origin/master');
+        await reply('✅ Git repository initialized successfully!');
+      }
 
       // Step 1: Set Git identity
       await run('git config user.name "crysnovax"');
       await run('git config user.email "carayasata1la@gmail.com"');
 
-      // Step 2: Detect current branch
-      const branch = await run('git rev-parse --abbrev-ref HEAD');
-      if (!branch) throw new Error('Unable to detect current branch');
+      // Step 2: Detect remote default branch dynamically
+      let branch = await run('git symbolic-ref refs/remotes/origin/HEAD | sed "s@refs/remotes/origin/@@g"').catch(() => 'main');
+      branch = branch.trim() || 'main';
+      await reply(`🌿 Detected branch: ${branch}`);
 
-      // Step 3: Fetch and reset to remote
-      await run(`git fetch ${repo} ${branch}`);
+      // Step 3: Fetch & reset
+      await reply('📥 Fetching latest commits...');
+      await run(`git fetch origin ${branch}`);
       await run(`git reset --hard origin/${branch}`);
-      await reply(`🌿 Bot updated to latest commit on branch ${branch}`);
+      await reply('✅ Bot updated to latest commit!');
 
       // Step 4: Restore packages
-      await reply('📦 Installing/updating npm packages...');
+      await reply('📦 Restoring npm packages...');
       await run('npm install');
       await reply('🎉 Packages restored successfully!');
 
-      // Step 5: Auto-restart bot
-      await reply('🔄 Restarting bot now...');
-      await run('pm2 restart all || node index.js'); // works if using pm2 or fallback to node
+      // Step 5: Auto-restart
+      await reply('🔄 Restarting bot...');
+      await run('pm2 restart all || node index.js');
+      
     } catch (err) {
       await reply('❌ Update failed:\n' + err);
     }
