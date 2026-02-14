@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
   command: 'update',
-  description: 'Update bot from GitHub safely with automatic package restore',
+  description: 'Update bot from GitHub safely, restore packages, and auto-restart',
   category: 'owner',
   owner: true,
 
@@ -27,22 +27,23 @@ module.exports = {
       await run('git config user.name "crysnovax"');
       await run('git config user.email "carayasata1la@gmail.com"');
 
-      // Step 2: Detect current branch dynamically
+      // Step 2: Detect current branch
       const branch = await run('git rev-parse --abbrev-ref HEAD');
       if (!branch) throw new Error('Unable to detect current branch');
 
       // Step 3: Fetch and reset to remote
       await run(`git fetch ${repo} ${branch}`);
       await run(`git reset --hard origin/${branch}`);
-      await reply(`🌿 Updated bot to latest commit on branch ${branch}`);
+      await reply(`🌿 Bot updated to latest commit on branch ${branch}`);
 
       // Step 4: Restore packages
-      await reply('📦 Restoring npm packages...');
+      await reply('📦 Installing/updating npm packages...');
       await run('npm install');
       await reply('🎉 Packages restored successfully!');
 
-      // Optional: restart prompt
-      await reply('🔄 Update complete! You may now restart the bot.');
+      // Step 5: Auto-restart bot
+      await reply('🔄 Restarting bot now...');
+      await run('pm2 restart all || node index.js'); // works if using pm2 or fallback to node
     } catch (err) {
       await reply('❌ Update failed:\n' + err);
     }
