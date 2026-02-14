@@ -98,7 +98,61 @@ const clientstart = async() => {
     }
     
     store.bind(sock.ev);
-    
+
+// ===== VV REACTION SYSTEM START =====
+global.vvEmoji = null;
+global.vvOwner = null;
+
+sock.ev.on('messages.reaction', async (updates) => {
+    try {
+        if (!global.vvEmoji || !global.vvOwner) return;
+
+        const { key, reaction } = updates[0];
+        if (!reaction?.text) return;
+        if (reaction.text !== global.vvEmoji) return;
+
+        const reactor = reaction.senderId || reaction.participant;
+        if (reactor !== global.vvOwner) return;
+
+        const msg = await store.loadMessage(key.remoteJid, key.id);
+        if (!msg?.message) return;
+
+        let content = msg.message.ephemeralMessage
+            ? msg.message.ephemeralMessage.message
+            : msg.message;
+
+        const type = Object.keys(content)[0];
+        if (!['imageMessage','videoMessage','stickerMessage'].includes(type)) return;
+
+        const stream = await downloadContentFromMessage(
+            content[type],
+            type.replace('Message','').toLowerCase()
+        );
+
+        let buffer = Buffer.alloc(0);
+        for await (const chunk of stream) {
+            buffer = Buffer.concat([buffer, chunk]);
+        }
+
+        await sock.sendMessage(global.vvOwner, {
+            [type === 'videoMessage'
+                ? 'video'
+                : type === 'imageMessage'
+                ? 'image'
+                : 'sticker']: buffer,
+            caption: '📥 Private view-once unlocked'
+        });
+
+        // delete reaction after sending
+        await sock.sendMessage(key.remoteJid, {
+            react: { text: '', key: key }
+        });
+
+    } catch (err) {
+        console.log('VV Reaction Error:', err.message);
+    }
+});
+// ===== VV REACTION SYSTEM END =====
     const lidMapping = sock.signalRepository.lidMapping;
     
     sock.getLIDForPN = async (phoneNumber) => {
@@ -153,7 +207,7 @@ const clientstart = async() => {
                     `> ✪ Version: 1.0.0\n` +
                     `> 𓉤 Owner: CRYSNOVA\n\n` +
                     `✓ Bot connected successfully\n` +
-                    `📢 Join our channel: https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38`,
+                    `📢 Join our channel🚀: https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38`,
                 contextInfo: {
                     forwardingScore: 1,
                     isForwarded: true,
@@ -197,36 +251,123 @@ const clientstart = async() => {
         });
     });
 
-    sock.ev.on('messages.upsert', async chatUpdate => {
-        try {
-            const mek = chatUpdate.messages[0];
-            if (!mek.message) return;
-            
-            mek.message = Object.keys(mek.message)[0] === 'ephemeralMessage' 
-                ? mek.message.ephemeralMessage.message 
-                : mek.message;
-            
-            if (config().status.reactsw && mek.key && mek.key.remoteJid === 'status@broadcast') {
-                let emoji = ['😘', '😭', '😂', '😹', '😍', '😋', '🙏', '😜', '😢', '😠', '🤫', '😎'];
-                let sigma = emoji[Math.floor(Math.random() * emoji.length)];
-                await sock.readMessages([mek.key]);
-                await sock.sendMessage('status@broadcast', { 
-                    react: { 
-                        text: sigma, 
-                        key: mek.key 
-                    }
-                }, { statusJidList: [mek.key.participant] });
-            }
-            
-            if (!sock.public && !mek.key.fromMe && chatUpdate.type === 'notify') return;
-            if (mek.key.id.startsWith('BASE-') && mek.key.id.length === 12) return;
-            
-            const m = await smsg(sock, mek, store);
-            require("./message")(sock, m, chatUpdate, store);
-        } catch (err) {
-            console.log(err);
+    const fs = require('fs');
+const path = require('path');
+const vvEmojiFile = path.join(__dirname, './plugins/vv-emoji.json');
+
+// Ensure vv-emoji.json exists
+if (!fs.existsSync(vvEmojiFile)) fs.writeFileSync(vvEmojiFile, JSON.stringify({}));
+
+sock.ev.on('messages.upsert', async chatUpdate => {
+    try {
+        const mek = chatUpdate.messages[0];
+        if (!mek.message) return;
+
+        // Normalize ephemeral message
+        if (Object.keys(mek.message)[0] === 'ephemeralMessage') {
+            mek.message = mek.message.ephemeralMessage.message;
         }
-    });
+       // await require('./plugins/group-guardian.js').listener(sock, m);
+        // index.js message handler
+const m = await smsg(sock, mek, store);
+await require('./plugins/group-guardian.js').listener(sock, m);
+// Call guardian listener once
+//require('./plugins/group-guardian.js').listener(sock, m);
+
+// Then call your command handler/plugins
+//require('./message')(sock, m, chatUpdate, store);
+       
+      //  const m = await smsg(sock, mek, store);
+        // ===== Group Guardian Plugin =====
+if (!global.guardian) global.guardian = { settings: {}, warnings: {}, spam: {} };
+const guardian = global.guardian;
+
+// Only run in group chats
+if (m.isGroup) {
+  const chatId = m.chat;
+  const userId = m.sender;
+
+  // Anti-Link
+  if (guardian.settings[chatId]?.antilink) {
+    if (m.text && m.text.match(/https?:\/\/|chat\.whatsapp\.com/gi)) {
+      try {
+        await sock.sendMessage(chatId, { delete: m.key }).catch(()=>{});
+
+        guardian.warnings[userId] = (guardian.warnings[userId] || 0) + 1;
+
+        await sock.sendMessage(chatId, {
+          text: `⚠ Warning ${guardian.warnings[userId]}/3 for posting links!`,
+          mentions: [userId]
+        });
+
+        if (guardian.warnings[userId] >= 3) {
+          await sock.groupParticipantsUpdate(chatId, [userId], 'remove');
+          guardian.warnings[userId] = 0; // reset after removal
+        }
+      } catch (err) { console.log('Guardian Anti-Link error:', err.message); }
+    }
+  }
+
+  // Anti-Spam (5 messages in 5 seconds)
+  if (guardian.settings[chatId]?.antispam) {
+    const now = Date.now();
+    if (!guardian.spam[userId]) guardian.spam[userId] = [];
+
+    guardian.spam[userId].push(now);
+    guardian.spam[userId] = guardian.spam[userId].filter(t => now - t < 5000);
+
+    if (guardian.spam[userId].length >= 5) {
+      try {
+        await sock.groupParticipantsUpdate(chatId, [userId], 'remove');
+        guardian.spam[userId] = [];
+        guardian.warnings[userId] = 0; // reset warnings too
+        await sock.sendMessage(chatId, { text: `❌ ${userId.split('@')[0]} removed for spamming!` });
+      } catch (err) { console.log('Guardian Anti-Spam error:', err.message); }
+    }
+  }
+}
+        // --- Run your plugin handler first (keeps all commands working) ---
+        require("./message")(sock, m, chatUpdate, store);
+
+        // --- Premium .vv emoji reaction handler ---
+        const vvEmojiData = JSON.parse(fs.readFileSync(vvEmojiFile));
+        const vvEmoji = vvEmojiData[m.sender] || null;
+
+        // Only proceed if the message is a reaction
+        if (mek.message?.reactionMessage && vvEmoji) {
+            const reactedEmoji = mek.message.reactionMessage.text;
+            if (reactedEmoji === vvEmoji) {
+                // Make sure it’s a view-once type
+                const quoted = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+                if (quoted) {
+                    const type = Object.keys(quoted)[0];
+                    if (['imageMessage', 'videoMessage', 'stickerMessage'].includes(type)) {
+                        // Download media
+                        const buffer = await sock.downloadMediaMessage(
+                            { message: quoted[type] },
+                            type.replace('Message','').toLowerCase()
+                        );
+
+                        // Send media to owner DM
+                        await sock.sendMessage(
+                            config().settings.ownerJid, 
+                            { 
+                                [type === 'videoMessage' ? 'video' : type === 'imageMessage' ? 'image' : 'sticker']: buffer,
+                                caption: `⚡ Premium .vv from ${m.sender}`
+                            }
+                        );
+
+                        // Delete reaction to keep privacy
+                        await sock.sendMessage(mek.key.remoteJid, { react: { text: '✅', key: mek.key } });
+                    }
+                }
+            }
+        }
+
+    } catch (err) {
+        console.log(err);
+    }
+});
 
     sock.decodeJid = (jid) => {
         if (!jid) return jid;
@@ -405,7 +546,7 @@ const clientstart = async() => {
         let m;
         try {
             m = await sock.sendMessage(jid, message, {
-                ...opt,
+                ...opt
                 ...options
             });
         } catch (e) {
@@ -429,7 +570,6 @@ const clientstart = async() => {
 };
 
 clientstart();
-
 const ignoredErrors = [
     'Socket connection timeout',
     'EKEYTYPE',
@@ -461,4 +601,4 @@ const originalStderrWrite = process.stderr.write;
 process.stderr.write = function (msg, encoding, fd) {
     if (typeof msg === 'string' && ignoredErrors.some(e => msg.includes(e))) return;
     originalStderrWrite.apply(process.stderr, arguments);
-};
+};  
