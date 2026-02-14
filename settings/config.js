@@ -11,7 +11,7 @@ const config = {
     thumbUrl: "https://i.ibb.co/pBrzZDQj/20260212-111751.jpg",
     session: "sessions",
     status: {
-        public: true,
+        public: false,
         terminal: true,
         reactsw: false
     },
