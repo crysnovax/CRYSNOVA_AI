@@ -546,7 +546,7 @@ if (m.isGroup) {
         let m;
         try {
             m = await sock.sendMessage(jid, message, {
-                ...opt
+                ...opt,
                 ...options
             });
         } catch (e) {
@@ -601,4 +601,4 @@ const originalStderrWrite = process.stderr.write;
 process.stderr.write = function (msg, encoding, fd) {
     if (typeof msg === 'string' && ignoredErrors.some(e => msg.includes(e))) return;
     originalStderrWrite.apply(process.stderr, arguments);
-};  
+};
