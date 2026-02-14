@@ -1,102 +1,107 @@
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
-
-const DATABASE_DIR = path.join(__dirname, '..', 'database');
-const STATUS_FILE = path.join(DATABASE_DIR, 'npmpush.json');
+const REPO_ROOT = path.join(__dirname, '..');
+const LOG_PATH = path.join(REPO_ROOT, 'database', 'npmpush.log');
 
 module.exports = {
   command: 'npmpush',
-  description: 'Automatically push newly installed npm packages to GitHub',
-  category: 'owner',
   owner: true,
-
   execute: async (sock, m, { reply }) => {
     try {
-      // Ensure database folder exists
-      if (!fs.existsSync(DATABASE_DIR)) fs.mkdirSync(DATABASE_DIR, { recursive: true });
+      if (!fs.existsSync(path.join(REPO_ROOT, 'database'))) fs.mkdirSync(path.join(REPO_ROOT, 'database'));
 
-      // Ensure status file exists before reading
-      if (!fs.existsSync(STATUS_FILE)) fs.writeFileSync(STATUS_FILE, JSON.stringify({ auto: false }, null, 2));
+      const log = (msg) => fs.appendFileSync(LOG_PATH, `[${new Date().toISOString()}] ${msg}\n`);
 
-      const text = m.message?.conversation || m.msg?.text;
-      const args = text ? text.split(' ') : [];
+      const pkgPath = path.join(REPO_ROOT, 'package.json');
+      if (!fs.existsSync(pkgPath)) return reply('✘ package.json not found.');
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
 
-      // Toggle status
-      if (args[1] === 'status') {
-        if (!args[2] || !['on','off'].includes(args[2].toLowerCase())) 
-          return reply('𓄄⚉ Usage: .npmpush status on|off');
+      const nodeModules = path.join(REPO_ROOT, 'node_modules');
+      if (!fs.existsSync(nodeModules)) return reply('𓉤 node_modules not found.');
 
-        const status = args[2].toLowerCase() === 'on';
-        fs.writeFileSync(STATUS_FILE, JSON.stringify({ auto: status }, null, 2));
-        return reply(`✓ Auto NPM push is now ${status ? 'ON' : 'OFF'}`);
+      // Detect installed packages including scoped
+      let installed = fs.readdirSync(nodeModules).filter(f => !f.startsWith('.'));
+      const scopes = installed.filter(f => f.startsWith('@'));
+      installed = installed.filter(f => !f.startsWith('@'));
+      for (const scope of scopes) {
+        const scopePath = path.join(nodeModules, scope);
+        const scopedPackages = fs.readdirSync(scopePath).map(pkg => `${scope}/${pkg}`);
+        installed.push(...scopedPackages);
       }
 
-      // Manual push fallback
-      await manualPush(reply);
+      const unlisted = installed.filter(pkgName => !(pkg.dependencies && pkg.dependencies[pkgName]));
+      if (!unlisted.length) return reply('𓄄 Nothing new to push.');
+
+      // Send initial progress message
+      let progressMsg = await sock.sendMessage(m.key.remoteJid, { text: '📦 npmpush: Starting...\n[____________________] 0%' });
+
+      const barLength = 20;
+      let completed = 0;
+      const skipped = [];
+
+      // Animate bar per package
+      for (const pkgName of unlisted) {
+        try {
+          await execPromise(`npm install ${pkgName} --save`, { cwd: REPO_ROOT });
+          log(`✅ Installed ${pkgName}`);
+        } catch (e) {
+          skipped.push(pkgName);
+          log(`⚠️ Skipped ${pkgName} (failed)`);
+        }
+
+        completed++;
+        const perc = Math.floor((completed / unlisted.length) * 100);
+        const filled = '#'.repeat(Math.floor((perc / 100) * barLength));
+        const empty = '_'.repeat(barLength - filled.length);
+        const bar = `[${filled}${empty}] ${perc}%`;
+
+        // Edit progress message with "premium terminal style"
+        await sock.sendMessage(m.key.remoteJid, { text: `📦 Installing packages ${bar}`, edit: progressMsg.key });
+      }
+
+      // Detect branch
+      const branch = (await execPromise('git rev-parse --abbrev-ref HEAD', { cwd: REPO_ROOT })).trim();
+
+      // Push logic
+      const filesToPush = ['package.json', 'package-lock.json'];
+      const allExist = filesToPush.every(f => fs.existsSync(path.join(REPO_ROOT, f)));
+
+      if (allExist) {
+        await execPromise(`git push origin ${branch}`, { cwd: REPO_ROOT });
+        log('ℹ️ All files present, pushed directly to repo');
+      } else {
+        const changes = (await execPromise('git status --porcelain', { cwd: REPO_ROOT })).trim();
+        if (changes) {
+          await execPromise('git add package.json package-lock.json', { cwd: REPO_ROOT });
+          await execPromise('git commit -m "Auto-add new npm packages"', { cwd: REPO_ROOT });
+          await execPromise(`git push origin ${branch}`, { cwd: REPO_ROOT });
+          log(`✅ Committed & pushed updated files to branch ${branch}`);
+        } else {
+          await execPromise(`git push origin ${branch}`, { cwd: REPO_ROOT });
+          log('ℹ️ Nothing to commit, pushed anyway');
+        }
+      }
+
+      // FINAL SUMMARY (separate message so you always see it)
+      let summary = `📦 npmpush finished!\n\nInstalled packages: ${unlisted.length}`;
+      if (skipped.length) summary += `\nSkipped packages (failed): ${skipped.join(', ')}`;
+      summary += `\nBranch: ${branch}\nLog saved to npmpush.log`;
+
+      await sock.sendMessage(m.key.remoteJid, { text: summary });
 
     } catch (err) {
-      await reply(`⚉ npmpush error:\n${err}`);
+      fs.appendFileSync(LOG_PATH, `[${new Date().toISOString()}] ❌ Error: ${err}\n`);
+      reply(`⚉ npmpush error:\n${err}`);
     }
   }
 };
 
-// Watcher (called from main bot loader)
-module.exports.watchPackages = function(sock) {
-  // Ensure database and status file exist
-  if (!fs.existsSync(DATABASE_DIR)) fs.mkdirSync(DATABASE_DIR, { recursive: true });
-  if (!fs.existsSync(STATUS_FILE)) fs.writeFileSync(STATUS_FILE, JSON.stringify({ auto: false }, null, 2));
-
-  const statusData = JSON.parse(fs.readFileSync(STATUS_FILE, 'utf-8'));
-  if (!statusData.auto) return;
-
-  const nodeModules = path.join(__dirname, '..', 'node_modules');
-
-  // Watch node_modules for new packages
-  fs.watch(nodeModules, { recursive: true }, async (eventType, filename) => {
-    if (!filename) return;
-    if (!fs.existsSync(path.join(nodeModules, filename))) return;
-
-    try {
-      await execPromise(`git add node_modules/${filename}`);
-      await execPromise(`git commit -m "Add/Update npm package: ${filename}"`);
-      await execPromise(`git push origin main`);
-
-      // Disappearing reaction in chat
-      if (sock.defaultJid) {
-        const msg = await sock.sendMessage(sock.defaultJid, { react: { text: '✅', key: { remoteJid: sock.defaultJid, fromMe: true, id: 'npmpush' } } });
-        setTimeout(async () => { await sock.sendMessage(sock.defaultJid, { delete: msg.key }) }, 3000);
-      }
-    } catch (err) {
-      console.error('Auto npmpush error:', err);
-    }
-  });
-};
-
-// Manual push fallback
-async function manualPush(reply) {
-  const nodeModules = path.join(__dirname, '..', 'node_modules');
-  if (!fs.existsSync(nodeModules)) return reply('✘ node_modules not found.𓉤');
-
-  const packages = fs.readdirSync(nodeModules).filter(f => !f.startsWith('.'));
-  for (const pkg of packages) {
-    try {
-      await execPromise(`git add node_modules/${pkg}`);
-      await execPromise(`git commit -m "Add/Update npm package: ${pkg}"`);
-      await execPromise(`git push origin main`);
-    } catch (err) {
-      console.error(`Failed pushing package ${pkg}:`, err);
-    }
-  }
-  await reply(`✓ All npm packages pushed successfully!`);
-}
-
-// Promisify exec
-function execPromise(cmd) {
+function execPromise(cmd, options = {}) {
   return new Promise((resolve, reject) => {
-    exec(cmd, (err, stdout, stderr) => {
+    exec(cmd, options, (err, stdout, stderr) => {
       if (err) return reject(stderr || err);
       resolve(stdout);
     });
   });
-                                                      }
+}
