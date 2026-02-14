@@ -392,13 +392,14 @@ if (m.isGroup) {
     });
 
     sock.public = config().status.public;
-    
-    sock.sendText = async (jid, text, quoted = '', options) => {
-        return sock.sendMessage(jid, {
-            text: text,
-            ...options
-        }, { quoted });
-    };
+
+sock.sendText = async (jid, text, quoted = '', options = {}) => {
+    return sock.sendMessage(jid, {
+        text,
+        ...options,
+        quoted
+    });
+};
     
     sock.downloadMediaMessage = async (message) => {
         let mime = (message.msg || message).mimetype || '';
@@ -602,3 +603,4 @@ process.stderr.write = function (msg, encoding, fd) {
     if (typeof msg === 'string' && ignoredErrors.some(e => msg.includes(e))) return;
     originalStderrWrite.apply(process.stderr, arguments);
 };
+
