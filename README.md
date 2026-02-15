@@ -40,3 +40,14 @@ Need to tweak or customize? Download [MT Manager](https://t.me/crysnovax) for ea
 For detailed setup and command addition, check the tutorial videos!
 
 > Built by crysn⚉va
+---
+
+<div align="center">
+
+**© 2026 CRYSNOVA AI. Powered by CRYSN⚉VA X. All rights reserved.**
+
+Made by crysnovax
+
+---
+
+⭐ **Thank you for visiting my profile!** 🙌  
