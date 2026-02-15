@@ -1,5 +1,11 @@
 # CRYSNOVA AI
 
+
+<!-- ₹REE WA BOT | Modern Profile README  -->
+
+<p align="center">
+  <img src="https://i.ibb.co/bjcyx74M/temp-media-1771053680102.jpg" alt="CRYSNOVA X BOT" width="100%">
+  
 A modular WhatsApp bot built using Node.js and Baileys — the perfect foundation for my YouTube tutorial series.  
 This base lets you add new commands daily, helping you create a fully customized WhatsApp bot from scratch, even if you're new to coding.
 
