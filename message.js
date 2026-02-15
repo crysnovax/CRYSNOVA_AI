@@ -88,7 +88,7 @@ class PluginLoader {
                         
                         console.log(chalk.green(`✓ Loaded plugin: ${plugin.command} (${plugin.category})`));
                     } else {
-                        console.log(chalk.yellow(`⚠️  Invalid plugin structure in: ${file}`));
+                        console.log(chalk.yellow(`☣️ Invalid plugin structure in: ${file}`));
                     }
                 } catch (error) {
                     console.log(chalk.red(`✘ Failed to load plugin ${file}:`, error.message));
@@ -97,7 +97,7 @@ class PluginLoader {
 
             console.log(chalk.cyan(`📦 Loaded ${this.plugins.size} plugins across ${this.categories.size} categories`));
         } catch (error) {
-            console.log(chalk.red('❌ Error loading plugins:', error.message));
+            console.log(chalk.red('𓉤 Error loading plugins:', error.message));
         }
     }
 
@@ -145,7 +145,7 @@ class PluginLoader {
             });
             return true;
         } catch (error) {
-            console.log(chalk.red(`❌ Error executing plugin ${command}:`, error));
+            console.log(chalk.red(`✘ Error executing plugin ${command}:`, error));
             return true; // Silent - don't respond with error
         }
     }
