@@ -20,8 +20,8 @@ This base lets you add new commands daily, helping you create a fully customized
 Follow along with the tutorial series: Each episode introduces 1–2 new commands, building your skills step by step.
 
 ## 👾 FORK CRYSNOVA-AI
-  
-  <a href="https://github.com/crysnovax/CRYSNOVA-AI/fork"><img title="CRYSNOVA-AI" src="https://img.shields.io/badge/FORK-CRYSNOVA-AI-h?color=blue&style=for-the-badge&logo=stackshare"></a>
+    
+  <a href="https://github.com/crysnovax/CRYSNOVA-AI/fork"><img title="CRYSNOVA AI" src="https://img.shields.io/badge/FORK-CRYSNOVA AI-h?color=blue&style=for-the-badge&logo=stackshare"></a>
 
 ## 🧠 Editing Bot Files
 Need to tweak or customize? Download [MT Manager](https://t.me/crysnovax) for easy file management.
