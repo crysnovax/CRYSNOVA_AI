@@ -1,7 +1,7 @@
 # CRYSNOVA AI
 
 
-<!-- ₹REE WA BOT | Modern Profile README  -->
+<!-- CRYSNOVA WA BOT | Modern Profile README  -->
 
 <p align="center">
   <img src="https://i.ibb.co/bjcyx74M/temp-media-1771053680102.jpg" alt="CRYSNOVA X BOT" width="100%">
@@ -41,18 +41,11 @@ Need to tweak or customize? Download [MT Manager](https://t.me/crysnovax) for ea
 3. Run the bot: `node index.js`
 4. Scan the QR code with WhatsApp to connect.
 
-## Installation & Deployment
+🚀 CRYSNOVA AI Deployment Guide
+🔥 Option 1: One-Command Deploy (Recommended)
+1️⃣ Create deploy.sh
 
-There are two main ways to deploy **CRYSNOVA AI** on your hosting panel (bot-hosting.net, Pterodactyl-based, etc.):
-
-### Method 1 – One-command Bash deploy script (recommended)
-
-Run this in your panel's **Console / Terminal** after creating the file.
-
-1. Create the script file:
-
-```bash
-nano deploy.sh
+```Bash
 #!/bin/bash
 # CRYSNOVA AI - One-command deploy script
 # Run: chmod +x deploy.sh && ./deploy.sh
@@ -106,16 +99,117 @@ echo "======================================"
 echo "✅ Deployment finished!"
 echo ""
 echo "Useful PM2 commands:"
-echo "  pm2 status          → check running processes"
-echo "  pm2 logs $APP_NAME  → view live logs"
-echo "  pm2 stop $APP_NAME  → stop bot"
-echo "  pm2 restart $APP_NAME → restart bot"
+echo "  pm2 status"
+echo "  pm2 logs $APP_NAME"
+echo "  pm2 stop $APP_NAME"
+echo "  pm2 restart $APP_NAME"
 echo "======================================"
+```
+
+▶ Run it:
+
+```Bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+🧩 Option 2: Manual Step-By-Step Deployment
+1️⃣ Clone (or switch to SSH remote)
+
+```Bash
+git clone git@github.com:crysnovax/CRYSNOVA-AIt.git .
+# OR if already cloned:
+# git remote set-url origin git@github.com:crysnovax/CRYSNOVA-AIt.git
+# git pull
+```
+
+2️⃣ Install dependencies
+```Bash
+npm install --no-audit --no-fund --production
+```
+3️⃣ Install PM2 (if not installed)
+
+```Bash
+npm install -g pm2
+```
+4️⃣ Start / Restart Bot
+
+```Bash
+pm2 delete crysnova-bot 2>/dev/null || true
+pm2 start index.js --name crysnova-bot
+pm2 save
+```
+🔎 Useful Commands
+
+```Bash
+pm2 status
+pm2 logs crysnova-bot
+```
 
 
 
+🖥 Option 3: Panel Deploy (Node Script)
+Create deploy.js:
+Js
+```bash
+// deploy.js - Run with: node deploy.js
+const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+
+const REPO = 'git@github.com:crysnovax/CRYSNOVA-AIt.git';
+const APP_NAME = 'crysnova-bot';
+const BRANCH = 'main';
+
+function run(cmd) {
+  try {
+    console.log(`> ${cmd}`);
+    execSync(cmd, { stdio: 'inherit' });
+  } catch (err) {
+    console.error(`❌ Command failed: ${cmd}`);
+    console.error(err.message);
+    process.exit(1);
+  }
+}
+
+console.log('CRYSNOVA X Deploy Script');
+console.log('============================');
+
+const cwd = process.cwd();
+
+if (!fs.existsSync(path.join(cwd, '.git'))) {
+  console.log('Cloning fresh repo...');
+  run(`git clone ${REPO} .`);
+} else {
+  console.log('Updating existing repo...');
+  run('git fetch origin');
+  run(`git reset --hard origin/${BRANCH}`);
+  run('git clean -fd');
+}
+
+console.log('Installing dependencies...');
+run('npm install --no-audit --no-fund --production');
+
+console.log('Managing with PM2...');
+try {
+  run('npm install -g pm2');
+} catch {}
+
+run(`pm2 delete ${APP_NAME} || true`);
+run(`pm2 start index.js --name ${APP_NAME}`);
+run('pm2 save');
+
+console.log('\n✅ Done!');
+console.log(`Status: pm2 status ${APP_NAME}`);
+console.log(`Logs: pm2 logs ${APP_NAME}`);
+```
 
 
+▶ Run:
+
+```Bash
+node deploy.js
+```
 
 For detailed setup and command addition, check the tutorial videos!
 
