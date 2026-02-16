@@ -41,6 +41,82 @@ Need to tweak or customize? Download [MT Manager](https://t.me/crysnovax) for ea
 3. Run the bot: `node index.js`
 4. Scan the QR code with WhatsApp to connect.
 
+## Installation & Deployment
+
+There are two main ways to deploy **CRYSNOVA AI** on your hosting panel (bot-hosting.net, Pterodactyl-based, etc.):
+
+### Method 1 – One-command Bash deploy script (recommended)
+
+Run this in your panel's **Console / Terminal** after creating the file.
+
+1. Create the script file:
+
+```bash
+nano deploy.sh
+#!/bin/bash
+# CRYSNOVA AI - One-command deploy script
+# Run: chmod +x deploy.sh && ./deploy.sh
+
+set -e
+
+REPO="git@github.com:crysnovax/CRYSNOVA-AIt.git"
+APP_NAME="crysnova-bot"
+BRANCH="main"
+
+echo "======================================"
+echo "  CRYSNOVA AI Deployment Script"
+echo "  $(date)"
+echo "======================================"
+
+# Check git
+if ! command -v git >/dev/null 2>&1; then
+    echo "❌ Git not found. Install git first."
+    exit 1
+fi
+
+# Clone or update
+if [ ! -d ".git" ]; then
+    echo "📥 Cloning fresh repository via SSH..."
+    git clone "$REPO" .
+else
+    echo "🔄 Repository exists → pulling latest..."
+    git fetch origin
+    git reset --hard origin/"$BRANCH"
+    git clean -fd
+fi
+
+# Install dependencies
+echo "📦 Installing npm packages..."
+npm install --no-audit --no-fund --production
+
+# PM2 setup
+echo "🔧 Setting up PM2..."
+if ! command -v pm2 >/dev/null 2>&1; then
+    echo "Installing PM2 globally..."
+    npm install -g pm2
+fi
+
+# Restart / start bot
+pm2 delete "$APP_NAME" 2>/dev/null || true
+pm2 start index.js --name "$APP_NAME"
+pm2 save
+
+echo ""
+echo "======================================"
+echo "✅ Deployment finished!"
+echo ""
+echo "Useful PM2 commands:"
+echo "  pm2 status          → check running processes"
+echo "  pm2 logs $APP_NAME  → view live logs"
+echo "  pm2 stop $APP_NAME  → stop bot"
+echo "  pm2 restart $APP_NAME → restart bot"
+echo "======================================"
+
+
+
+
+
+
 For detailed setup and command addition, check the tutorial videos!
 
 > Built by crysn⚉va
