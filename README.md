@@ -1,4 +1,4 @@
-# CRYSNOVA AI
+## CRYSNOVA AI
 
 
 <!-- CRYSNOVA WA BOT | Modern Profile README  -->
@@ -152,7 +152,9 @@ pm2 logs crysnova-bot
 Create deploy.js:
 Js
 ```bash
-// deploy.js - Run with: node deploy.js
+// deploy.js - Safe for Pterodactyl panels
+// Run with: node deploy.js
+
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -166,31 +168,39 @@ function run(cmd) {
     console.log(`> ${cmd}`);
     execSync(cmd, { stdio: 'inherit' });
   } catch (err) {
-    console.error(`❌ Command failed: ${cmd}`);
-    console.error(err.message);
+    console.error(`❌ Failed: ${cmd}`);
     process.exit(1);
   }
 }
 
-console.log('CRYSNOVA X Deploy Script');
-console.log('============================');
+console.log('====================================');
+console.log(' CRYSNOVA AI Panel Deploy');
+console.log('====================================');
 
 const cwd = process.cwd();
+const gitFolder = path.join(cwd, '.git');
 
-if (!fs.existsSync(path.join(cwd, '.git'))) {
-  console.log('Cloning fresh repo...');
-  run(`git clone ${REPO} .`);
+// ✅ Initialize git if not present (NO CLONING INTO DOT)
+if (!fs.existsSync(gitFolder)) {
+  console.log('Initializing fresh git repository...');
+  run('git init');
+  run(`git remote add origin ${REPO}`);
 } else {
-  console.log('Updating existing repo...');
-  run('git fetch origin');
-  run(`git reset --hard origin/${BRANCH}`);
-  run('git clean -fd');
+  console.log('Git already initialized.');
 }
 
+// ✅ Always pull latest clean version
+console.log('Pulling latest updates...');
+run(`git fetch origin`);
+run(`git reset --hard origin/${BRANCH}`);
+run('git clean -fd');
+
+// ✅ Install dependencies
 console.log('Installing dependencies...');
 run('npm install --no-audit --no-fund --production');
 
-console.log('Managing with PM2...');
+// ✅ PM2 management
+console.log('Starting with PM2...');
 try {
   run('npm install -g pm2');
 } catch {}
@@ -199,11 +209,10 @@ run(`pm2 delete ${APP_NAME} || true`);
 run(`pm2 start index.js --name ${APP_NAME}`);
 run('pm2 save');
 
-console.log('\n✅ Done!');
-console.log(`Status: pm2 status ${APP_NAME}`);
-console.log(`Logs: pm2 logs ${APP_NAME}`);
+console.log('\n✅ Deployment Complete!');
+console.log(`Check status: pm2 status ${APP_NAME}`);
+console.log(`View logs:   pm2 logs ${APP_NAME}`);
 ```
-
 
 ▶ Run:
 
