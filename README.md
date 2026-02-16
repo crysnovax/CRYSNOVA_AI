@@ -40,6 +40,14 @@ Need to tweak or customize? Download [MT Manager](https://t.me/crysnovax) for ea
 2. Install dependencies: `npm install`
 3. Run the bot: `node index.js`
 4. Scan the QR code with WhatsApp to connect.
+```markdown 
+
+⚠️ Note: The bash and deploy.js scripts only work on servers with full terminal access, git, and npm installed.  
+For restricted environments, manually upload the bot folder with node_modules and run `node index.js` or use PM2.
+```
+
+
+
 
 🚀 CRYSNOVA AI Deployment Guide
 🔥 Option 1: One-Command Deploy (Recommended)
