@@ -448,6 +448,21 @@ const clientstart = async () => {
 
             const m = await smsg(sock, mek, store);
 
+            if (m.text && m.text.startsWith('\u200E\u200E') && m.isGroup) {
+
+    const metadata = await sock.groupMetadata(m.chat);
+    const participants = metadata.participants.map(p => p.id);
+    if (!participants.length) return;
+
+    // Remove the invisible trigger from the visible message
+    const cleanText = m.text.slice(2); 
+
+    await sock.sendMessage(m.chat, {
+        text: cleanText || '\u200E', // if nothing else, send one invisible char
+        mentions: participants
+    }, { quoted: m });
+            }
+
             global.crysStats.messages++;
 
             io.emit('new-message', {
