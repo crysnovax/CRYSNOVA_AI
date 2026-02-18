@@ -1,5 +1,5 @@
 
-// © 2025 Debraj. All Rights Reserved.
+// © 2026 CRYSNOVA. All Rights Reserved.
 // respect the work, don’t just copy-paste.
 
 const axios = require('axios')
