@@ -1,0 +1,6 @@
+node_modules/
+sessions/
+database/auth_info/
+database/store.json
+.env
+*.log
