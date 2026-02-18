@@ -1,36 +1,83 @@
 const { getByCategory } = require('../../Plugin/crysCmd');
+
 const { getVar } = require('../../Plugin/configManager');
 
 module.exports = {
+
     name: 'menu',
-    alias: ['help', 'list'],
+
+    alias: ['help', 'list', 'cmds'],
+
     desc: 'Show all commands',
+
     category: 'Bot',
+
     execute: async (sock, m, { prefix, config }) => {
+
         const cats = getByCategory();
-        const botName = getVar('botName', config.settings.title);
+
+        const botName = getVar('botName', config.settings.title) || 'CRYSNOVA AI';
+
         const uptime = Math.floor((Date.now() - global.crysStats.startTime) / 60000);
 
-        let text = `╔══════════════════════════╗\n`;
-        text += `║  ${botName}\n`;
-        text += `╚══════════════════════════╝\n\n`;
-        text += `> ❏┃ Prefix: *[${prefix}]*\n`;
-        text += `> ❏┃ Commands: *${[...require('../../Plugin/crysCmd').getAll().keys()].filter(k => !require('../../Plugin/crysCmd').getAll().get(k).isAlias).length}*\n`;
-        text += `> ❏┃ Uptime: *${uptime}m*\n`;
-        text += `> ❏┃ Mode: *${config.status.public ? 'Public' : 'Private'}*\n`;
-        text += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+        const total = [...require('../../Plugin/crysCmd').getAll().keys()]
+
+            .filter(k => !require('../../Plugin/crysCmd').getAll().get(k).isAlias).length;
+
+        const now = new Date();
+
+        const time = now.toLocaleTimeString('en-US', { hour12: true });
+
+        let text = '';
+
+        // ── SYSTEM INFO ──
+
+        text += ` ╭─❍ *${botName.toUpperCase()} V2*\n`;
+
+        text += ` │ ❏ COMMANDS : ${total}\n`;
+
+        text += ` │ ❏ UPTIME   : ${uptime} MIN\n`;
+
+        text += ` │ ❏ MODE     : ${config.status.public ? 'PUBLIC' : 'PRIVATE'}\n`;
+
+        text += ` ╰─ 𓄄 \`\`\`${time}\`\`\`\n\n`;
+
+        // ── COMMANDS BY CATEGORY ──
 
         for (const [cat, cmds] of Object.entries(cats)) {
-            text += `> ━━〔 *${cat.toUpperCase()}* 〕━━\n`;
+
+            text += `> ╭─❍ *${cat.toUpperCase()}*\n`;
+
             for (const cmd of cmds) {
-                text += `> ❏┃ ${prefix}${cmd.name}${cmd.desc ? ` - ${cmd.desc}` : ''}\n`;
+
+                text += `> │ ➤ ${prefix}${cmd.name}\n`;
+
             }
-            text += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+            text += `> ╰──────────────────\n\n`;
+
         }
 
+        // ── FOOTER ──
+
+        text += ` ╭─❍ *DEVELOPER*\n`;
+
+        text += ` │ ➤ CRYSNOVA\n`;
+
+        text += ` │ ➤ VERSION : 2.0.0\n`;
+
+        text += ` ╰──────────────────`;
+
         await sock.sendMessage(m.chat, {
-            image: { url: config.thumbUrl },
-            caption: text
+
+            image: { url: config.thumbUrl || 'https://i.imgur.com/BoN9kdC.png' },
+
+            caption: text,
+
+            mimetype: 'image/png'
+
         }, { quoted: m });
+
     }
+
 };
