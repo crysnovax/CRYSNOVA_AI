@@ -1,0 +1,719 @@
+/**
+
+ * ╔══════════════════════════════════════════════════╗
+
+ * ║         CRYSNOVA AI V2.0 - Professional         ║
+
+ * ║   Connection: CRYSNOVA V1.0 (Pairing Code)      ║
+
+ * ╚══════════════════════════════════════════════════╝
+
+ */
+
+console.clear();
+
+// ── Core ───────────────────────────────────────────
+
+const express  = require('express');
+
+const http     = require('http');
+
+const socketIo = require('socket.io');
+
+const path     = require('path');
+
+const pino     = require('pino');
+
+const readline = require('readline');
+
+const fs       = require('fs');
+
+const chalk    = require('chalk');
+
+const { Boom } = require('@hapi/boom');
+
+// ── Baileys (dynamic import) ───────────────────────
+
+let makeWASocket, Browsers, useMultiFileAuthState,
+
+    DisconnectReason, fetchLatestBaileysVersion,
+
+    jidDecode, downloadContentFromMessage,
+
+    jidNormalizedUser, isPnUser;
+
+const loadBaileys = async () => {
+
+    const baileys = await import('@whiskeysockets/baileys');
+
+    makeWASocket              = baileys.default;
+
+    Browsers                  = baileys.Browsers;
+
+    useMultiFileAuthState     = baileys.useMultiFileAuthState;
+
+    DisconnectReason          = baileys.DisconnectReason;
+
+    fetchLatestBaileysVersion = baileys.fetchLatestBaileysVersion;
+
+    jidDecode                 = baileys.jidDecode;
+
+    downloadContentFromMessage= baileys.downloadContentFromMessage;
+
+    jidNormalizedUser         = baileys.jidNormalizedUser;
+
+    isPnUser                  = baileys.isPnUser;
+
+};
+
+// ── CRYSNOVA Modules ───────────────────────────────
+
+const config       = () => require('./settings/config');
+
+const { smsg }     = require('./library/serialize');
+
+const { getBuffer }= require('./library/function');
+
+const { videoToWebp, writeExifImg, writeExifVid, addExif, toPTT, toAudio } = require('./library/exif');
+
+const FileType     = require('file-type');
+
+// ── Kord-Style Modules ─────────────────────────────
+
+const { loadCommands }   = require('./src/Plugin/crysLoadCmd');
+
+const { handleMessage }  = require('./src/Plugin/crysMsg');
+
+const { crysStatistic }  = require('./src/Plugin/crysStatistic');
+
+// ── AI & Chatbot Plugins (load once at top) ────────
+
+  // CRYSNOVA main AI
+
+const littleBot = require('./src/Plugin/chatbot.js');       // LittleBot fun chatbot
+
+// ── Express + Socket.IO ────────────────────────────
+
+const app    = express();
+
+const port   = process.env.PORT || 3000;
+
+const server = http.createServer(app);
+
+const io     = socketIo(server);
+
+app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(__dirname, 'Public')));
+
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'Public/index.html')));
+
+// ── Global Stats ───────────────────────────────────
+
+global.crysStats = {
+
+    messages: 0,
+
+    commands: 0,
+
+    startTime: Date.now(),
+
+    uptime: 0
+
+};
+
+// ── Ignored Errors ─────────────────────────────────
+
+const ignoredErrors = [
+
+    'Socket connection timeout', 'EKEYTYPE', 'item-not-found',
+
+    'rate-overlimit', 'Connection Closed', 'Timed Out', 'Value not found'
+
+];
+
+// ── Readline helper ────────────────────────────────
+
+const question = (text) => {
+
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+    return new Promise(resolve => {
+
+        rl.question(chalk.yellow(text), answer => { resolve(answer); rl.close(); });
+
+    });
+
+};
+
+// ── Banner ─────────────────────────────────────────
+
+const showBanner = () => {
+
+    console.log(chalk.cyan(`
+
+╔═══════════════════════════════════════════╗
+
+║   CRYSNOVA AI V2.0 - Professional        ║
+
+║   Connection : CRYSNOVA V1.0 Style       ║
+
+║   Features   : CRYSNOVA-Ai Style         ║
+
+╚═══════════════════════════════════════════╝`));
+
+};
+
+// ═══════════════════════════════════════════════════
+
+// MAIN CONNECTION
+
+// ═══════════════════════════════════════════════════
+
+const clientstart = async () => {
+
+    await loadBaileys();
+
+    showBanner();
+
+    const browserOptions = [
+
+        Browsers.macOS('Safari'),
+
+        Browsers.macOS('Chrome'),
+
+        Browsers.windows('Firefox'),
+
+        Browsers.ubuntu('Chrome'),
+
+        Browsers.baileys('Baileys'),
+
+        Browsers.macOS('Edge'),
+
+        Browsers.windows('Edge'),
+
+    ];
+
+    const randomBrowser = browserOptions[Math.floor(Math.random() * browserOptions.length)];
+
+    const store = {
+
+        messages: new Map(),
+
+        contacts: new Map(),
+
+        groupMetadata: new Map(),
+
+        loadMessage: async (jid, id) => store.messages.get(`${jid}:${id}`) || null,
+
+        bind: (ev) => {
+
+            ev.on('messages.upsert', ({ messages }) => {
+
+                for (const msg of messages) {
+
+                    if (msg.key?.remoteJid && msg.key?.id) {
+
+                        store.messages.set(`${msg.key.remoteJid}:${msg.key.id}`, msg);
+
+                    }
+
+                }
+
+            });
+
+        }
+
+    };
+
+    const { state, saveCreds } = await useMultiFileAuthState(`./${config().session}`);
+
+    const { version } = await fetchLatestBaileysVersion();
+
+    const sock = makeWASocket({
+
+        logger: pino({ level: 'silent' }),
+
+        printQRInTerminal: !config().status.terminal,
+
+        auth: state,
+
+        version,
+
+        browser: randomBrowser
+
+    });
+
+    // Pairing Code
+
+    if (config().status.terminal && !sock.authState.creds.registered) {
+
+        const phoneNumber = await question('secured by crysnova enter your WhatsApp number, starting with 234:\nnumber WhatsApp: ');
+
+        const code = await sock.requestPairingCode(phoneNumber);
+
+        console.log(chalk.green(`your pairing code: ` + chalk.bold.green(code)));
+
+    }
+
+    store.bind(sock.ev);
+
+    // Sock helpers
+
+    sock.decodeJid = (jid) => {
+
+        if (!jid) return jid;
+
+        if (/:\d+@/gi.test(jid)) {
+
+            const decode = jidDecode(jid) || {};
+
+            return decode.user && decode.server ? `${decode.user}@${decode.server}` : jid;
+
+        }
+
+        return jid;
+
+    };
+
+    sock.public = config().status.public;
+
+    sock.downloadMediaMessage = async (message) => {
+
+        let mime = (message.msg || message).mimetype || '';
+
+        let messageType = message.mtype ? message.mtype.replace(/Message/gi, '') : mime.split('/')[0];
+
+        const stream = await downloadContentFromMessage(message, messageType);
+
+        let buffer = Buffer.from([]);
+
+        for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+
+        return buffer;
+
+    };
+
+    sock.sendImageAsSticker = async (jid, pathOrBuf, quoted, options = {}) => {
+
+        let buff = Buffer.isBuffer(pathOrBuf) ? pathOrBuf
+
+            : /^https?:\/\//.test(pathOrBuf) ? await getBuffer(pathOrBuf)
+
+            : fs.existsSync(pathOrBuf) ? fs.readFileSync(pathOrBuf) : Buffer.alloc(0);
+
+        const buffer = (options.packname || options.author) ? await writeExifImg(buff, options) : await addExif(buff);
+
+        await sock.sendMessage(jid, { sticker: { url: buffer }, ...options }, { quoted });
+
+        return buffer;
+
+    };
+
+    sock.sendVideoAsSticker = async (jid, pathOrBuf, quoted, options = {}) => {
+
+        let buff = Buffer.isBuffer(pathOrBuf) ? pathOrBuf
+
+            : /^https?:\/\//.test(pathOrBuf) ? await getBuffer(pathOrBuf)
+
+            : fs.existsSync(pathOrBuf) ? fs.readFileSync(pathOrBuf) : Buffer.alloc(0);
+
+        const buffer = (options.packname || options.author) ? await writeExifVid(buff, options) : await videoToWebp(buff);
+
+        await sock.sendMessage(jid, { sticker: { url: buffer }, ...options }, { quoted });
+
+        return buffer;
+
+    };
+
+    sock.sendText = async (jid, text, quoted = '', options) =>
+
+        sock.sendMessage(jid, { text, ...options }, { quoted });
+
+    sock.ev.on('creds.update', saveCreds);
+
+    // Connection Update
+
+    sock.ev.on('connection.update', async (update) => {
+
+        const { connection, lastDisconnect } = update;
+
+        if (connection === 'connecting') console.log(chalk.yellow('🔄 Connecting...'));
+
+        if (connection === 'open') {
+
+            console.log(chalk.green('✅ Connected!'));
+
+            console.log(chalk.cyan(`📱 Number: ${sock.user?.id?.split(':')[0]}`));
+
+            console.log(chalk.cyan(`🌐 Dashboard: http://localhost:${port}\n`));
+
+            io.emit('bot-status', { status: 'connected', number: sock.user?.id?.split(':')[0], name: sock.user?.name });
+
+            const botJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+
+            sock.sendMessage(botJid, {
+
+                text: `亗 *${config().settings.title}* is Online!\n\n` +
+
+                    `> ⚉ User: ${sock.user.name || 'Unknown'}\n` +
+
+                    `> 乂 Prefix: [ . ]\n` +
+
+                    `> ☬ Mode: ${config().status.public ? 'Public' : 'Private'}\n` +
+
+                    `> ✪ Version: 2.0.0\n` +
+
+                    `> 𓉤 Owner: CRYSNOVA\n\n` +
+
+                    `✓ Bot connected successfully\n` +
+
+                    `🗣️ CHANNEL: https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38`,
+
+                contextInfo: {
+
+                    forwardingScore: 1, isForwarded: true,
+
+                    externalAdReply: {
+
+                        title: config().settings.title,
+
+                        body: config().settings.description,
+
+                        thumbnailUrl: config().thumbUrl,
+
+                        sourceUrl: 'https://github.com/crysnovax/CRYSNOVA_AI',
+
+                        mediaType: 1, renderLargerThumbnail: false
+
+                    }
+
+                }
+
+            }).catch(() => {});
+
+        }
+
+        if (connection === 'close') {
+
+            const statusCode = lastDisconnect?.error?.output?.statusCode;
+
+            const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+
+            console.log(chalk.red('❌ Connection closed:'), statusCode);
+
+            if (shouldReconnect) {
+
+                console.log(chalk.yellow('🔄 Reconnecting...'));
+
+                setTimeout(clientstart, 5000);
+
+            } else {
+
+                console.log(chalk.red('🚫 Logged out. Restart the bot.'));
+
+            }
+
+        }
+
+        try {
+
+            const { konek } = require('./library/connection/connection');
+
+            konek({ sock, update, clientstart, DisconnectReason, Boom });
+
+        } catch {}
+
+    });
+
+    // ── Messages Upsert (with fixed auto-reply) ───────────────────
+
+    sock.ev.on('messages.upsert', async (chatUpdate) => {
+
+        try {
+
+            const mek = chatUpdate.messages[0];
+
+            if (!mek.message) return;
+
+            if (Object.keys(mek.message)[0] === 'ephemeralMessage') {
+
+                mek.message = mek.message.ephemeralMessage.message;
+
+            }
+
+            const m = await smsg(sock, mek, store);
+
+            global.crysStats.messages++;
+
+            io.emit('new-message', {
+
+                from: m.sender,
+
+                chat: m.chat,
+
+                text: m.text || '[Media]',
+
+                isGroup: m.isGroup,
+
+                time: Date.now()
+
+            });
+
+            // Handle normal prefix commands first
+
+            await handleMessage(sock, m, store);
+
+            // CRYSNOVA AI Auto-Reply (only when relevant)
+
+            if (m.text && !m.key.fromMe) {
+
+                try {
+
+                    const isPrivate = !m.isGroup;
+
+                    const isMentioned = m.mentionedJid?.some(j => sock.decodeJid(j) === sock.decodeJid(sock.user.id));
+
+                    const isRepliedToBot = m.quoted?.sender && sock.decodeJid(m.quoted.sender) === sock.decodeJid(sock.user.id);
+
+                    // Skip if short, command, or bot not addressed
+
+                    if (m.text.length < 8 || m.text.startsWith('.') || 
+
+                        (!isPrivate && !isMentioned && !isRepliedToBot)) {
+
+                        return;
+
+                    }
+
+                    await crysAI.handleAiAutoReply(sock, m);
+
+                } catch (aiErr) {
+
+                    console.error('[CRYSNOVA AI Auto]', aiErr.message);
+
+                }
+
+            }
+
+            // LittleBot Auto-Reply (same safe conditions)
+
+            if (m.text && !m.key.fromMe) {
+
+                try {
+
+                    const isPrivate = !m.isGroup;
+
+                    const isMentioned = m.mentionedJid?.some(j => sock.decodeJid(j) === sock.decodeJid(sock.user.id));
+
+                    const isRepliedToBot = m.quoted?.sender && sock.decodeJid(m.quoted.sender) === sock.decodeJid(sock.user.id);
+
+                    if (m.text.length < 8 || m.text.startsWith('.') || 
+
+                        (!isPrivate && !isMentioned && !isRepliedToBot)) {
+
+                        return;
+
+                    }
+
+                    await littleBot.handleChatAutoReply(sock, m);
+
+                } catch (botErr) {
+
+                    console.error('[LittleBot Auto]', botErr.message);
+
+                }
+
+            }
+
+        } catch (err) {
+
+            console.log(chalk.red('[MSG ERROR]'), err.message);
+
+        }
+
+    });
+
+    // ── Group Participant Updates ────────────────────
+
+    sock.ev.on('group-participants.update', async (data) => {
+
+        try {
+
+            const dbPath = './database/groupEvents.json';
+
+            if (!fs.existsSync(dbPath)) return;
+
+            const db = JSON.parse(fs.readFileSync(dbPath));
+
+            if (!db[data.id]?.enabled) return;
+
+            const meta = await sock.groupMetadata(data.id);
+
+            const count = meta.participants.length;
+
+            const groupName = meta.subject;
+
+            if (data.action === 'add') {
+
+                for (const user of data.participants) {
+
+                    const userId = typeof user === 'string' ? user : user.id;
+
+                    const welcomeText = db[data.id].welcome || 'Welcome to the group!';
+
+                    let ppUrl;
+
+                    try { ppUrl = await sock.profilePictureUrl(userId, 'image'); }
+
+                    catch { ppUrl = 'https://i.imgur.com/BoN9kdC.png'; }
+
+                    await sock.sendMessage(data.id, {
+
+                        image: { url: ppUrl },
+
+                        caption: `┏━━━━〔 🚀 𝐂𝐑𝐘𝐒𝐍𝐎𝐕𝐀-𝐕𝟮 〕━━━━━\n` +
+
+                            `❏┃ Hello @${userId.split('@')[0]}!\n` +
+
+                            `❏┃ Welcome to *${groupName}*!\n` +
+
+                            `❏┃ Members: ${count}\n` +
+
+                            `❏┃ ${welcomeText}\n` +
+
+                            `━━━━━━━━━━━━━━━━━━━━━`,
+
+                        mentions: [userId]
+
+                    });
+
+                }
+
+            }
+
+            if (data.action === 'remove') {
+
+                for (const user of data.participants) {
+
+                    const userId = typeof user === 'string' ? user : user.id;
+
+                    const goodbyeText = db[data.id].goodbye || 'Goodbye!';
+
+                    await sock.sendMessage(data.id, {
+
+                        text: `👋 @${userId.split('@')[0]} left *${groupName}*\n❏┃ ${goodbyeText}\n❏┃ Members: ${count}`,
+
+                        mentions: [userId]
+
+                    });
+
+                }
+
+            }
+
+        } catch (err) {
+
+            console.log('Group Events Error:', err.message);
+
+        }
+
+    });
+
+    // ── Contacts Update ─────────────────────────────
+
+    sock.ev.on('contacts.update', (update) => {
+
+        for (const contact of update) {
+
+            store.contacts.set(contact.id, {
+
+                id: contact.id, name: contact.notify || contact.name || null
+
+            });
+
+        }
+
+    });
+
+    return sock;
+
+};
+
+// ── Socket.IO ──────────────────────────────────────
+
+io.on('connection', (socket) => {
+
+    console.log(chalk.cyan('👤 Dashboard connected'));
+
+    socket.emit('stats', global.crysStats);
+
+    socket.on('disconnect', () => console.log(chalk.cyan('👤 Dashboard disconnected')));
+
+});
+
+// ── Error Handling ─────────────────────────────────
+
+process.on('unhandledRejection', reason => {
+
+    if (ignoredErrors.some(e => String(reason).includes(e))) return;
+
+    console.log('Unhandled Rejection:', reason);
+
+});
+
+const origErr = console.error;
+
+console.error = function (msg, ...args) {
+
+    if (typeof msg === 'string' && ignoredErrors.some(e => msg.includes(e))) return;
+
+    origErr.apply(console, [msg, ...args]);
+
+};
+
+// ── Start ──────────────────────────────────────────
+
+(async () => {
+
+    try {
+
+        if (!fs.existsSync('./database')) fs.mkdirSync('./database', { recursive: true });
+
+        if (!fs.existsSync('./database/groupEvents.json')) fs.writeFileSync('./database/groupEvents.json', '{}');
+
+        loadCommands();
+
+        server.listen(port, () => {
+
+            console.log(chalk.green(`✅ Dashboard: http://localhost:${port}`));
+
+        });
+
+        crysStatistic(app, io);
+
+        await clientstart();
+
+    } catch (err) {
+
+        console.error(chalk.red('Startup error:'), err);
+
+        process.exit(1);
+
+    }
+
+})();
+
+// ── File Watcher ───────────────────────────────────
+
+let file = require.resolve(__filename);
+
+require('fs').watchFile(file, () => {
+
+    delete require.cache[file];
+
+    require(file);
+
+});
