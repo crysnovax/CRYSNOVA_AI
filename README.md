@@ -44,7 +44,7 @@ Need to tweak or customize? Download [MT Manager](https://t.me/crysnovax) for ea
 4. Scan the QR code with WhatsApp to connect.
 
 
-```
+
 
 For detailed setup and command addition, check the tutorial videos!
 
@@ -52,7 +52,7 @@ For detailed setup and command addition, check the tutorial videos!
 ---
 
 <div align="center">
-
+  
 **© 2026 CRYSNOVA AI. Powered by CRYSN⚉VA X. All rights reserved.**
 
 Made by crysnovax
