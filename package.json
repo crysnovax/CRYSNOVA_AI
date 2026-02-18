@@ -1,7 +1,8 @@
+// ✪ editing this file might course connection failure 
 {
   "name": "crysnova-ai-v2",
   "version": "2.0.0",
-  "description": "CRYSNOVA AI V2 - Kord Features + CRYSNOVA V1 Connection",
+  "description": "CRYSNOVA AI V2 + CRYSNOVA V1 Connection",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
