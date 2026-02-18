@@ -3,34 +3,57 @@ const path = require('path');
 
 module.exports = {
     name: 'reload',
-    alias: ['r', 'refresh'],
+    alias: ['rl', 'refresh', 'relo'],
     desc: 'Reload all plugins without restarting the bot',
-    category: 'Bot',
-    execute: async (sock, m, { config }) => {
-        const pluginFolder = path.join(__dirname); // Adjust if your plugins are in another folder
-        let reloaded = 0, failed = 0;
+    category: 'owner',
+    usage: '.reload',
+    owner: true,
 
-        const files = fs.readdirSync(pluginFolder).filter(f => f.endsWith('.js'));
+    execute: async (sock, m, { reply }) => {
+        try {
+            await reply('_*✪ Reloading all plugins...*_');
 
-        for (const file of files) {
-            try {
-                const pluginPath = path.join(pluginFolder, file);
-                delete require.cache[require.resolve(pluginPath)]; // Clear cache
-                const newPlugin = require(pluginPath); // Reload plugin
+            // ── Plugin directory ── adjust to your bot's Plugin folder
+            const pluginDir = path.join(__dirname, '../../Plugin'); // 2 levels up from Owner
+            if (!fs.existsSync(pluginDir)) throw new Error('Plugin folder not found');
 
-                // Replace in global bot commands
-                if (newPlugin.name && global.botCommands.has(newPlugin.name)) {
-                    global.botCommands.set(newPlugin.name, newPlugin);
-                    reloaded++;
+            const files = fs.readdirSync(pluginDir).filter(f => f.endsWith('.js'));
+
+            let reloadedCount = 0;
+
+            for (const file of files) {
+                const filePath = path.join(pluginDir, file);
+                const resolvedPath = require.resolve(filePath);
+
+                if (require.cache[resolvedPath]) {
+                    delete require.cache[resolvedPath];
+                    reloadedCount++;
                 }
-            } catch (err) {
-                console.log('[RELOAD ERROR]', file, err.message);
-                failed++;
             }
-        }
 
-        await sock.sendMessage(m.chat, {
-            text: `✪ _*Reload complete!*_\n*✓ Plugins reloaded*: ${reloaded}\n*✘ Failed*: ${failed}`
-        }, { quoted: m });
+            // ── Load crysLoadCmd safely
+            const crysLoadCmdPath = path.join(pluginDir, 'crysLoadCmd.js');
+            if (fs.existsSync(crysLoadCmdPath)) {
+                const crysLoadCmd = require(crysLoadCmdPath);
+                if (crysLoadCmd.loadCommands) await crysLoadCmd.loadCommands();
+            } else {
+                console.log('[RELOAD WARNING] crysLoadCmd.js not found at:', crysLoadCmdPath);
+            }
+
+            await reply(
+                `✓ _*Reload successful!*_\n\n` +
+                `*Reloaded* ```${reloadedCount}``` *plugin files*.\n` +
+                `*All commands refreshed — test any command now.*`
+            );
+
+            // ── Optional reaction
+            await sock.sendMessage(m.key.remoteJid, {
+                react: { text: '🔄', key: m.key }
+            });
+
+        } catch (err) {
+            console.error('[RELOAD ERROR]', err);
+            await reply(`✘ *Reload failed*\n\`\`\`${err.message || 'Unknown error'}\`\`\``);
+        }
     }
 };
