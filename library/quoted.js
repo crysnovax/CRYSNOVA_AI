@@ -1,5 +1,5 @@
 
-// © 2025 Debraj. All Rights Reserved.
+// © 202y CRYSNOVA. All Rights Reserved.
 // respect the work, don’t just copy-paste.
 
 const fs = require('fs')
