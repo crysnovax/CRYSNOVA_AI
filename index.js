@@ -88,9 +88,6 @@ const { crysStatistic }  = require('./src/Plugin/crysStatistic');
 
 // ── AI & Chatbot Plugins (load once at top) ────────
 
-  // CRYSNOVA main AI
-
-const littleBot = require('./src/Plugin/chatbot.js');       // LittleBot fun chatbot
 
 // ── Express + Socket.IO ────────────────────────────
 
