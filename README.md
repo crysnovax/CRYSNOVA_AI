@@ -12,11 +12,12 @@
       alt="CRYSNOVA AI V2 - Holographic Neon Circle Logo" 
       width="380" 
       style="
-        border-radius: 50%; 
+        border-radius: 50%;
         box-shadow: 
           0 0 40px rgba(0, 255, 240, 0.9),
           0 0 80px rgba(0, 255, 240, 0.6),
           inset 0 0 30px rgba(255, 255, 255, 0.4);
+        transition: all 0.3s ease;
       "
     />
   </a>
@@ -26,7 +27,6 @@
   <strong>CRYSN⚉VA AI V2</strong><br>
   <em>Professional WhatsApp Bot • Built by crysnova</em>
 </p>
-  
 A modular WhatsApp bot built using Node.js and Baileys — the perfect foundation for my YouTube tutorial series.  
 This is a More integrated version of CRYSNOVA AI V1.0 with Amazing Customizable features tagging along the much more established WhatsApp bot.
 it's completely user friendly and requires less labor compared to V1.0 everything is now sorted for easy access and manipulation 
