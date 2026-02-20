@@ -2,9 +2,28 @@
 
 <!-- CRYSNOVA WA BOT | Modern Profile README  -->
 
-<p align="center">
-  <img src="https://i.ibb.co/Wpzv6bWj/temp-media-1771600830191.png" alt="CRYSNOVA X BOT" width="100%">
-  
+  <p align="center">
+  <a href="https://github.com/crysnovax">
+    <img 
+      src="https://i.ibb.co/Wpzv6bWj/temp-media-1771600830191.jpg" 
+      alt="CRYSNOVA AI V2 Logo - Holographic Neon Circle" 
+      width="380" 
+      style="
+        border-radius: 50%; 
+        box-shadow: 
+          0 0 30px rgba(0, 255, 240, 0.8),
+          0 0 60px rgba(0, 255, 240, 0.5),
+          inset 0 0 20px rgba(255, 255, 255, 0.3);
+        transition: transform 0.3s ease;
+      "
+      onmouseover="this.style.transform='scale(1.08)'"
+      onmouseout="this.style.transform='scale(1)'"
+    />
+  </a>
+  <br><br>
+  <strong>CRYSN⚉VA AI V2</strong><br>
+  <em>Professional WhatsApp Bot • Built by crysnova</em>
+</p>
 
 
 A modular WhatsApp bot built using Node.js and Baileys — the perfect foundation for my YouTube tutorial series.  
