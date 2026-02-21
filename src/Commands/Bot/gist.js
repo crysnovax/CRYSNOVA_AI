@@ -2,7 +2,7 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 
 // ── CONFIG ────────────────────────────
-const GITHUB_TOKEN = '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'; // Replace with your actual token
+const GITHUB_TOKEN = 'ghp_nx5xxxxxxxxxxxxxxxxxxxxxxxx'; // Replace with your actual token
 const sessions = new Map();
 
 // ── PLUGIN ───────────────────────────
