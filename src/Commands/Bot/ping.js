@@ -1,50 +1,39 @@
 module.exports = {
-
     name: 'ping',
-
     alias: ['speed', 'test', 'latency'],
-
     desc: 'Check bot response speed',
-
     category: 'Bot',
 
     execute: async (sock, m, { reply }) => {
-
         const start = Date.now();
 
-        // Optional: short loading message (uncomment if you want a two-step feel)
-
-        // await reply('✪ _Pinging_...');
+        // Create real delay: send a quick message + typing indicator
+        await sock.sendPresenceUpdate('composing', m.key.remoteJid);
+        await sock.sendMessage(m.key.remoteJid, {
+            text: '✪ _Pinging..._'
+        }, { quoted: m });
 
         const latency = Date.now() - start;
 
-        // Get current time in WAT (West Africa Time) format like your example
-
+        // Real Nigerian time (WAT / Africa/Lagos)
         const now = new Date();
-
         const timeString = now.toLocaleTimeString('en-US', {
-
             hour: 'numeric',
-
             minute: '2-digit',
-
             second: '2-digit',
+            hour12: true,
+            timeZone: 'Africa/Lagos'  // ← This forces correct WAT time
+        }).toLowerCase(); // → e.g. 11:52:06pm
 
-            hour12: true
-
-        }).toLowerCase(); // makes it like 4:25:54pm
-
-        // Exact format you requested
-
-        const pingText =
-
-`╭─❍ *PONG!*
+        // Your exact format
+        const pingText = `╭─❍ *PONG!*
 │ ❏ ${latency}ms
 │ ⚉  _online_
 ╰─ 𓄄 \`\`\`${timeString}\`\`\``;
 
         await reply(pingText);
 
+        // Reset presence
+        await sock.sendPresenceUpdate('available', m.key.remoteJid);
     }
-
 };
