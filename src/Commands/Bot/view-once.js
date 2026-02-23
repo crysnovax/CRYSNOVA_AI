@@ -23,6 +23,12 @@ module.exports = {
   alias: ['viewonce', 'vview', 'vvp'],
   category: 'media',
   owner: true,
+   // ⭐ Reaction config
+    reactions: {
+        start: '👌',
+        success: '🤫'
+    },
+  
 
   execute: async (sock, m, { args, reply }) => {
     try {
