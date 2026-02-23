@@ -13,7 +13,39 @@
 console.clear();
 
 // ── Core ───────────────────────────────────────────
+const HASH_DB = require('path').join(__dirname, 'database', 'hash.lock');
 
+function getFileHash(file) {
+    return require('crypto')
+        .createHash('sha256')
+        .update(require('fs').readFileSync(file))
+        .digest('hex');
+}
+
+function autoIntegrityCheck() {
+    const targetFile = require('path').join(__dirname, 'index.js');
+
+    let savedHash = null;
+
+    if (require('fs').existsSync(HASH_DB)) {
+        savedHash = require('fs').readFileSync(HASH_DB, 'utf8');
+    }
+
+    const currentHash = getFileHash(targetFile);
+
+    if (!savedHash) {
+        require('fs').mkdirSync(require('path').dirname(HASH_DB), { recursive: true });
+        require('fs').writeFileSync(HASH_DB, currentHash);
+        return;
+    }
+
+    if (savedHash !== currentHash) {
+        console.log("🚫 Integrity violation detected!");
+        process.exit(1);
+    }
+}
+
+autoIntegrityCheck();
 const express  = require('express');
 
 const http     = require('http');
