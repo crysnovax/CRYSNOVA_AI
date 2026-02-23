@@ -3,6 +3,12 @@ module.exports = {
     alias: ['creator', 'admin'],
     desc: 'Show bot owner contact',
     category: 'Bot',
+     // ⭐ Reaction config
+    reactions: {
+        start: '💬',
+        success: '✨'
+    },
+    
     execute: async (sock, m) => {
         try {
             // Get bot’s own JID
