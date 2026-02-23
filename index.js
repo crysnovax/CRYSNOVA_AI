@@ -13,39 +13,89 @@
 console.clear();
 
 // ── Core ───────────────────────────────────────────
-const HASH_DB = require('path').join(__dirname, 'database', 'hash.lock');
+const PROTECT_FILES = [
+    path.join(__dirname, 'index.js'),
+    path.join(__dirname, 'src/Commands/Bot/menu.js'),
+    path.join(__dirname, 'src/Plugin/ai.js'),
+    path.join(__dirname, 'src/Plugin/gist.js'),
+    path.join(__dirname, 'README.md')
+];
 
-function getFileHash(file) {
-    return require('crypto')
-        .createHash('sha256')
-        .update(require('fs').readFileSync(file))
+/* ===== Hash Database ===== */
+
+const HASH_DB = path.join(__dirname, 'database', 'hash.lock');
+
+/* ===== Hash Generator ===== */
+
+function hashFile(file) {
+    return crypto.createHash('sha256')
+        .update(fs.readFileSync(file))
         .digest('hex');
 }
 
-function autoIntegrityCheck() {
-    const targetFile = require('path').join(__dirname, 'index.js');
+/* ===== Integrity Checker ===== */
 
-    let savedHash = null;
+function secureBoot() {
 
-    if (require('fs').existsSync(HASH_DB)) {
-        savedHash = require('fs').readFileSync(HASH_DB, 'utf8');
-    }
+    try {
 
-    const currentHash = getFileHash(targetFile);
+        /* Create database folder if not exists */
+        if (!fs.existsSync(path.dirname(HASH_DB))) {
+            fs.mkdirSync(path.dirname(HASH_DB), { recursive: true });
+        }
 
-    if (!savedHash) {
-        require('fs').mkdirSync(require('path').dirname(HASH_DB), { recursive: true });
-        require('fs').writeFileSync(HASH_DB, currentHash);
-        return;
-    }
+        /* First time boot → generate hash */
+        if (!fs.existsSync(HASH_DB)) {
 
-    if (savedHash !== currentHash) {
-        console.log("🚫 Integrity violation detected!");
+            let combinedHash = '';
+
+            for (const file of PROTECT_FILES) {
+                if (fs.existsSync(file)) {
+                    combinedHash += hashFile(file);
+                }
+            }
+
+            fs.writeFileSync(HASH_DB,
+                crypto.createHash('sha256')
+                    .update(combinedHash)
+                    .digest('hex')
+            );
+
+            return;
+        }
+
+        /* Verify integrity */
+
+        let combinedHash = '';
+
+        for (const file of PROTECT_FILES) {
+
+            if (!fs.existsSync(file)) {
+                console.log("🚫 Security Alert: Missing protected file");
+                process.exit(1);
+            }
+
+            combinedHash += hashFile(file);
+        }
+
+        const savedHash = fs.readFileSync(HASH_DB, 'utf8');
+
+        const currentHash = crypto.createHash('sha256')
+            .update(combinedHash)
+            .digest('hex');
+
+        if (savedHash !== currentHash) {
+            console.log("🚫 CRYSNOVA SECURITY: File modification detected!");
+            process.exit(1);
+        }
+
+    } catch (e) {
+        console.log("🚫 Security Engine Error:", e.message);
         process.exit(1);
     }
 }
 
-autoIntegrityCheck();
+secureBoot();
 const express  = require('express');
 
 const http     = require('http');
