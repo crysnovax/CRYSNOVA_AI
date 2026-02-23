@@ -43,7 +43,7 @@ const config = {
 
     session: "sessions",
 
-    thumbUrl: "https://i.ibb.co/pBrzZDQj/20260212-111751.jpg",
+    thumbUrl: "https://litter.catbox.moe/5krk8y.png",
 
     status: {
         public: userConfig?.bot?.public ?? false,
