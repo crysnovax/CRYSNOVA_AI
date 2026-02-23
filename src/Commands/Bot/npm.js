@@ -15,6 +15,12 @@ module.exports = {
     category: 'Owner',
 
     ownerOnly: true,  // ← ensures only the owner can run it
+     // ⭐ Reaction config
+    reactions: {
+        start: '♻️',
+        success: '📦'
+    },
+    
 
     execute: async (sock, m, { reply, text }) => {
 
