@@ -4,11 +4,11 @@
 <!-- CRYSNOVA WA BOT | Modern Profile README  -->
 
 <p align="center">
-  <img src="https://i.ibb.co/bjcyx74M/temp-media-1771053680102.jpg" alt="CRYSNOVA X BOT" width="100%">
+  <img src="https://litter.catbox.moe/5krk8y.png" alt="CRYSNOVA X BOT" width="100%">
   <p align="center">
   <a href="https://github.com/crysnovax">
     <img 
-      src="https://i.ibb.co/Wpzv6bWj/temp-media-1771600830191.jpg" 
+      src="https://litter.catbox.moe/1po5gi.png" 
       alt="CRYSNOVA AI V2 - Holographic Neon Circle Logo" 
       width="380" 
       style="
