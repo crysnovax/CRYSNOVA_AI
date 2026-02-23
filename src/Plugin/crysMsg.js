@@ -22,7 +22,7 @@ const handleMessage = async (sock, m, store) => {
 
         const config = () => require('../../settings/config');
 
-        const prefix    = getVar('prefix', '.');
+        const prefix    = getVar('prefix', '.','‎');
 
         const autoReact = getVar('autoReact', true);
 
@@ -84,7 +84,7 @@ const handleMessage = async (sock, m, store) => {
 
         if (cmd.adminOnly && !isAdmin && !isOwner) return reply(config().message.admin);
 
-        if (cmd.botAdmin  && !isBotAdmin)  return reply('⚠️ Make me an admin first!');
+        if (cmd.botAdmin  && !isBotAdmin)  return reply('𓉤 Make me an admin first!');
 
         // Cooldown
 
@@ -108,7 +108,7 @@ const handleMessage = async (sock, m, store) => {
 
         // React processing
 
-        if (autoReact) sock.sendMessage(m.chat, { react: { text: '⚙️', key: m.key } }).catch(() => {});
+        if (autoReact) sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } }).catch(() => {});
 
         console.log(chalk.cyan(`[CMD] .${cmdName} | ${m.sender?.split('@')[0]}`));
 
@@ -122,13 +122,13 @@ const handleMessage = async (sock, m, store) => {
 
         });
 
-        if (autoReact) sock.sendMessage(m.chat, { react: { text: '✅', key: m.key } }).catch(() => {});
+        if (autoReact) sock.sendMessage(m.chat, { react: { text: '👽', key: m.key } }).catch(() => {});
 
     } catch (err) {
 
         console.log(chalk.red('[MSG ERROR]'), err.message);
 
-        sock.sendMessage(m.chat, { react: { text: '❌', key: m.key } }).catch(() => {});
+        sock.sendMessage(m.chat, { react: { text: '🙈', key: m.key } }).catch(() => {});
 
     }
 
