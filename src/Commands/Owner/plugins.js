@@ -86,6 +86,12 @@ module.exports = {
     category: 'owner',
     usage: '.plugin <url> | .remove <url> | .plugins',
     owner: true,
+     // ⭐ Reaction config
+    reactions: {
+        start: '🔎',
+        success: '📦'
+    },
+    
 
     execute: async (sock, m, { args, reply }) => {
         const cmd = (m.body || '').toLowerCase().split(/\s+/)[0].trim();
