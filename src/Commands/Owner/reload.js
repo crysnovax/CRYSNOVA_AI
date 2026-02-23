@@ -7,6 +7,12 @@ module.exports = {
     alias: ['rl', 'refresh'],
     category: 'owner',
     owner: true,
+     // ⭐ Reaction config
+    reactions: {
+        start: '♻️',
+        success: '💨'
+    },
+    
 
     execute: async (sock, m, { reply }) => {
         try {
