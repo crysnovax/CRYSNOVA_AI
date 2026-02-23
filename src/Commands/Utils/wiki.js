@@ -13,6 +13,12 @@ module.exports = {
     ownerOnly: true, // owner-only command
 
     usage: '.wiki <term>',
+     // ⭐ Reaction config
+    reactions: {
+        start: '🔎',
+        success: '💬'
+    },
+    
 
     execute: async (sock, m, { args, reply }) => {
 
