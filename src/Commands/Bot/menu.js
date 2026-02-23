@@ -1,8 +1,4 @@
 
-const PROTECT_FILES = [
-    path.join(__dirname, 'index.js'),
-    path.join(__dirname, 'src/Commands/Bot/menu.js')
-];
 
 const { getByCategory, getAll } = require('../../Plugin/crysCmd');
 const { getVar } = require('../../Plugin/configManager');
