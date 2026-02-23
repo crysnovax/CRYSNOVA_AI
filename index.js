@@ -13,6 +13,9 @@
 console.clear();
 
 // ── Core ───────────────────────────────────────────
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
 const PROTECT_FILES = [
     path.join(__dirname, 'index.js'),
     path.join(__dirname, 'src/Commands/Bot/menu.js'),
@@ -102,13 +105,9 @@ const http     = require('http');
 
 const socketIo = require('socket.io');
 
-const path     = require('path');
-
 const pino     = require('pino');
 
 const readline = require('readline');
-
-const fs       = require('fs');
 
 const chalk    = require('chalk');
 
