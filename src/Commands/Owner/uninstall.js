@@ -33,6 +33,12 @@ module.exports = {
     alias: [],
     category: 'owner',
     owner: true,
+     // ⭐ Reaction config
+    reactions: {
+        start: '💨',
+        success: '✨'
+    },
+    
 
     execute: async (sock, m, { args, reply }) => {
         const input = args[0];
