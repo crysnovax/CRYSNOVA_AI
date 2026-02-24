@@ -43,7 +43,7 @@ const config = {
 
     session: "sessions",
 
-    thumbUrl: "https://i.imgur.com/HPLf1Qk.jpeg",
+    thumbUrl: "https://crysnovax-media-api.crysnovax.workers.dev/1771948318227-media",
 
     status: {
         public: userConfig?.bot?.public ?? false,
