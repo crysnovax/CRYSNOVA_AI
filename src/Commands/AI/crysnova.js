@@ -8,7 +8,7 @@ const HISTORY_FILE = path.join(__dirname, '../../../database/ai-memory.json');
 
 const MAX_HISTORY = 10;
 
-const GROQ_API_KEY = 'gsk_ULmxxxxxxxx';// make sure you add groq API here that supports openai/gpt-oss-120b
+const GROQ_API_KEY = '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';// make sure you add groq API here that supports openai/gpt-oss-120b
 
 const MODEL = 'openai/gpt-oss-120b';
 
