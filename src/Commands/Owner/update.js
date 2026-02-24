@@ -2,10 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const AdmZip = require('adm-zip');
-const { exec } = require('child_process');
-const util = require('util');
-
-const execPromise = util.promisify(exec);
 
 // ── CONFIGURATION ──
 const CONFIG = {
@@ -17,7 +13,7 @@ const CONFIG = {
     requestTimeout: 30000
 };
 
-// ── USER DATA PROTECTION ──
+// ── PROTECTED PATHS (never overwrite) ──
 const PROTECTED_PATHS = [
     'sessions/',
     'database/',
@@ -39,9 +35,7 @@ const safeFs = {
     
     mkdir: (p) => {
         try {
-            if (!safeFs.exists(p)) {
-                fs.mkdirSync(p, { recursive: true });
-            }
+            if (!safeFs.exists(p)) fs.mkdirSync(p, { recursive: true });
             return true;
         } catch (err) {
             console.error(`[SAFE_FS] mkdir failed: ${p}`, err.message);
@@ -89,13 +83,12 @@ const safeFs = {
     }
 };
 
-// ── MAIN MODULE ──
 module.exports = {
     name: 'update',
     alias: ['upgrade', 'sync', 'gitpull'],
     category: 'owner',
     owner: true,
-    desc: 'Safe auto-updater with backup and dependency install',
+    desc: 'Safe auto-updater with backup (manual dependency install & restart)',
      // ⭐ Reaction config
     reactions: {
         start: '♻️',
@@ -107,7 +100,6 @@ module.exports = {
         const logs = [];
         const startTime = Date.now();
         
-        // ✅ DEFINE sendProgress FIRST (before using it!)
         const sendProgress = async (text) => {
             logs.push({ time: Date.now(), text });
             console.log(`[UPDATE] ${text}`);
@@ -115,10 +107,9 @@ module.exports = {
         };
 
         try {
-            // Now we can use sendProgress (it's already defined)
             await sendProgress('🔍 *CRYSNOVA AI Update System*\n\nChecking for updates...');
 
-            // ── STEP 1: GET VERSION INFO ──
+            // ── STEP 1: GET REMOTE VERSION ──
             const versionUrl = `https://raw.githubusercontent.com/${CONFIG.repo}/${CONFIG.branch}/package.json`;
             
             let remotePackage;
@@ -130,7 +121,7 @@ module.exports = {
                 remotePackage = response.data;
             } catch (err) {
                 console.error('[UPDATE] Version check failed:', err.message);
-                return reply('✘ *Update check failed*\nCannot reach repository. Check your internet connection.');
+                return reply('✘ *Update check failed*\nCannot reach repository. Check internet.');
             }
 
             const localPackage = safeFs.exists('./package.json') 
@@ -140,8 +131,6 @@ module.exports = {
             const currentVer = localPackage.version;
             const remoteVer = remotePackage.version;
 
-            console.log(`[UPDATE] Local=${currentVer}, Remote=${remoteVer}`);
-
             if (currentVer === remoteVer) {
                 return reply(`✓ *CRYSNOVA AI is up to date!*\n\nVersion: ${currentVer}`);
             }
@@ -149,7 +138,7 @@ module.exports = {
             await sendProgress(`⬆ *Update Available!*\n\nCurrent: ${currentVer}\nLatest: ${remoteVer}\n\nStarting safe update...`);
 
             // ── STEP 2: CREATE BACKUP ──
-            await sendProgress('💾 *Creating backup...*');
+            await sendProgress('𓉤 *Creating backup...*');
             
             safeFs.remove(CONFIG.backupDir);
             safeFs.mkdir(CONFIG.backupDir);
@@ -175,7 +164,7 @@ module.exports = {
 
             await sendProgress(`✓ *Backup created* (${backupCount} items)`);
 
-            // ── STEP 3: DOWNLOAD UPDATE ──
+            // ── STEP 3: DOWNLOAD UPDATE ZIP ──
             await sendProgress('✪ _*Downloading update...*_');
             
             const zipUrl = `https://github.com/${CONFIG.repo}/archive/refs/heads/${CONFIG.branch}.zip`;
@@ -208,7 +197,7 @@ module.exports = {
             const zipSize = (zipBuffer.length / 1024 / 1024).toFixed(2);
             await sendProgress(`✓ *Downloaded* (${zipSize}MB)`);
 
-            // ── STEP 4: EXTRACT ──
+            // ── STEP 4: EXTRACT FILES ──
             await sendProgress('📦 `Extracting files...`');
             
             const zip = new AdmZip(zipBuffer);
@@ -224,7 +213,7 @@ module.exports = {
                     
                     let entryName = entry.entryName.replace(repoPrefix, '');
 
-                    // Check protected paths
+                    // Skip protected paths
                     const isProtected = PROTECTED_PATHS.some(protected => 
                         entryName.toLowerCase().startsWith(protected.toLowerCase())
                     );
@@ -246,66 +235,76 @@ module.exports = {
 
             await sendProgress(`✓ *Extracted* ${extractedCount} files, skipped ${skippedCount}`);
 
-            // ── STEP 5: INSTALL DEPENDENCIES ──
-            await sendProgress('✪ _*Installing dependencies...*_');
-            
-            let depsInstalled = false;
+            // ── STEP 5: CHECK DEPENDENCIES (no auto install) ──
+            await sendProgress('🔎 _*Checking dependencies...*_');
+
+            let depsChanged = false;
             try {
                 const newPackage = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
                 const oldDeps = JSON.stringify(localPackage.dependencies || {});
                 const newDeps = JSON.stringify(newPackage.dependencies || {});
 
                 if (oldDeps !== newDeps) {
-                    await execPromise('npm install --production', { timeout: 300000 });
-                    depsInstalled = true;
+                    depsChanged = true;
+                    const missing = Object.keys(newPackage.dependencies || {})
+                        .filter(pkg => !localPackage.dependencies?.[pkg]);
+
+                    let msg = '⚉ *Dependencies changed!*\n\n';
+                    if (missing.length > 0) {
+                        msg += `Missing packages:\n${missing.map(p => `- ${p}`).join('\n')}\n\n`;
+                    }
+                    msg += `Run this command in console:\n\n` +
+                           `npm install\n\n` +
+                           `After install, restart bot with:\n${prefix}restart`;
+
+                    await reply(msg);
+                } else {
+                    await sendProgress('✓ Dependencies unchanged');
                 }
             } catch (err) {
-                console.log('[UPDATE] Deps install warning:', err.message);
+                console.log('[UPDATE] Deps check warning:', err.message);
+                await sendProgress('✘ *Could not check dependencies* — manual check recommended');
             }
-
-            await sendProgress(depsInstalled ? '✓ *Dependencies installed*' : '𓄄 *Dependencies unchanged*');
 
             // ── CLEANUP ──
             safeFs.remove(CONFIG.tempDir);
             
-            // Auto-delete backup after 24h
-            setTimeout(() => safeFs.remove(CONFIG.backupDir), 24 * 60 * 60 * 1000);
+            // Auto-delete backup after 7 days (optional)
+            setTimeout(() => safeFs.remove(CONFIG.backupDir), 7 * 24 * 60 * 60 * 1000);
 
             // ── FINAL REPORT ──
             const duration = ((Date.now() - startTime) / 1000).toFixed(1);
             
-            await reply(`⚉ *UPDATE COMPLETE!*
+            let finalMsg = `✓ *UPDATE COMPLETE!*
 
-📊 *Summary:*
+📊 Summary:
 • Version: ${currentVer} → ${remoteVer}
-• Files: ${extractedCount} updated
-• Protected: ${skippedCount} skipped
-• Backup: ${backupCount} items
-• Duration: ${duration}s
+• Files updated: ${extractedCount}
+• Protected/skipped: ${skippedCount}
+• Backup created: ${backupCount} items
+• Duration: ${duration}s`;
 
-⚠️ *RESTART REQUIRED*
-Use: ${prefix}restart or restart panel
-
-💾 Backup: \`${CONFIG.backupDir}\``);
-
-            // Auto-restart if enabled
-            if (process.env.AUTO_RESTART === 'true') {
-                await reply('♻️ *Auto-restarting in 5s...*');
-                setTimeout(() => process.exit(0), 5000);
+            if (depsChanged) {
+                finalMsg += `\n\n𓄄 Dependencies changed — please run:\n` +
+                            `npm install\n\n` +
+                            `Then restart with: ${prefix}restart`;
+            } else {
+                finalMsg += `\n\nNo dependency changes. Restart recommended:\n${prefix}restart`;
             }
+
+            await reply(finalMsg);
 
         } catch (err) {
             console.error('[UPDATE ERROR]', err);
             
             await reply('✘ *Update failed!*\nRestoring backup...');
             
-            // Restore
             if (safeFs.exists(CONFIG.backupDir)) {
                 try {
                     fs.cpSync(CONFIG.backupDir, './', { recursive: true, force: true });
-                    await reply('✓ *Backup restored*');
+                    await reply('✓ Backup restored');
                 } catch {
-                    await reply('✘ *Restore failed* - manual fix needed');
+                    await reply('✘ Restore failed — manual fix needed');
                 }
             }
             
@@ -313,4 +312,3 @@ Use: ${prefix}restart or restart panel
         }
     }
 };
-                                      
