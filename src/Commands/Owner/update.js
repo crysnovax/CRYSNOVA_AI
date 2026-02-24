@@ -24,7 +24,7 @@ module.exports = {
             const zipURL =
                 "https://github.com/crysnovax/CRYSNOVA_AI/archive/refs/heads/main.zip";
 
-            const packageJson = require('../../package.json');
+            const packageJson = require('../../../package.json');
             const currentVersion = packageJson.version;
 
             reply("🔍 Checking for update...");
