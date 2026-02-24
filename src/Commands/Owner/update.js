@@ -7,16 +7,46 @@ module.exports = {
     name: 'update',
     category: 'Owner',
     owner: true,
-   // ⭐ Reaction config
+     // ⭐ Reaction config
     reactions: {
-        start: '🔎',
-        success: '♻️'
+        start: '♻️',
+        success: '📦'
     },
-  
+    
 
     execute: async (sock, m, { reply }) => {
 
         try {
+
+            /*
+            ──────────────────────────────
+            AUTO CREATE UPDATE STRUCTURE
+            ──────────────────────────────
+            */
+
+            const updateDir = path.join(__dirname, '../../../updates');
+            const versionFile = path.join(updateDir, 'version.json');
+
+            if (!fs.existsSync(updateDir)) {
+                fs.mkdirSync(updateDir, { recursive: true });
+            }
+
+            if (!fs.existsSync(versionFile)) {
+
+                fs.writeFileSync(
+                    versionFile,
+                    JSON.stringify({
+                        version: "1.0.0",
+                        changelog: "CRYSNOVA AI Initial Setup"
+                    }, null, 2)
+                );
+            }
+
+            /*
+            ──────────────────────────────
+            VERSION CHECK
+            ──────────────────────────────
+            */
 
             const repoVersionURL =
                 "https://raw.githubusercontent.com/crysnovax/CRYSNOVA_AI/main/updates/version.json";
@@ -25,31 +55,38 @@ module.exports = {
                 "https://github.com/crysnovax/CRYSNOVA_AI/archive/refs/heads/main.zip";
 
             const packageJson = require('../../../package.json');
+
             const currentVersion = packageJson.version;
 
-            reply("🔍 Checking for update...");
+            reply("🔍 _Checking *CRYSNOVA AI* update..._");
 
             const res = await fetch(repoVersionURL);
             const data = await res.json();
 
             if (!data.version) {
-                return reply("Update metadata missing.");
+                return reply("⚉ *Update metadata missing*.");
             }
 
             if (data.version === currentVersion) {
                 return reply("✓ _*CRYSNOVA AI is already latest version*_.");
             }
 
-            reply(`⬆ Update Found\n\nCurrent: ${currentVersion}\nLatest: ${data.version}\n\nDownloading update...`);
+            reply(`⬆ Update Found\nVersion: ${data.version}\nUpdating bot...`);
 
-            // Download ZIP update
+            /*
+            ──────────────────────────────
+            DOWNLOAD UPDATE ZIP
+            ──────────────────────────────
+            */
+
             const zipRes = await fetch(zipURL);
             const buffer = await zipRes.buffer();
 
             const zipPath = path.join(__dirname, "update.zip");
+
             fs.writeFileSync(zipPath, buffer);
 
-            reply("📦 _*Extracting update...*_");
+            reply("✪ `Installing update...`");
 
             const zip = new AdmZip(zipPath);
             const entries = zip.getEntries();
@@ -82,7 +119,7 @@ module.exports = {
 
             fs.unlinkSync(zipPath);
 
-            reply("✪ *Update installed successfully*!\n♻️ _*Restart bot panel now*_.");
+            reply("✓ *Update installed!*\n♻️ _*Restart panel now*_.");
 
         } catch (err) {
             console.error(err);
