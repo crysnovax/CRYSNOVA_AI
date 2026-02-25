@@ -5,6 +5,12 @@ module.exports = {
     alias: ["gemi", "gptg"],
     category: "ai",
     desc: "Gemini AI Chat",
+     // ⭐ Reaction config
+    reactions: {
+        start: '💬',
+        success: '✨'
+    },
+    
 
     execute: async (sock, m, { args = [], reply }) => {
 
@@ -14,7 +20,7 @@ module.exports = {
         const query = args.join(" ").trim();
 
         if (!query) {
-            return reply("⚉ Please ask something.");
+            return reply("⚉ _*Please ask something*_.");
         }
 
         try {
@@ -57,7 +63,7 @@ ${query}
                 }, { quoted: m });
 
             } else {
-                reply("❌ Gemini response invalid.");
+                reply("✘ _*Gemini response invalid*_.");
             }
 
         } catch (err) {
