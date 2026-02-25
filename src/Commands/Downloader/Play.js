@@ -1,77 +1,106 @@
+const yts = require('yt-search');
 const axios = require('axios');
 
-const yts = require('yt-search');
-
 module.exports = {
-
-    name: 'play',
-
-    alias: ['song'],
-
-    desc: 'Download song from YouTube',
-
-    category: 'downloader',
-
-    usage: '.play <song name>',
-
-    owner: true,
-     // ⭐ Reaction config
-    reactions: {
-        start: '🎙️',
-        success: '✨'
-    },
-    
+    name: "play",
+    alias: ["song", "ytplay", "music"],
+    category: "media",
+    desc: "Play YouTube music",
 
     execute: async (sock, m, { args, reply }) => {
 
-        const query = args.join(' ');
+        const jid = m.key.remoteJid;
 
-        if (!query) return reply('Provide a song name.');
+        const query = args.join(" ").trim();
 
-        await reply('🔎 _*Searching...*_');
+        if (!query) {
+
+            await reply(
+                "✘ _*Provide song name or YouTube link*_.\nExample:\n.play Alan Walker"
+            );
+
+            await sock.sendMessage(jid, {
+                react: { text: "😥", key: m.key }
+            });
+
+            return;
+        }
 
         try {
 
-            const search = await yts(query);
+            /* Searching */
 
-            const video = search.videos[0];
-
-            if (!video) return reply('⚉*Song not found.*');
-
-            await reply(`🎵 Found: ${video.title}`);
-
-            const apiUrl = `https://api.vevioz.com/api/button/mp3/${video.videoId}`;
-
-            // Fetch as buffer
-
-            const response = await axios.get(apiUrl, {
-
-                responseType: 'arraybuffer',
-
-                timeout: 60000
-
+            await sock.sendMessage(jid, {
+                react: { text: "🔎", key: m.key }
             });
 
-            const buffer = Buffer.from(response.data);
+            let videoUrl = query;
 
-            await sock.sendMessage(m.key.remoteJid, {
+            if (
+                !query.includes("youtube.com") &&
+                !query.includes("youtu.be")
+            ) {
 
-                audio: buffer,
+                const search = await yts(query);
 
-                mimetype: 'audio/mpeg',
+                if (!search?.videos?.length) {
+                    return reply("✘ _*No song found*_.");
+                }
 
-                fileName: `${video.title}.mp3`
+                videoUrl = search.videos[0].url;
+            }
 
+            const searchResult = await yts(videoUrl);
+            const video = searchResult.videos?.[0];
+
+            if (!video) return reply("𓉤 _*Song info not found*_.");
+
+            /* Show thumbnail */
+
+            await sock.sendMessage(jid, {
+                image: { url: video.thumbnail },
+                caption:
+                    `🎵 *${video.title}*\n\n` +
+                    `♻️ Processing audio...`
             }, { quoted: m });
+
+            await sock.sendMessage(jid, {
+                react: { text: "🎙️", key: m.key }
+            });
+
+            /* Download audio */
+
+            const apiUrl =
+                "https://yt-dl.officialhectormanuel.workers.dev/?url=" +
+                encodeURIComponent(video.url);
+
+            const response = await axios.get(apiUrl, {
+                timeout: 60000
+            });
+
+            const data = response.data;
+
+            if (!data?.status || !data?.audio) {
+                return reply("✘ _*Audio download failed*_.");
+            }
+
+            /* Send audio */
+
+            await sock.sendMessage(jid, {
+                audio: { url: data.audio },
+                mimetype: "audio/mpeg",
+                fileName: `${video.title}.mp3`
+            }, { quoted: m });
+
+            await sock.sendMessage(jid, {
+                react: { text: "✨", key: m.key }
+            });
 
         } catch (err) {
 
-            console.log('[PLAY ERROR]', err.response?.status || err.message);
+            console.error("Play Plugin Error:", err.message);
 
-            reply('✘_*Download failed. API may be down.*_');
-
+            reply("❌ Song processing error.");
         }
-
     }
-
 };
