@@ -1,6 +1,6 @@
 {
   "name": "crysnova-ai-v2",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "description": "CRYSNOVA AI V2 + CRYSNOVA V1 Connection",
   "main": "index.js",
   "type": "commonjs",
