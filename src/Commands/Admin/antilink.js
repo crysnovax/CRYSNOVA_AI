@@ -23,6 +23,12 @@ module.exports = {
     name: 'antilink',
     alias: ['al'],
     category: 'admin',
+     // ⭐ Reaction config
+    reactions: {
+        start: '🖇️',
+        success: '🚫'
+    },
+    
 
     execute: async (sock, m, { args, reply }) => {
 
@@ -37,19 +43,19 @@ module.exports = {
 
         if (!cmd) {
             const status = db[group].enabled ? "ON" : "OFF";
-            return reply(`🛡️ AntiLink Status: ${status}\n\nUse .antilink on/off`);
+            return reply(`✪ AntiLink Status: ${status}\n\nUse .antilink on/off`);
         }
 
         if (cmd === 'on') {
             db[group].enabled = true;
             saveDB(db);
-            return reply('🛡️ AntiLink Enabled');
+            return reply('亗 `AntiLink Enabled`');
         }
 
         if (cmd === 'off') {
             db[group].enabled = false;
             saveDB(db);
-            return reply('❌ AntiLink Disabled');
+            return reply('✘ _*AntiLink Disabled*_');
         }
 
         reply('⚉ Usage: .antilink on/off');
