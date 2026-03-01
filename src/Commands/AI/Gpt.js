@@ -2,7 +2,7 @@ const axios = require("axios");
 
 module.exports = {
     name: "gpt",
-    alias: ["chatgpt", "chatbot", "gpt4"],
+    alias: ["chatgpt", "chat", "gpt4"],
     category: "ai",
     desc: "GPT AI Assistant",
 
