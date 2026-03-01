@@ -1,4 +1,4 @@
-## CRYSNOVA AI V2.0
+## CRYSNOVA AI V2.1
 
 
 <!-- CRYSNOVA WA BOT | Modern Profile README  -->
