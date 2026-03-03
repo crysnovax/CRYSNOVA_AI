@@ -1,6 +1,6 @@
 module.exports = {
     name: 'listonline',
-    alias: ['online', 'active', 'here', 'listact', 'onlinelist', 'whoisonline'],
+    alias: ['active', 'here', 'listact', 'onlinelist', 'whoisonline'],
     desc: 'List all online/active users in the group',
     category: 'group',
     usage: '.listonline',
