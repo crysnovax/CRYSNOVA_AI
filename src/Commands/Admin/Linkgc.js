@@ -1,6 +1,6 @@
 module.exports = {
     name: 'linkgc',
-    alias: ['gclink', 'link', 'invitelink', 'grouplink'],
+    alias: ['gclink', 'link', 'grouplink'],
     desc: 'Get the current shareable group invite link (with preview)',
     category: 'group',
     usage: '.linkgc',
