@@ -13,7 +13,7 @@ module.exports = {
                 image: Buffer.from(res.data),
                 caption: `📸 *Group Picture*\n👥 ${groupMeta?.subject || 'Group'}`
             });
-            await reply(`✅ Group picture sent to your DM!`);
-        } catch { await reply('❌ This group has no profile picture!'); }
+            await reply(`✦ _*Group picture sent to your DM!*_`);
+        } catch { await reply('✘ _*This group has no profile picture!*_'); }
     }
 };
