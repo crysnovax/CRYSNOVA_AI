@@ -56,6 +56,21 @@ Need to tweak or customize? Download [MT Manager](https://t.me/crysnovax) for ea
 
 ## 📺 Connect & Learn
 - **YouTube Channel**: [CRYSNOVA](https://youtube.com/@crysnovax)
+
+<p align="center">
+  <img src="https://i.imgur.com/LyHic3i.gif" alt="divider"/>
+</p>
+
+
+> 🔔 Stay Connected For Updates Feature Drops And Tutorials!
+
+<a href="https://youtube.com/@crysnovax" target="_blank">
+  <img src="Shaban/youtube.svg" alt="YouTube" width="250"/>
+</a>
+
+<p align="center">
+  <img src="https://i.imgur.com/LyHic3i.gif" alt="footer divider"/>
+</p>
 - **WhatsApp Channel**: [Official Channel](https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38)
 
 ## 🚀 Getting Started
