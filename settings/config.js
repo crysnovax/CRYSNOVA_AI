@@ -74,7 +74,7 @@ const config = {
     thumbUrl:
         getVar("THUMB_URL") ||
         userConfig?.thumbUrl ||
-        "https://media.crysnovax.workers.dev/41629ab0-6833-41c3-8d00-8f099f206ae8.jpg",
+        "https://media.crysnovax.workers.dev/5fa19b5e-3dbb-4bd2-be39-90d01bf65070.png",
 
     status: {
         public:   getVar("PUBLIC_MODE")   ?? userConfig?.bot?.public   ?? true,
