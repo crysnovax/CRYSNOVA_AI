@@ -8,7 +8,7 @@
   <p align="center">
   <a href="https://github.com/crysnovax">
     <img 
-      src="https://i.imgur.com/HPLf1Qk.jpeg" 
+      src="https://media.crysnovax.workers.dev/4159c277-bf8b-48e8-b73d-a5e901c2ff83.png" 
       alt="CRYSNOVA AI V2 - Holographic Neon Circle Logo" 
       width="380" 
       style="
@@ -25,8 +25,6 @@
 
 <p align="center">
   <strong>CRYSN⚉VA AI V2</strong><br>
-  ![WELLCOME](https://media.crysnovax.workers.dev/4159c277-bf8b-48e8-b73d-a5e901c2ff83.png)
-  
 ______
 
 ___ 
