@@ -25,6 +25,20 @@
 
 <p align="center">
   <strong>CRYSN⚉VA AI V2</strong><br>
+  ![WELLCOME](Shaban/wellcome.svg)
+  
+______
+
+[![Shaban](https://files.catbox.moe/7m53zc.jpg)](https://whatsapp.com/channel/0029Vb6aq4cCHDygiEqJZl0S)
+___ 
+  
+<p align="center">
+  <a href="https://whatsapp.com/channel/0029Vb6aq4cCHDygiEqJZl0S" target="_blank">
+    <img src="./Shaban/channel-update.svg" width="350" alt="Bot Updating — WhatsApp Channel | Join Fast">
+  </a>
+</p>
+
+-------------
   <em>Professional WhatsApp Bot • Built by crysnova</em>
 </p>
 A modular WhatsApp bot built using Node.js and Baileys — the perfect foundation for my YouTube tutorial series.  
