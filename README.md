@@ -28,7 +28,7 @@
 ______
 
 ___ 
-  
+  JOIN NOW 👾
 <p align="center">
   <a href="https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38" target="_blank">
     <img src="https://media.crysnovax.workers.dev/2edabe62-411f-48a1-a277-6ad7e6d8fe39.jpg" width="350" alt="Bot Updating — WhatsApp Channel | Join Fast">
