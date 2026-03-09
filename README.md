@@ -64,7 +64,7 @@ Need to tweak or customize? Download [MT Manager](https://t.me/crysnovax) for ea
 
 > 🔔 Stay Connected For Updates Feature Drops And Tutorials!
 
-<a href="https://youtube.com/@crysnovax" target="_blank">
+<a href="https://youtu.be/xPZri7IGku4?si=t44dgWTrSOwxcJQO_" target="_blank">
   <img src="Shaban/youtube.svg" alt="YouTube" width="250"/>
 </a>
 
