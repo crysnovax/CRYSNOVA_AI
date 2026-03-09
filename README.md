@@ -4,7 +4,7 @@
 <!-- CRYSNOVA WA BOT | Modern Profile README  -->
 
 <p align="center">
-  <img src="https://media.crysnovax.workers.dev/ff578ce8-e698-48a9-9b3c-37c21c76a255.jpg" alt="CRYSNOVA X BOT" width="100%">
+  <img src="https://media.crysnovax.workers.dev/426675e4-b382-4e18-bcd8-19d0f7b2320c.jpg" alt="CRYSNOVA X BOT" width="100%">
   <p align="center">
   <a href="https://github.com/crysnovax">
     <img 
