@@ -3,6 +3,12 @@ module.exports = {
     alias: ['aza','account','sendaza','setbank','setaza'],
     category: 'tools',
     desc: 'View or set bank account details (Aza)',
+     // ⭐ Reaction config
+    reactions: {
+        start: '💱',
+        success: '🌟'
+    },
+    
 
     execute: async (sock, m, { args, reply, prefix }) => {
 
