@@ -7,6 +7,12 @@ module.exports = {
     category: 'ai',
     desc: 'Extract text from image (OCR)',
     usage: '.scan (reply to image)',
+     // ⭐ Reaction config
+    reactions: {
+        start: '💬',
+        success: '🔍'
+    },
+    
 
     execute: async (sock, m, { reply }) => {
 
