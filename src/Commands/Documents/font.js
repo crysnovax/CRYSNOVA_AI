@@ -2,7 +2,7 @@ module.exports = {
   name: 'font',
   alias: ['allfonts'],
   desc: 'Convert text to styled fonts',
-  category: 'Bot',
+  category: 'Documents',
 
   execute: async (sock, m, { args, prefix, command }) => {
 
