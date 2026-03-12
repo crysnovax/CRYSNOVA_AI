@@ -4,7 +4,7 @@ const FormData = require('form-data');
 module.exports = {
     name: 'scan',
     alias: ['ocr', 'read'],
-    category: 'ai',
+    category: 'Documents',
     desc: 'Extract text from image (OCR)',
     usage: '.scan (reply to image)',
      // ⭐ Reaction config
