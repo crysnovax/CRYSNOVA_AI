@@ -3,7 +3,7 @@ const { downloadContentFromMessage } = require('@whiskeysockets/baileys')
 module.exports = {
     name: "tovv",
     alias: ["vv", "viewonce"],
-    category: "tools",
+    category: "Converter",
     desc: "Convert media to view once",
 
     reactions: {
