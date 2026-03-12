@@ -85,7 +85,7 @@ const handleMessage = async (sock, m, store) => {
             const exp = cooldowns.get(key);
 
             if (exp && now < exp) {
-                return reply(`⏳ Wait ${((exp - now) / 1000).toFixed(1)}s`);
+                return reply(`🚀 Wait ${((exp - now) / 1000).toFixed(1)}s`);
             }
 
             cooldowns.set(key, now + cooldown * 1000);
@@ -122,7 +122,7 @@ const handleMessage = async (sock, m, store) => {
         /* Reaction Success */
         if (autoReact) {
 
-            const successReact = cmd.reactions?.success || '👽';
+            const successReact = cmd.reactions?.success || '🥏';
 
             sock.sendMessage(m.chat, {
                 react: { text: successReact, key: m.key }
