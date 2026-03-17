@@ -1,6 +1,6 @@
 module.exports = {
-  name: 'font',
-  alias: ['allfonts'],
+  name: 'txt',
+  alias: ['text'],
   desc: 'Convert text to styled fonts',
   category: 'Documents',
 
