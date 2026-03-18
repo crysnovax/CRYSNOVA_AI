@@ -1,0 +1,17 @@
+{
+  "name": "CRYSNOVA AI",
+  "description": "Professional WhatsApp Bot - CRYSNOVA AI V2.0",
+  "repository": "https://github.com/crysnovax/CRYSNOVA_AI",
+  "logo": "https://media.crysnovax.workers.dev/b5160094-6827-4c63-9b40-7dfb979c1684.png",
+  "keywords": ["whatsapp", "bot", "crysnova", "ai"],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "formation": {
+    "worker": {
+      "quantity": 1
+    }
+  }
+}
