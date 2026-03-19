@@ -286,8 +286,8 @@ function listFonts(page = 1) {
 
 // ── MAIN MODULE ──
 module.exports = {
-    name: 'font',
-    alias: ['fonts', 'allfonts', 'botfont', 'style', 'textstyle'],
+    name: 'xfont',
+    alias: [],
     category: 'tools',
     owner: false,
     desc: 'Convert text to 100+ stylish fonts',
