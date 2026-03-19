@@ -75,10 +75,6 @@ Follow along with the tutorial series: Each episode introduces 1–2 new command
   <a href="https://github.com/crysnovax/CRYSNOVA_AI/fork"><img title="CRYSNOVA AI" src="https://img.shields.io/badge/FORK-CRYSNOVA AI-h?color=blue&style=for-the-badge&logo=stackshare"></a>
 
 
-## 👨‍💻 Credits
-- **Base Project**: [CRYSNOVA](https://t.me/crysnovax)
-- **Tutorials & Upgrades**: **CRYSTAL LEVI**
-- **Library**: [Baileys by @crysnovax](https://github.com/crysnovax/CRYSNOVA_AI)
 
 ## 📺 Connect & Learn
 - **YouTube Channel**: [CRYSNOVA](https://youtube.com/@crysnovax)
