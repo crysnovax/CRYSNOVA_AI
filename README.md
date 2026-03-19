@@ -44,6 +44,23 @@ This is a More integrated version of CRYSNOVA AI V1.0 with Amazing Customizable 
 it's completely user friendly and requires less labor compared to V1.0 everything is now sorted for easy access and manipulation 
 > crysnovax
 
+
+
+
+
+ <div align="center"> 
+  <a href="https://git.io/typing-svg"> 
+    <img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=50&pause=1000&color=33ff00&center=true&width=910&height=100&lines=CRYSNOVA_AI;Advanced+Multifunctional+WhatsApp+Bot;Advanced+Group+Management;Entertainment+%26+Utility" alt="Typing SVG" />
+  </a> 
+</div>
+
+<div align="center">
+  <img src="https://img.shields.io/github/stars/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=yellow" alt="GitHub Stars"/>
+  <img src="https://img.shields.io/github/forks/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=blue" alt="GitHub Forks"/>
+  <img src="https://img.shields.io/github/issues/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=red" alt="GitHub Issues"/>
+  <img src="https://img.shields.io/github/license/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=green" alt="License"/>
+</div>
+
 ## 💡 Key Features
 - **Dynamic Plugin System**: Simply add .js files for new commands — no complex setup required.
 - **Auto-Reload Functionality**: Changes take effect instantly without restarting the bot.
