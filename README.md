@@ -50,7 +50,7 @@ it's completely user friendly and requires less labor compared to V1.0 everythin
 
  <div align="center"> 
   <a href="https://git.io/typing-svg"> 
-    <img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=50&pause=1000&color=33ff00&center=true&width=910&height=100&lines=CRYSNOVA_AI;Multifunctional+WhatsApp+Bot;Advanced+Group+Management;Entertainment+%26+Utility;By+crysnovax" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=50&pause=1000&color=33ff00&center=true&width=910&height=100&lines=CRYSN⚉VA+AI;Multifunctional+WhatsApp+Bot;Advanced+Group+Management;Entertainment+%26+Utility;By+crysnovax" alt="Typing SVG" />
   </a> 
 </div>
 <div align="center">
