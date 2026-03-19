@@ -1,12 +1,14 @@
 services:
   - type: web
     name: crysnova-ai
-    env: node
+    runtime: node
     plan: free
     buildCommand: npm install
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
-        value: 18
+        value: 20
       - key: PORT
         value: 3000
+    healthCheckPath: /
+    
