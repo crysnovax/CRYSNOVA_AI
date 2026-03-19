@@ -254,7 +254,7 @@ function c(text, color = 'white') {
 // Configuration
 const PROJECT_DIR = 'CRYSNOVA_AI';
 const REPO_URL = 'https://github.com/crysnovax/CRYSNOVA_AI.git';
-const ENTRY_FILE = 'main.js';
+const ENTRY_FILE = 'index.js';
 
 // Create readline interface
 const rl = readline.createInterface({
