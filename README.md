@@ -1,4 +1,4 @@
-## ✦ CRYSNOVA AI V2.3.9
+## ✦ CRYSNOVA AI V2.8.8.0
 
 
 <!-- CRYSNOVA WA BOT | Modern Profile README  -->
