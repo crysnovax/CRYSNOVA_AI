@@ -1,0 +1,8 @@
+node_modules/
+sessions/
+.env
+database/runtime-config.json
+database/user-config.json
+database/ai-memory.json
+src/Commands/*/assets/
+*.log
