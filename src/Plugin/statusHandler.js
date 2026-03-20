@@ -5,7 +5,7 @@
 const { getVar } = require('./configManager');
 const chalk      = require('chalk');
 
-const STATUS_EMOJIS = ['❤️', '🔥', '💯', '😍', '👏', '✨', '😂', '🥰', '👀', '🎉', '💪', '⚡'];
+const STATUS_EMOJIS = ['❤️‍🔥', '🔥', '💯', '😍', '👏', '✨', '😂', '🥰', '👀', '🎉', '💪', '⚡','❌','😩','👾','🙏','🤗','🥏'];
 const randomEmoji   = () => STATUS_EMOJIS[Math.floor(Math.random() * STATUS_EMOJIS.length)];
 
 const seen = new Set();
