@@ -1,6 +1,6 @@
 /**
  * ╔══════════════════════════════════════════════════╗
- * ║     setupMessageHandler.js - ZEE BOT V2          ║
+ * ║   - ZEE BOT V2          ║
  * ║   CRYSNOVA AI V2 Message Routing Engine          ║
  * ╚══════════════════════════════════════════════════╝
  */
