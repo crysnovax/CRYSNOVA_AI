@@ -23,6 +23,7 @@
     "@faker-js/faker": "^10.3.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@google/generative-ai": "^0.24.1",
+    "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "@hapi/boom": "^10.0.1",
     "adm-zip": "^0.5.16",
     "archiver": "^7.0.1",
