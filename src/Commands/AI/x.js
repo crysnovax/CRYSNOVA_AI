@@ -5,12 +5,12 @@ const { getLunaResponse } = require("../Core/!!!.js");
 module.exports = {
  name: "xm",
  alias: ["mcmd"],
- category: "ai",
+ category: "AI",
 
  execute: async (sock, m, { args, reply }) => {
 
  if (args[0] !== "command") {
- return reply("Usage:\n.luna make command <name> [description]");
+ return reply("_*⚉ Usage:\n.xm command <name> [description]*_");
  }
 
  const name = args[1];
