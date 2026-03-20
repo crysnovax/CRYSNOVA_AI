@@ -1,8 +1,8 @@
 {
   "name": "zee-bot-v2",
-  "version": "2.0.0",
+  "version": "2.8.8.0",
   "description": "ZEE BOT V2 — Powered by CRYSNOVA AI V2 Technology",
-  "main": "main.js",
+  "main": "index.js",
   "type": "commonjs",
   "scripts": {
     "start": "node main.js",
