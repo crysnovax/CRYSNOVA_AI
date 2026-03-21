@@ -9,6 +9,9 @@ const chalk = require('chalk');
 const { setupStatusHandler } = require('./src/Plugin/statusHandler');
 const { getVar }             = require('./src/Plugin/configManager');
 
+const styles = require("./src/Commands/Core/'.js");
+const botFont = require("./src/Commands/Bot/botfont.js");
+
 const ignoredErrors = [
     'Socket connection timeout', 'EKEYTYPE', 'item-not-found',
     'rate-overlimit', 'Connection Closed', 'Timed Out', 'Value not found',
@@ -18,6 +21,20 @@ const ignoredErrors = [
 ];
 
 module.exports = function setupMessageHandler(sock, customStore, handleMessage, smsg, io, config) {
+
+    
+    const originalSend = sock.sendMessage.bind(sock);
+    sock.sendMessage = async (jid, content, options = {}) => {
+        try {
+            if (content?.text) {
+                const font = botFont.getFont(jid);
+                if (font && styles[font]) {
+                    content.text = styles[font](content.text);
+                }
+            }
+        } catch (e) {}
+        return originalSend(jid, content, options);
+    };
 
     // ── Auto Status View + Like (Kord AI style) ────────────────
     setupStatusHandler(sock);
