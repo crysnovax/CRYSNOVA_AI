@@ -1,9 +1,11 @@
 /**
- * CRYSNOVA AI V2 – Auto-reply + Manual query + Creator special handling
+ * CRYSNOVA AI V2 – Auto-reply + Manual query + Creator special handling + Image Reading
  */
 
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
+const FormData = require('form-data');
 
 const DB = path.join(__dirname, '../../database/autoreply.json');
 
@@ -13,6 +15,84 @@ const getDB = () => JSON.parse(fs.readFileSync(DB, 'utf8'));
 const saveDB = (data) => fs.writeFileSync(DB, JSON.stringify(data, null, 2));
 
 const { getLunaResponse } = require('../Core/!!!.js');
+
+// ── Groq API key (hard-coded as requested) ─────────────────────────────
+const GROQ_API_KEY = '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';
+
+// ── Pending image confirmation (new) ─────────────────────────────
+const pendingImageAnalysis = new Map(); // chatId → { buffer, caption }
+
+// ── Upload image → public URL ─────────────────────────
+const uploadImage = async (buffer) => {
+    // Try catbox.moe
+    try {
+        const form = new FormData();
+        form.append('reqtype', 'fileupload');
+        form.append('userhash', '');
+        form.append('fileToUpload', buffer, {
+            filename: 'image.jpg',
+            contentType: 'image/jpeg'
+        });
+        const res = await axios.post('https://catbox.moe/user/api.php', form, {
+            headers: form.getHeaders(),
+            timeout: 20000
+        });
+        if (typeof res.data === 'string' && res.data.startsWith('https://'))
+            return res.data.trim();
+    } catch (err) {
+        console.log('[UPLOAD catbox FAIL]', err.message);
+    }
+
+    // Fallback: tmpfiles.org
+    try {
+        const form2 = new FormData();
+        form2.append('file', buffer, {
+            filename: 'image.jpg',
+            contentType: 'image/jpeg'
+        });
+        const res2 = await axios.post('https://tmpfiles.org/api/v1/upload', form2, {
+            headers: form2.getHeaders(),
+            timeout: 20000
+        });
+        const url = res2.data?.data?.url;
+        if (url) return url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+    } catch (err) {
+        console.log('[UPLOAD tmpfiles FAIL]', err.message);
+    }
+
+    throw new Error('All image upload hosts failed');
+};
+
+// ── Groq Vision ───────────────────────────────────────
+const describeImage = async (imageUrl, prompt) => {
+    const res = await axios.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
+            model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+            messages: [
+                {
+                    role: 'user',
+                    content: [
+                        { type: 'image_url', image_url: { url: imageUrl } },
+                        { type: 'text', text: prompt }
+                    ]
+                }
+            ],
+            max_tokens: 1024
+        },
+        {
+            headers: {
+                'Authorization': `Bearer ${GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 45000
+        }
+    );
+
+    const text = res.data?.choices?.[0]?.message?.content;
+    if (!text) throw new Error('No response from Groq Vision');
+    return text.trim();
+};
 
 // Memory per chat
 const chatMemory = new Map();
@@ -30,7 +110,7 @@ const isPrivateChat = (chatId) => {
 module.exports = {
     name: 'crysnova',
     alias: ['crys', 'ai'],
-    desc: 'CRYSNOVA AI V2 – smart auto-reply & manual query',
+    desc: 'CRYSNOVA AI V2 – smart auto-reply & image reading',
 
     execute: async (sock, m, { args, reply }) => {
         const chatId = getChatId(m);
@@ -125,7 +205,7 @@ module.exports = {
                 ''
             ).trim();
 
-            if (!fullTextRaw) return;
+            if (!fullTextRaw && !m.message?.imageMessage && !m.message?.stickerMessage) return;
 
             fullText = fullTextRaw.toLowerCase();
 
@@ -145,74 +225,74 @@ module.exports = {
             return;
         }
 
-// ── Creator question detection ──────────────────────────────────────
-try {
-    const creatorKeywords = [
-        'who created', 'who made', 'who is your', 'who owns', 'who is the owner',
-        'creator', 'developer', 'admin', 'founder', 'maker', 'built by',
-        'your owner', 'your creator', 'crys', 'crysnova', 'who are you',
-        'introduce yourself', 'about you', 'bot owner', 'who owns you',
-        'who developed', 'who programmed', 'your developer',
-        'crysnovax', 'who is crysnovax'
-    ];
-
-    const isCreatorQuestion = creatorKeywords.some(kw => fullText.includes(kw));
-
-    if (isCreatorQuestion) {
-
-        // 🔥 React to user message
-        await sock.sendMessage(chatId, {
-            react: { text: '🔥', key: m.key }
-        }).catch(() => {});
-
-        let owner = {
-            name: "crysnovax",
-            number: "2348077134210",
-            displayNumber: "+2348077134210",
-            profilePicUrl: "https://files.catbox.moe/z2rqc1.jpg"
-        };
-
+        // ── Creator question detection ──────────────────────────────────────
         try {
-            const core = require('../Core/-.js');
-            if (core?.ownerInfo) {
-                owner = {
-                    ...owner,
-                    ...core.ownerInfo,
-                    displayNumber: core.ownerInfo.displayNumber || `+${core.ownerInfo.number}`
+            const creatorKeywords = [
+                'who created', 'who made', 'who is your', 'who owns', 'who is the owner',
+                'creator', 'developer', 'admin', 'founder', 'maker', 'built by',
+                'your owner', 'your creator', 'crys', 'crysnova', 'who are you',
+                'introduce yourself', 'about you', 'bot owner', 'who owns you',
+                'who developed', 'who programmed', 'your developer',
+                'crysnovax', 'who is crysnovax'
+            ];
+
+            const isCreatorQuestion = creatorKeywords.some(kw => fullText.includes(kw));
+
+            if (isCreatorQuestion) {
+
+                // 🔥 React to user message
+                await sock.sendMessage(chatId, {
+                    react: { text: '🔥', key: m.key }
+                }).catch(() => {});
+
+                let owner = {
+                    name: "crysnovax",
+                    number: "2348077134210",
+                    displayNumber: "+2348077134210",
+                    profilePicUrl: "https://files.catbox.moe/z2rqc1.jpg"
                 };
-            }
-        } catch {}
 
-        // ✅ vCard
-        const vcard = [
-            'BEGIN:VCARD',
-            'VERSION:3.0',
-            `FN:${owner.name}`,
-            `TEL;type=CELL;type=VOICE;waid=${owner.number}:${owner.displayNumber}`,
-            'END:VCARD'
-        ].join('\n');
+                try {
+                    const core = require('../Core/-.js');
+                    if (core?.ownerInfo) {
+                        owner = {
+                            ...owner,
+                            ...core.ownerInfo,
+                            displayNumber: core.ownerInfo.displayNumber || `+${core.ownerInfo.number}`
+                        };
+                    }
+                } catch {}
 
-        // ✅ Clean intro text
-        const introText = 
+                // ✅ vCard
+                const vcard = [
+                    'BEGIN:VCARD',
+                    'VERSION:3.0',
+                    `FN:${owner.name}`,
+                    `TEL;type=CELL;type=VOICE;waid=\( {owner.number}: \){owner.displayNumber}`,
+                    'END:VCARD'
+                ].join('\n');
+
+                // ✅ Clean intro text
+                const introText = 
 `⚉ Heyy! 👋
 
 I'm *CRYSNOVA AI V2* — your multi-core, spicy AI companion 😏
 
 The real creator & brain behind me is:
 
-*${owner.name} (${owner.displayNumber})*
+*\( {owner.name} ( \){owner.displayNumber})*
 AI Developer • Designer • Tinkerer  
 Based in Benin City 🔥
 
 He's the one who coded me from scratch and keeps upgrading me 😈`;
 
-        const channelJid = '120363402922206865@newsletter';
-        const thumbnail = owner.profilePicUrl;
+                const channelJid = '120363402922206865@newsletter';
+                const thumbnail = owner.profilePicUrl;
 
-        // ✅ Image + clickable preview
-        let picMsg = await sock.sendMessage(chatId, {
-            image: { url: thumbnail },
-            caption: introText + `
+                // ✅ Image + clickable preview
+                let picMsg = await sock.sendMessage(chatId, {
+                    image: { url: thumbnail },
+                    caption: introText + `
 
 💬 *Support Group:*  
 https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax
@@ -235,49 +315,111 @@ https://soloist.ai/crysnova-designs
 ✨ *WEB 2
 https://soloist.ai/crysnovadesigns`,
 
-       
+                    contextInfo: {
+                        isForwarded: true,
+                        forwardedNewsletterMessageInfo: {
+                            newsletterJid: channelJid,
+                            newsletterName: '𝓬𝓻𝔂𝓼𝓷𝓸𝓿𝓪 𝓿𝓮𝓻𝓲𝓯𝓲𝓮𝓭',
+                            serverMessageId: 1
+                        },
+                        externalAdReply: {
+                            title: '✦ 𝘾𝙍𝙔𝙎𝙉⚉𝙑𝘼 𝘼𝙄',
+                            body: '📢 follow channel',
+                            sourceUrl: 'https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38',
+                            thumbnailUrl: thumbnail,
+                            mediaType: 1,
+                            renderLargerThumbnail: false,
+                            showAdAttribution: true
+                        }
+                    }
 
-            contextInfo: {
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: channelJid,
-                    newsletterName: '𝓬𝓻𝔂𝓼𝓷𝓸𝓿𝓪 𝓿𝓮𝓻𝓲𝓯𝓲𝓮𝓭',
-                    serverMessageId: 1
-                },
-                externalAdReply: {
-                    title: '✦ 𝘾𝙍𝙔𝙎𝙉⚉𝙑𝘼 𝘼𝙄',
-                    body: '📢 follow channel',
-                    sourceUrl: 'https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38',
-                    thumbnailUrl: thumbnail,
-                    mediaType: 1,
-                    renderLargerThumbnail: false,
-                    showAdAttribution: true
+                }, { quoted: m }).catch(() => {});
+
+                // 😎 React to image
+                if (picMsg) {
+                    await sock.sendMessage(chatId, {
+                        react: { text: '😎', key: picMsg.key }
+                    }).catch(() => {});
                 }
+
+                // ✅ Send contact card
+                await sock.sendMessage(chatId, {
+                    contacts: {
+                        displayName: owner.name,
+                        contacts: [{ vcard }]
+                    }
+                }, { quoted: m });
+
+                return;
             }
 
-        }, { quoted: m }).catch(() => {});
-
-        // 😎 React to image
-        if (picMsg) {
-            await sock.sendMessage(chatId, {
-                react: { text: '😎', key: picMsg.key }
-            }).catch(() => {});
+        } catch (err) {
+            console.error('[CRYSNOVA CREATOR HANDLER ERROR]', err?.message || err);
         }
 
-        // ✅ Send contact card
-        await sock.sendMessage(chatId, {
-            contacts: {
-                displayName: owner.name,
-                contacts: [{ vcard }]
+        // ── Image confirmation system ───────────────────────────────────────
+        const pending = pendingImageAnalysis.get(chatId);
+
+        // If there's a pending image and user is confirming
+        if (pending) {
+            const confirmWords = ['yes', 'analyze', 'describe', 'ok', 'go', 'sure', 'do it', 'read it', 'what is this', 'analyze it'];
+            if (confirmWords.some(word => fullText.includes(word))) {
+                await sock.sendPresenceUpdate('composing', chatId);
+
+                let imageUrl;
+                try {
+                    imageUrl = await uploadImage(pending.buffer);
+                } catch {
+                    pendingImageAnalysis.delete(chatId);
+                    return sock.sendMessage(chatId, { text: '⚉ Failed to upload image.' }, { quoted: m });
+                }
+
+                const prompt = pending.caption || 'Describe this image in detail. Include any visible text (OCR), objects, people, colors, setting, mood, style, and context. Be accurate and concise.';
+
+                try {
+                    const description = await describeImage(imageUrl, prompt);
+                    await sock.sendMessage(chatId, {
+                        text: `⚉ *CRYSNOVA AI V2* analyzed:\n\n${description}\n\n_⚉ Powered by crysnovax verified_`
+                    }, { quoted: m });
+                } catch (e) {
+                    await sock.sendMessage(chatId, { text: '⚉ Analysis failed — try again later.' }, { quoted: m });
+                }
+
+                pendingImageAnalysis.delete(chatId);
+                return;
+            } else {
+                // User said something else → cancel pending
+                pendingImageAnalysis.delete(chatId);
             }
-        }, { quoted: m });
+        }
 
-        return;
-    }
+        // ── Detect new image and ask for confirmation ───────────────────────
+        if (m.message?.imageMessage || m.message?.stickerMessage) {
+            const imageMsg = m.message.imageMessage || m.message.stickerMessage;
+            const caption = (imageMsg.caption || '').trim();
 
-} catch (err) {
-    console.error('[CRYSNOVA CREATOR HANDLER ERROR]', err?.message || err);
-}
+            if (caption.toLowerCase().includes('⚉') || caption.startsWith('.')) return;
+            if (imageMsg.viewOnce || !imageMsg.mimetype) return;
+
+            let buffer;
+            try {
+                buffer = await m.download();
+            } catch (e) {
+                console.error('[IMAGE DOWNLOAD FAIL]', e.message);
+                return;
+            }
+
+            if (!buffer?.length) return;
+
+            // Save image and ask for confirmation
+            pendingImageAnalysis.set(chatId, { buffer, caption });
+
+            await sock.sendMessage(chatId, {
+                text: `⚉ Image detected.\n\nDo you want me to analyze this image? (yes / analyze / describe / ok)`
+            }, { quoted: m });
+
+            return;
+        }
 
         // ── Normal auto-reply ────────────────────────────────────────────────
         try {
