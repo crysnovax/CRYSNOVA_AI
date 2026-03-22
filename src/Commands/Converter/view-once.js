@@ -23,16 +23,13 @@ module.exports = {
   alias: ['viewonce', 'vview', 'vvp'],
   category: 'media',
   owner: true,
-   // ⭐ Reaction config
-    reactions: {
-        start: '👌',
-        success: '🤫'
-    },
-  
+  reactions: {
+    start: '👌',
+    success: '🤫'
+  },
 
   execute: async (sock, m, { args, reply }) => {
     try {
-
       const cmd = m.body.split(' ')[0].toLowerCase();
       const sender = m.sender;
 
@@ -50,19 +47,19 @@ module.exports = {
       }
 
       // unwrap ephemeral
-      if (quoted.ephemeralMessage)
-        quoted = quoted.ephemeralMessage.message;
+      if (quoted.ephemeralMessage) quoted = quoted.ephemeralMessage.message;
 
       // unwrap viewOnce
-      if (quoted.viewOnceMessage)
-        quoted = quoted.viewOnceMessage.message;
+      if (quoted.viewOnceMessage) quoted = quoted.viewOnceMessage.message;
 
       const type = Object.keys(quoted)[0];
 
-      if (!['imageMessage','videoMessage','stickerMessage'].includes(type)) {
-        return reply('╭─❍ *CRYSNOVA AI V2.0*\n│ ✘ Only view-once media supported.\n╰──────────────────');
+      // ───── SUPPORTED TYPES ─────
+      if (!['imageMessage','videoMessage','stickerMessage','audioMessage'].includes(type)) {
+        return reply('╭─❍ *CRYSNOVA AI V2.0*\n│ ✘ Only view-once media/audio supported.\n╰──────────────────');
       }
 
+      // ───── DOWNLOAD BUFFER ─────
       const stream = await downloadContentFromMessage(
         quoted[type],
         type.replace('Message','').toLowerCase()
@@ -73,12 +70,19 @@ module.exports = {
         buffer = Buffer.concat([buffer, chunk]);
       }
 
+      // ───── MAP TYPE TO SEND TYPE ─────
       const sendType =
         type === 'videoMessage'
           ? 'video'
           : type === 'imageMessage'
           ? 'image'
-          : 'sticker';
+          : type === 'stickerMessage'
+          ? 'sticker'
+          : type === 'audioMessage'
+          ? 'audio'
+          : null;
+
+      if (!sendType) return reply('╭─❍ *CRYSNOVA AI V2.0*\n│ ✘ Unsupported type.\n╰──────────────────');
 
       // ───── PRIVATE (.vvp) ─────
       if (cmd === '.vvp') {
@@ -86,7 +90,6 @@ module.exports = {
           [sendType]: buffer,
           caption: `╭─❍ *CRYSNOVA AI V2.0*\n│ ✓ View-once saved privately.\n╰──────────────────`
         });
-
         return reply('╭─❍ *CRYSNOVA AI V2.0*\n│ ✓ Sent to your DM.\n╰──────────────────');
       }
 
@@ -95,7 +98,6 @@ module.exports = {
         [sendType]: buffer,
         caption: `╭─❍ *CRYSNOVA AI V2.0*\n│ ✓ View-once unlocked.\n╰──────────────────`
       }, { quoted: m });
-
 
       // ───── ATTACH REACTION LISTENER ONCE ─────
       if (!listenerAttached) {
@@ -114,15 +116,11 @@ module.exports = {
             if (!msg?.message) return;
 
             let content = msg.message;
-
-            if (content.ephemeralMessage)
-              content = content.ephemeralMessage.message;
-
-            if (content.viewOnceMessage)
-              content = content.viewOnceMessage.message;
+            if (content.ephemeralMessage) content = content.ephemeralMessage.message;
+            if (content.viewOnceMessage) content = content.viewOnceMessage.message;
 
             const t = Object.keys(content)[0];
-            if (!['imageMessage','videoMessage','stickerMessage'].includes(t)) return;
+            if (!['imageMessage','videoMessage','stickerMessage','audioMessage'].includes(t)) return;
 
             const s = await downloadContentFromMessage(
               content[t],
@@ -139,7 +137,13 @@ module.exports = {
                 ? 'video'
                 : t === 'imageMessage'
                 ? 'image'
-                : 'sticker';
+                : t === 'stickerMessage'
+                ? 'sticker'
+                : t === 'audioMessage'
+                ? 'audio'
+                : null;
+
+            if (!st) return;
 
             await sock.sendMessage(reactor, {
               [st]: buf,
