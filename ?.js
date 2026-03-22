@@ -9,6 +9,7 @@ const chalk = require('chalk');
 const { setupStatusHandler } = require('./src/Plugin/statusHandler');
 const { getVar }             = require('./src/Plugin/configManager');
 
+// BOTFONT IMPORTS
 const styles = require("./src/Commands/Core/'.js");
 const botFont = require("./src/Commands/Bot/botfont.js");
 
@@ -22,7 +23,7 @@ const ignoredErrors = [
 
 module.exports = function setupMessageHandler(sock, customStore, handleMessage, smsg, io, config) {
 
-    
+    // BOTFONT OVERRIDE (GLOBAL)
     const originalSend = sock.sendMessage.bind(sock);
     sock.sendMessage = async (jid, content, options = {}) => {
         try {
@@ -36,19 +37,17 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
         return originalSend(jid, content, options);
     };
 
-    // ── Auto Status View + Like (Kord AI style) ────────────────
+    // Auto Status View + Like
     setupStatusHandler(sock);
 
-    // ── messages.upsert (CRYSNOVA V2 routing) ─────────────────
+    // messages.upsert
     sock.ev.on('messages.upsert', async (chatUpdate) => {
         try {
             const mek = chatUpdate.messages[0];
             if (!mek || !mek.message) return;
 
-            // Status is handled exclusively by statusHandler above
             if (mek.key?.remoteJid === 'status@broadcast') return;
 
-            // Handle ephemeral messages
             if (mek.message.ephemeralMessage) {
                 mek.message = mek.message.ephemeralMessage.message;
             }
@@ -56,7 +55,6 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             const m = await smsg(sock, mek, customStore);
             if (!m) return;
 
-            // Ensure message is in store for antidelete
             if (mek.key?.remoteJid && mek.key?.id) {
                 customStore.messages.set(mek.key.remoteJid + ':' + mek.key.id, mek);
             }
@@ -71,7 +69,7 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                 time: Date.now()
             });
 
-            // ── Invisible Tag (@everyone) ──────────────────────
+            // Invisible Tag (@everyone)
             if (m.text && m.text.startsWith('\u200E\u200E\u200E\u200E\u200E') && m.isGroup) {
                 try {
                     const metadata     = await sock.groupMetadata(m.chat);
@@ -86,7 +84,7 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                 return;
             }
 
-            // ── Mute User Check ───────────────────────────────
+            // Mute User Check
             try {
                 const mutePlugin = require('./src/Commands/Group/muteuser.js');
                 if (mutePlugin?.handleMutedMessage) {
@@ -95,24 +93,53 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                 }
             } catch {}
 
-            // ── Fake Typing (exactly like ping) ────────────────
+            // Fake Typing
             try {
-                const { getVar } = require('./src/Plugin/configManager');
                 if (getVar('FAKE_TYPING', true) !== false) {
                     await sock.sendPresenceUpdate('composing', m.key.remoteJid);
                 }
             } catch {}
 
-            // ── Main Command Engine ────────────────────────────
+            // ─────────────────────────────────────────────────────────────
+            //                   MAIN COMMAND ENGINE
+            // ─────────────────────────────────────────────────────────────
             await handleMessage(sock, m, customStore);
 
-            // ── Anti-Link ──────────────────────────────────────
+            // ─────────────────────────────────────────────────────────────
+            //                   CRYSNOVA AI AUTO-REPLY
+            // ─────────────────────────────────────────────────────────────
+            try {
+                const crysnova = require('./src/Commands/AI/crysnova.js');
+
+                const msgText = (m.text || '').toLowerCase().trim();
+
+                // Prevent auto-reply from triggering on command prefixes
+                // → let handleMessage() take care of .crysnova / .ai / .crys commands
+                if (
+                    msgText.startsWith('.crysnova') ||
+                    msgText.startsWith('.ai') ||
+                    msgText.startsWith('.crys')
+                ) {
+                    // do nothing here → command already handled above
+                } else if (crysnova?.onMessage) {
+                    await crysnova.onMessage(sock, m);
+                }
+            } catch (err) {
+                // silent fail by default – only log when debugging
+                // console.error('[CRYSNOVA AUTO]', err?.message || err);
+            }
+
+            // ─────────────────────────────────────────────────────────────
+            //                   OTHER FEATURES
+            // ─────────────────────────────────────────────────────────────
+
+            // Anti-Link
             try {
                 const anti = require('./src/Plugin/antilink.js');
                 if (anti?.handleAntiLink) await anti.handleAntiLink(sock, m);
             } catch {}
 
-            // ── Auto React when Bot is Tagged in a group ───────
+            // Auto React on Tag
             try {
                 if (m.isGroup && m.mentionedJid?.length) {
                     const botJid   = (sock.user?.id || '').replace(/:\d+@/, '@');
@@ -128,16 +155,6 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                 }
             } catch {}
 
-            // ── AI Auto Reply (non-command messages only) ──────
-            try {
-                const cfg    = config();
-                const prefix = cfg.settings?.prefix || '.';
-                if (m.text && !m.key.fromMe && !m.text.startsWith(prefix) && cfg.autoReply?.enabled) {
-                    const autoReply = require('./src/Commands/AI/autoreply.js');
-                    if (autoReply?.onMessage) await autoReply.onMessage(sock, m, cfg);
-                }
-            } catch {}
-
         } catch (err) {
             if (!ignoredErrors.some(e => err.message?.includes(e))) {
                 console.log(chalk.red('[MSG ERROR]'), err.message);
@@ -145,21 +162,21 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
         }
     });
 
-    // ── AntiDelete System ──────────────────────────────────────
+    // AntiDelete System
     sock.ev.on('messages.update', async (updates) => {
         try {
             const antidelete = require('./src/Commands/Tools/antidelete.js');
             if (antidelete?.onDelete) await antidelete.onDelete(sock, updates, customStore);
         } catch {}
+
         try {
             const quoted = require('./src/Commands/Tools/quoted.js');
             if (quoted?.onDelete) await quoted.onDelete(sock, updates, customStore);
         } catch {}
-
     });
 };
 
-// ── Auto-clean quoted temp store every 60s ─────────────────────
+// Auto-clean quoted temp store
 setInterval(() => {
     try {
         const quoted = require('./src/Commands/Tools/quoted.js');
