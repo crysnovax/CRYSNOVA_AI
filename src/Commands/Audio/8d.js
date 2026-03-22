@@ -7,7 +7,7 @@ category: "audio",
 execute: async (sock, m) => {
 
 await convertAudio(sock, m,
-"apulsator=hz=0.15:amount=0.9"
+"apulsator=hz=0.19:amount=0.8"
 )
 
 }
