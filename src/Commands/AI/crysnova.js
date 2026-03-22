@@ -14,7 +14,7 @@ const saveDB = (data) => fs.writeFileSync(DB, JSON.stringify(data, null, 2));
 
 const { getLunaResponse } = require('../Core/!!!.js');
 
-// Memory per chat (still in-memory, that's fine)
+// Memory per chat (unchanged)
 const chatMemory = new Map();
 const MAX_MEMORY = 10;
 
@@ -23,27 +23,66 @@ const getChatId = (m) => {
     return m.key?.remoteJid || m.chat || m.key?.chat || m.from || 'unknown';
 };
 
+// Is this a private chat (DM)?
+const isPrivateChat = (chatId) => {
+    return !chatId.includes('@g.us') && !chatId.includes('status@broadcast');
+};
+
 module.exports = {
     name: 'crysnova',
     alias: ['crys', 'ai'],
     desc: 'CRYSNOVA AI – auto-reply & manual query',
 
-    // ── Command handler (.crysnova / .ai / .crys) ───────────────────────
+    // ── Command handler ────────────────────────────────────────────────
     execute: async (sock, m, { args, reply }) => {
         const chatId = getChatId(m);
         const db = getDB();
 
-        // No argument → show usage
+        const isGroup = chatId.includes('@g.us');
+
+        // ── GLOBAL TOGGLE (only works from private chat or if you want from anywhere) ──
+        if (args[0]?.toLowerCase() === 'on' && args[1]?.toLowerCase() === 'all') {
+            if (isGroup) {
+                return reply('Global "on all" can only be used in private chats (DMs).');
+            }
+            db.global_force_private = true;
+            saveDB(db);
+            return reply(
+                '╭─❍ *CRYSNOVA GLOBAL*\n' +
+                '│ Auto-reply **FORCED ON** for **all private chats**\n' +
+                '│ Groups are unaffected.\n' +
+                '╰────────────────'
+            );
+        }
+
+        if (args[0]?.toLowerCase() === 'off' && args[1]?.toLowerCase() === 'all') {
+            if (isGroup) {
+                return reply('Global "off all" can only be used in private chats (DMs).');
+            }
+            delete db.global_force_private;
+            saveDB(db);
+            return reply(
+                '╭─❍ *✦ CRYSNOVA GLOBAL*\n' +
+                '│ Global force-on *disabled*\n' +
+                '│ Private chats now follow per-chat settings again\n' +
+                '╰────────────────'
+            );
+        }
+
+        // ── NORMAL PER-CHAT TOGGLE ──────────────────────────────────────
         if (!args[0]) {
-            const status = db[chatId] ? 'ON ✓' : 'OFF ✘';
+            const perChatStatus = db[chatId] ? 'ON ✓' : 'OFF ✘';
+            const globalStatus = db.global_force_private && isPrivateChat(chatId) ? '(global force ON)' : '';
+
             return reply(
                 `╭─❍ *CRYSNOVA AI* 𓉤\n` +
-                `│ Status in this chat: **${status}**\n` +
+                `│ Status in this chat: **${perChatStatus}** ${globalStatus}\n` +
                 `│ \n` +
                 `│ Usage:\n` +
-                `│   .crysnova on     → Enable auto-reply\n` +
-                `│   .crysnova off    → Disable auto-reply\n` +
-                `│   .crysnova        → Show this help\n` +
+                `│   .crysnova on        → Enable in this chat\n` +
+                `│   .crysnova off       → Disable in this chat\n` +
+                `│   .crysnova on all    → Force ON for ALL private chats\n` +
+                `│   .crysnova off all   → Remove global force-on\n` +
                 `╰────────────────`
             );
         }
@@ -62,7 +101,7 @@ module.exports = {
             return reply('╭─❍ *CRYSNOVA AI* DISABLED ✘\n╰─ Auto-reply stopped in this chat');
         }
 
-        // If unknown subcommand → treat as normal query (fallback)
+        // Fallback: treat as manual query
         const question = args.join(' ').trim();
         if (!question) return;
 
@@ -75,7 +114,7 @@ module.exports = {
         }
     },
 
-    // ── Auto-reply trigger (called from main handler) ─────────────────────
+    // ── Auto-reply trigger ─────────────────────────────────────────────
     onMessage: async (sock, m) => {
         if (!m.message) return;
 
@@ -84,9 +123,25 @@ module.exports = {
 
         const db = getDB();
 
-        // Feature is OFF for this chat → skip completely
-        if (!db[chatId]) return;
+        // ── Decide if auto-reply should run ─────────────────────────────
+        let shouldReply = false;
 
+        if (isPrivateChat(chatId)) {
+            // Private chat: global override has highest priority
+            if (db.global_force_private) {
+                shouldReply = true;
+            } else {
+                // Otherwise respect per-chat setting
+                shouldReply = !!db[chatId];
+            }
+        } else {
+            // Group: always use per-chat setting only
+            shouldReply = !!db[chatId];
+        }
+
+        if (!shouldReply) return;
+
+        // ── Rest of auto-reply logic (unchanged) ────────────────────────
         try {
             const fullTextRaw = (
                 m.message?.conversation ||
@@ -101,12 +156,9 @@ module.exports = {
 
             const fullText = fullTextRaw.toLowerCase();
 
-            // Protect against loops & commands
             if (fullText.includes('⚉')) return;
             if (fullText.startsWith('.')) return;
-            // if (m.key.fromMe) return;     // ← uncomment if you want to block bot→bot
 
-            // Remove mentions from question
             let question = fullTextRaw.replace(/@\d+(\s+|$)/g, '').trim();
             if (!question) return;
 
