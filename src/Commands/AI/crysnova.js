@@ -112,7 +112,6 @@ module.exports = {
 
         if (!shouldReply) return;
 
-        // ── Extract text ────────────────────────────────────────────────────
         let fullTextRaw = '';
         let fullText = '';
 
@@ -133,7 +132,6 @@ module.exports = {
             if (fullText.includes('⚉')) return;
             if (fullText.startsWith('.')) return;
 
-            // Specific filter for creator panel to prevent loop
             if (
                 fullText.includes('crysnovax') &&
                 fullText.includes('ai developer') &&
@@ -147,110 +145,139 @@ module.exports = {
             return;
         }
 
-        // ── Creator question detection ──────────────────────────────────────
+// ── Creator question detection ──────────────────────────────────────
+try {
+    const creatorKeywords = [
+        'who created', 'who made', 'who is your', 'who owns', 'who is the owner',
+        'creator', 'developer', 'admin', 'founder', 'maker', 'built by',
+        'your owner', 'your creator', 'crys', 'crysnova', 'who are you',
+        'introduce yourself', 'about you', 'bot owner', 'who owns you',
+        'who developed', 'who programmed', 'your developer',
+        'crysnovax', 'who is crysnovax'
+    ];
+
+    const isCreatorQuestion = creatorKeywords.some(kw => fullText.includes(kw));
+
+    if (isCreatorQuestion) {
+
+        // 🔥 React to user message
+        await sock.sendMessage(chatId, {
+            react: { text: '🔥', key: m.key }
+        }).catch(() => {});
+
+        let owner = {
+            name: "crysnovax",
+            number: "2348077134210",
+            displayNumber: "+2348077134210",
+            profilePicUrl: "https://files.catbox.moe/z2rqc1.jpg"
+        };
+
         try {
-            const creatorKeywords = [
-                'who created', 'who made', 'who is your', 'who owns', 'who is the owner',
-                'creator', 'developer', 'admin', 'founder', 'maker', 'built by',
-                'your owner', 'your creator', 'crys', 'crysnova', 'who are you',
-                'introduce yourself', 'about you', 'bot owner', 'who owns you',
-                'who developed', 'who programmed', 'your developer',
-                'crysnovax', 'who is crysnovax'
-            ];
-
-            const isCreatorQuestion = creatorKeywords.some(kw => fullText.includes(kw));
-
-            if (isCreatorQuestion) {
-                let owner = {
-                    name: "crysnovax",
-                    number: "2348077134210",           // fallback
-                    displayNumber: "+2348077134210",
-                    profilePicUrl: "https://media.crysnovax.workers.dev/d1c4273f-dbd8-4a15-a874-40087fb66eff.jpg"
+            const core = require('../Core/-.js');
+            if (core?.ownerInfo) {
+                owner = {
+                    ...owner,
+                    ...core.ownerInfo,
+                    displayNumber: core.ownerInfo.displayNumber || `+${core.ownerInfo.number}`
                 };
+            }
+        } catch {}
 
-                try {
-                    const core = require('../Core/-.js');
-                    if (core?.ownerInfo) {
-                        owner = {
-                            ...owner,
-                            ...core.ownerInfo,
-                            displayNumber: core.ownerInfo.displayNumber || `+${core.ownerInfo.number}`
-                        };
-                    }
-                } catch (e) {
-                    console.error('[OWNER LOAD ERROR]', e.message);
-                }
+        // ✅ vCard
+        const vcard = [
+            'BEGIN:VCARD',
+            'VERSION:3.0',
+            `FN:${owner.name}`,
+            `TEL;type=CELL;type=VOICE;waid=${owner.number}:${owner.displayNumber}`,
+            'END:VCARD'
+        ].join('\n');
 
-                const vcard = `
-BEGIN:VCARD
-VERSION:3.0
-FN:${owner.name}
-TEL;type=CELL;type=VOICE;waid=${owner.number}:${owner.displayNumber}
-END:VCARD`.trim();
-                const introText = 
+        // ✅ Clean intro text
+        const introText = 
 `⚉ Heyy! 👋
 
 I'm *CRYSNOVA AI V2* — your multi-core, spicy AI companion 😏
 
 The real creator & brain behind me is:
 
-**\( {owner.name}**  ( \){owner.displayNumber})
-AI Developer • Designer • Tinkerer
+*${owner.name} (${owner.displayNumber})*
+AI Developer • Designer • Tinkerer  
 Based in Benin City 🔥
 
-He's the one who coded me from scratch and keeps upgrading me.
+He's the one who coded me from scratch and keeps upgrading me 😈`;
 
-Want the full vibe? Check out his links:
+        const channelJid = '120363402922206865@newsletter';
+        const thumbnail = owner.profilePicUrl;
 
-╭───────────────
-│ ⚉ *WhatsApp Channel*  
-│ https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38
+        // ✅ Image + clickable preview
+        let picMsg = await sock.sendMessage(chatId, {
+            image: { url: thumbnail },
+            caption: introText + `
 
-│ ⚉ *Support Group*  
-│ https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax
+💬 *Support Group:*  
+https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax
 
-│ ⚉ *Direct Contact*  
-│ https://wa.me/message/636PEVHM5BZUM1
+🥏 *Contact Owner:*  
+https://wa.me/${owner.number}
 
-│ ⚉ *GitHub*  
-│ https://github.com/crysnovax/CRYSNOVA_AI
+👾 *GitHub:*
+https://github.com/crysnovax/CRYSNOVA_AI
 
-│ ⚉ *YouTube*  
-│ https://youtube.com/@crysnovax
+📺 *YouTube:*
+https://youtube.com/@crysnovax?si=Zfl2Ov79lHy4kgWD
 
-│ ⚉ *TikTok*  
-│ https://www.tiktok.com/@crysnovax
+🐾 *Tiktok:*
+https://www.tiktok.com/@crysnovax?_r=1&_t=ZS-94pVSsCQUWi
 
-│ ⚉ *Web Portfolio 1*  
-│ https://soloist.ai/crysnova-designs
+🔎 *WEB 1
+https://soloist.ai/crysnova-designs
 
-│ ⚉ *Web Portfolio 2*  
-│ https://soloist.ai/crysnovadesigns
-╰───────────────
+✨ *WEB 2
+https://soloist.ai/crysnovadesigns`,
 
-Hit him up for collabs, bots, designs, or just to say hi~ 😈`;
+       
 
-                await sock.sendMessage(chatId, { text: introText }, { quoted: m });
-
-                await sock.sendMessage(chatId, {
-                    contacts: {
-                        displayName: owner.name,
-                        contacts: [{ vcard }]
-                    }
-                }, { quoted: m });
-
-                if (owner.profilePicUrl) {
-                    await sock.sendMessage(chatId, {
-                        image: { url: owner.profilePicUrl },
-                        caption: `⚉ That's ${owner.name} himself 😎`
-                    }, { quoted: m }).catch(() => {});
+            contextInfo: {
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: channelJid,
+                    newsletterName: '𝓬𝓻𝔂𝓼𝓷𝓸𝓿𝓪 𝓿𝓮𝓻𝓲𝓯𝓲𝓮𝓭',
+                    serverMessageId: 1
+                },
+                externalAdReply: {
+                    title: '✦ 𝘾𝙍𝙔𝙎𝙉⚉𝙑𝘼 𝘼𝙄',
+                    body: '📢 follow channel',
+                    sourceUrl: 'https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38',
+                    thumbnailUrl: thumbnail,
+                    mediaType: 1,
+                    renderLargerThumbnail: false,
+                    showAdAttribution: true
                 }
-
-                return;
             }
-        } catch (err) {
-            console.error('[CRYSNOVA CREATOR HANDLER ERROR]', err?.message || err);
+
+        }, { quoted: m }).catch(() => {});
+
+        // 😎 React to image
+        if (picMsg) {
+            await sock.sendMessage(chatId, {
+                react: { text: '😎', key: picMsg.key }
+            }).catch(() => {});
         }
+
+        // ✅ Send contact card
+        await sock.sendMessage(chatId, {
+            contacts: {
+                displayName: owner.name,
+                contacts: [{ vcard }]
+            }
+        }, { quoted: m });
+
+        return;
+    }
+
+} catch (err) {
+    console.error('[CRYSNOVA CREATOR HANDLER ERROR]', err?.message || err);
+}
 
         // ── Normal auto-reply ────────────────────────────────────────────────
         try {
