@@ -70,8 +70,8 @@ async function newUpdate(sock, m, { reply }) {
 }
 
 module.exports = {
-    name: 'newupd',
-    alias: ['checkupd'],
+    name: 'checkup',
+    alias: ['newupd'],
     category: 'owner',
     owner: true,
     desc: 'Check for new updates without applying',
