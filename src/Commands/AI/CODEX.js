@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-function chunkText(text, size = 3500) {
+function chunkText(text, size = 99900) {
     const chunks = [];
     for (let i = 0; i < text.length; i += size) chunks.push(text.slice(i, i + size));
     return chunks;
