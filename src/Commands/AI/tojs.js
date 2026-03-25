@@ -27,7 +27,7 @@ module.exports = {
             const jsOutput = (data.result || data.code).trim();
 
             // Handle very long output by splitting if > 4000 chars
-            const MAX_CHARS = 4000;
+            const MAX_CHARS = 400000;
             if (jsOutput.length > MAX_CHARS) {
                 for (let i = 0; i < jsOutput.length; i += MAX_CHARS) {
                     await sock.sendMessage(m.chat, {
