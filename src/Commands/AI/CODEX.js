@@ -122,7 +122,7 @@ async function requestCode(prompt) {
 
 module.exports = {
     name: 'code',
-    alias: ['aicode', 'codex', 'dev'],
+    alias: ['aicode', 'coder', 'dev'],
     desc: 'Advanced AI coder powered by Crysnova AI',
     category: 'ai',
 
@@ -187,7 +187,7 @@ module.exports = {
             }
 
             await sock.sendMessage(m.chat, {
-                react: { text: '🤖', key: m.key }
+                react: { text: '📤', key: m.key }
             });
 
             const parts = chunkText(result, 3500);
@@ -199,7 +199,7 @@ module.exports = {
             }
 
             await sock.sendMessage(m.chat, {
-                react: { text: '👾', key: m.key }
+                react: { text: '✅', key: m.key }
             });
         } catch (err) {
             console.log('CODE CMD ERROR:', err?.message);
@@ -220,4 +220,4 @@ module.exports = {
         }
     }
 };
-
+            
