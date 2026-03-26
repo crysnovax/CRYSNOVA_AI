@@ -79,7 +79,7 @@ module.exports = {
 
         if (parts.length < 3 || parts[0].toLowerCase() !== 'command') {
             return reply(
-                `❌ Wrong format\n\n` +
+                `⚉ Wrong format\n\n` +
                 `*Correct:* .xm command|<name>|<what it does>\n` +
                 `*Example:* .xm command|meme|fetch a random meme from meme-api`
             )
@@ -88,8 +88,8 @@ module.exports = {
         const cmdName = parts[1].toLowerCase().replace(/[^a-z0-9]/g, '')
         const description = parts.slice(2).join('|')
 
-        if (!cmdName) return reply('❌ Command name is invalid')
-        if (!description) return reply('❌ Please describe what the command should do')
+        if (!cmdName) return reply('✘ Command name is invalid')
+        if (!description) return reply('𓄄 Please describe what the command should do')
 
         // Show coding status
         const statusMsg = await sock.sendMessage(m.chat, {
@@ -160,7 +160,7 @@ const fetchImageCmd = {
     name: 'fetchimage',
     alias: ['fi', 'imgfetch', 'searchimage'],
     desc: 'Search and fetch images from the web',
-    category: 'Tools',
+    category: 'Search',
 
     execute: async (sock, m, { text, reply }) => {
         if (!text) return reply(
@@ -201,7 +201,7 @@ const fetchImageCmd = {
             const data = await searchRes.json()
             const results = (data?.results || []).filter(r => r?.image)
 
-            if (!results.length) return reply(`❌ No images found for: *${text}*`)
+            if (!results.length) return reply(`𓉤 No images found for: *${text}*`)
 
             // Pick from top 5 randomly for variety
             const pick = results[Math.floor(Math.random() * Math.min(5, results.length))]
@@ -223,7 +223,7 @@ const fetchImageCmd = {
             }, { quoted: m })
 
         } catch (err) {
-            reply(`❌ Image fetch failed\n_${err.message}_`)
+            reply(`✘ Image fetch failed\n_${err.message}_`)
         }
     }
 }
@@ -235,7 +235,7 @@ const fetchWebCmd = {
     name: 'fetchweb',
     alias: ['fw', 'websearch', 'search'],
     desc: 'Search the web and get an AI-summarized answer',
-    category: 'Tools',
+    category: 'Search',
 
     execute: async (sock, m, { text, reply }) => {
         if (!text) return reply(
@@ -299,7 +299,7 @@ const fetchWebCmd = {
             if (statusMsg?.key) {
                 await sock.sendMessage(m.chat, { delete: statusMsg.key }).catch(() => {})
             }
-            reply(`❌ Search failed\n_${err.message}_`)
+            reply(`✘ Search failed\n_${err.message}_`)
         }
     }
 }
