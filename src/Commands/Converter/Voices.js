@@ -21,7 +21,7 @@ module.exports = {
 
             const text = args.slice(1).join(' ').trim();
             if (!text) return reply('_*𓄄 Give text to speak*_');
-            if (text.length > 200) return reply('_*⚉ Max 200 chars (tmp files expire fast)*_');
+            if (text.length > 999999) return reply('_*⚉ Max 200 chars (tmp files expire fast)*_');
 
             await sock.sendPresenceUpdate('recording', m.chat);
 
@@ -104,7 +104,7 @@ module.exports = {
             await sock.sendMessage(m.chat, {
                 document: buffer,
                 mimetype: 'audio/wav',
-                fileName: `tts-${voiceNum}.wav`,
+                fileName: `tts-${voiceNum}.CRYSN⚉VA`,
                 caption: `🎙️ TTS Voice ${voiceNum}`
             }, { quoted: m });
 
