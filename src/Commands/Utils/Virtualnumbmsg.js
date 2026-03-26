@@ -1,58 +1,69 @@
-// veepnmsg.js - Get messages for a number
 module.exports = {
-    name: 'vnumbmsg',
-    alias: ['vmsg', 'sms', 'getmsg'],
-    desc: 'Get SMS messages for a Veepn virtual number',
+    name: 'sms24msg',
+    alias: ['24msg', 'smsget', 'readsms'],
+    desc: 'Get SMS messages for SMS24 virtual number',
     category: 'Tools',
 
     execute: async (sock, m, { args, reply }) => {
         try {
             if (!args.length) {
                 return reply(`📩 Usage:
-.veepnmsg <number>
-.veepnmsg +1234567890
+.sms24msg <number>
 
-☬ Get numbers from .veepnnumbers`);
+Example:
+.sms24msg +12017367277
+
+☬ Get numbers from .sms24numbers`);
             }
 
             const number = args[0].trim();
-            const country = args[1]?.toUpperCase() || 'US';
-            const page = args[2] || '1';
-            const count = args[3] || '10';
 
             await sock.sendPresenceUpdate('composing', m.chat);
 
-            const apiUrl = `https://apis.prexzyvilla.site/vnum/veepn-messages?country=${encodeURIComponent(country)}&number=${encodeURIComponent(number)}&page=${page}&count=${count}`;
+            const apiUrl = `https://apis.prexzyvilla.site/vnum/sms24-messages?number=${encodeURIComponent(number)}`;
 
-            const res = await fetch(apiUrl);
-            if (!res.ok) return reply('_*⚉ Failed to fetch messages*_');
+            const res = await fetch(apiUrl, { timeout: 15000 });
+            
+            if (!res.ok) {
+                return reply(`_*⚉ API Error ${res.status}*_\n☬ Failed to fetch messages`);
+            }
 
             const json = await res.json();
 
-            if (!json.data || !json.data.length) {
-                return reply(`_*亗 No messages for ${number}*_`);
+            // SMS24 uses 'messages' array with 'from' and 'content' fields
+            const messages = json.messages || [];
+
+            if (!messages.length) {
+                return reply(`_*亗 No messages for ${number}*_\n☬ Number may be inactive or no recent SMS`);
             }
 
-            const messages = json.data.slice(0, 5);
-            let msgList = messages.map((msg, i) => {
-                const from = msg.from || msg.sender || 'Unknown';
-                const text = msg.text || msg.message || msg.body || 'No content';
-                const time = msg.time || msg.date || 'Unknown time';
-                return `*${i + 1}. From:* ${from}\n📝 ${text.substring(0, 100)}${text.length > 100 ? '...' : ''}\n⏰ ${time}\n`;
+            const displayMsgs = messages.slice(0, 8);
+            let msgList = displayMsgs.map((msg, i) => {
+                const from = msg.from || 'Unknown';
+                const text = msg.content || msg.text || msg.message || msg.body || 'No content'; // 'content' is the correct field
+                const time = msg.time || msg.date || msg.timestamp || 'Recent';
+                
+                // Extract verification codes if present
+                const codeMatch = text.match(/\b\d{4,6}\b/);
+                const code = codeMatch ? codeMatch[0] : '';
+                
+                return `*${i + 1}. 📨 From:* ${from}
+📝 ${text.substring(0, 200)}${text.length > 200 ? '...' : ''}
+${code ? `🔐 *Code: ${code}*\n` : ''}⏰ ${time}\n`;
             }).join('\n');
 
-            const message = `*⚉ MESSAGES FOR ${number} ⚉*
-☬ Country: ${country}
-📨 Total: ${json.data.length}
+            const message = `*⚉ SMS24 MESSAGES ⚉*
+☬ Number: ${number}
+📨 Total: ${messages.length} | Showing: ${displayMsgs.length}
 
 ${msgList}
 
-☬ Use .veepnnumbers to see available numbers`;
+☬ Refresh: .sms24msg ${number}`;
 
             await reply(message);
 
         } catch (err) {
-            console.error('[VEEPNMSG ERROR]', err);
+            console.error('[SMS24MSG ERROR]', err);
             reply('_*✘ Failed to get messages*_');
         }
     }
