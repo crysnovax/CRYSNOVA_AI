@@ -1,8 +1,7 @@
-// veepnnumbers.js - Get available numbers
 module.exports = {
-    name: 'vnumb',
-    alias: ['vnums', 'numbers', 'vnumlist'],
-    desc: 'List available Veepn virtual phone numbers',
+    name: 'sms24numbers',
+    alias: ['sms24', 'smsnums', '24numbers'],
+    desc: 'List available SMS24 virtual phone numbers',
     category: 'Tools',
 
     execute: async (sock, m, { args, reply }) => {
@@ -11,36 +10,42 @@ module.exports = {
             
             await sock.sendPresenceUpdate('composing', m.chat);
 
-            const apiUrl = `https://apis.prexzyvilla.site/vnum/veepn-numbers?country=${encodeURIComponent(country)}`;
+            const apiUrl = `https://apis.prexzyvilla.site/vnum/sms24-numbers?country=${encodeURIComponent(country)}`;
             
-            const res = await fetch(apiUrl);
-            if (!res.ok) return reply(`_*⚉ API failed for country ${country}*_`);
+            const res = await fetch(apiUrl, { timeout: 15000 });
+            
+            if (!res.ok) {
+                return reply(`_*⚉ SMS24 API Error ${res.status}*_\n☬ Service temporarily unavailable`);
+            }
 
             const json = await res.json();
 
-            if (!json.data || !json.data.length) {
-                return reply(`_*亗 No numbers available for ${country}*_`);
+            // SMS24 uses 'numbers' array with 'phoneNumber' field
+            const numbers = json.numbers || [];
+
+            if (!numbers.length) {
+                return reply(`_*亗 No numbers for ${country}*_\n☬ Try: US, GB, CA, AU, DE, FR`);
             }
 
-            const numbers = json.data.slice(0, 10);
-            let list = numbers.map((num, i) => {
-                const phone = num.number || num.phone || num.num;
-                const country = num.country || num.region || 'Unknown';
-                return `${i + 1}. *${phone}* (${country})`;
+            const displayNumbers = numbers.slice(0, 15);
+            let list = displayNumbers.map((num, i) => {
+                const phone = num.phoneNumber || num.phone || num.number || num.num; // phoneNumber is the correct field
+                const region = num.country || country;
+                return `${i + 1}. *${phone}* (${region})`;
             }).join('\n');
 
-            const message = `*⚉ VEEPN NUMBERS ⚉*
+            const message = `*⚉ SMS24 NUMBERS ⚉*
 ☬ Country: ${country}
-📊 Available: ${json.data.length}
+📊 Available: ${numbers.length}
 
 ${list}
 
-☬ Use: .veepnmsg <number> to get messages`;
+☬ Use: .sms24msg <number> to read SMS`;
 
             await reply(message);
 
         } catch (err) {
-            console.error('[VEEPNNUMBERS ERROR]', err);
+            console.error('[SMS24NUMBERS ERROR]', err);
             reply('_*✘ Failed to fetch numbers*_');
         }
     }
