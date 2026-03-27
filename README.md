@@ -60,7 +60,11 @@ ___
     <img src="https://readme-typing-svg.herokuapp.com?size=26&duration=1800&pause=700&color=FF0000&center=true&vCenter=true&width=500&lines=▶+Subscribe+to+Crysnova;🔥+Elite+Content+Only;🚀+Join+Now!" />
   </a>
 </p>
-
+<p align="center">
+  <a href="https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax?mode=gi_t">
+    <img src="https://img.shields.io/badge/Join%20Support%20Group-WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white"/>
+  </a>
+</p>
 -------------
   <em>Professional WhatsApp Bot • Built by crysnova</em>
 </p>
