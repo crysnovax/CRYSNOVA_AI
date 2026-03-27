@@ -48,6 +48,11 @@ ___
     <img src="https://media.crysnovax.workers.dev/2edabe62-411f-48a1-a277-6ad7e6d8fe39.jpg" width="350" alt="Bot Updating — WhatsApp Channel | Join Fast">
   </a>
 </p>
+<p align="center">
+  <a href="https://youtube.com/@crysnovax?si=Zfl2Ov79lHy4kgWD">
+    <img src="https://capsule-render.vercel.app/api?type=rect&color=ff0000&height=60&section=header&text=▶%20CRYSNOVA%20YOUTUBE&fontSize=20&fontColor=ffffff&animation=blinking"/>
+  </a>
+</p>
 
 -------------
   <em>Professional WhatsApp Bot • Built by crysnova</em>
