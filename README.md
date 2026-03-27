@@ -232,6 +232,11 @@ Your bot is now running 24/7 on the platform! 🎉
 ❌ No SSH/terminal skills needed  
 ❌ No domain required  
 ❌ No credit card needed (for free tiers)  
+<p align="center">
+  <a href="https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax?mode=gi_t">
+    <img src="https://readme-typing-svg.herokuapp.com?size=25&duration=2000&pause=800&color=25D366&center=true&vCenter=true&width=500&lines=💬+Join+Crysnova+Support+Group;🚀+Get+Help+Instantly;🔥+Active+Community+24/7" />
+  </a>
+</p>
 
 ✅ Just click, pair, and use!  
 ✅ Bot runs 24/7  
