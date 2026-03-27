@@ -72,6 +72,8 @@ it's completely user friendly and requires less labor compared to V1.0 everythin
   <img src="https://img.shields.io/github/issues/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=red" alt="GitHub Issues"/>
   <img src="https://img.shields.io/github/license/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=green" alt="License"/>
 </div>
+
+
 <div align="center">
   <svg width="300" height="300" viewBox="0 0 300 300">
     <!-- Robot face with SMIL animations -->
