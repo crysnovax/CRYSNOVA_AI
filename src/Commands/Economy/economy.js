@@ -5,7 +5,7 @@ const API = "https://eco.crysnovax.workers.dev";
 module.exports = {
   name: 'economy',
   alias: [
-    'bal','earn','pay','steal','daily',
+    'bal','earn','pay','steal#','daily',
     'work','loan','save','bank#','withdraw',
     'shield','buyweapon'
   ],
@@ -28,7 +28,7 @@ module.exports = {
 ┃ 🎁 .daily
 ┃ 💼 .work
 ┃ 💸 .pay @user 500
-┃ 😈 .steal @user
+┃ 😈 .steal# @user
 ┃
 ┃ 🏦 .bank#
 ┃ 💾 .save|name amount
@@ -90,22 +90,27 @@ module.exports = {
       }
 
       // 😈 STEAL
-      if (cmd === ".steal") {
+      if (cmd === ".steal#") {
         const user = m.mentionedJid?.[0];
         if (!user) return reply("Tag someone");
 
-        const res = await axios.get(
-          `${API}/steal?from=${m.sender}&to=${user}`
-        );
-
-        return sock.sendMessage(
-          m.chat,
-          {
-            text: `╭─😈 STEAL\n│ ${res.data}\n│ Target: @${user.split("@")[0]}\n╰──────────`,
-            mentions: [user]
-          },
-          { quoted: m }
-        );
+        try {
+          const res = await axios.get(`${API}/steal?from=${m.sender}&to=${user}`);
+          return sock.sendMessage(
+            m.chat,
+            {
+              text: `╭─😈 STEAL\n│ ${res.data}\n│ Target: @${user.split("@")[0]}\n╰──────────`,
+              mentions: [user]
+            },
+            { quoted: m }
+          );
+        } catch (err) {
+          if (err.response?.data?.includes("no such table: shield")) {
+            return reply("⚠️ Steal failed: shield system not set up yet.");
+          }
+          console.error("[STEAL ERROR]", err);
+          return reply("❌ Steal failed due to a system error");
+        }
       }
 
       // 💳 LOAN
@@ -136,7 +141,7 @@ module.exports = {
       }
 
       // 🏦 BANK
-      if (cmd === ".bank") {
+      if (cmd === ".bank#") {
         const res = await axios.get(`${API}/bank?user=${m.sender}`);
         return reply(`╭─🏦 BANK\n│ ${res.data}\n╰──────────`);
       }
