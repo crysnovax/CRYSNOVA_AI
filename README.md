@@ -1,4 +1,4 @@
-## ✦ CRYSN⚉VA AI V2.8.8.1
+### ✦ CRYSN⚉VA AI V2.8.8.1
 
 
 <!-- CRYSNOVA WA BOT | Modern Profile README  -->
@@ -166,14 +166,14 @@ Follow along with the tutorial series: Each episode introduces 1–2 new command
 </p>
 
 
-## 🚀 Getting Started
+### 🚀 Getting Started
 1. Clone the repository: `git clone https://github.com/crysnovax/CRYSNOVA_AI`
 2. Install dependencies: `npm install`
 3. Run the bot: `node index.js`
 4. Scan the QR code with WhatsApp to connect.
 
 
-## ⚡ **ONE-CLICK DEPLOYMENT** (Choose Any Platform):
+### ⚡ **ONE-CLICK DEPLOYMENT** (Choose Any Platform):
 
 ### **Railway (Recommended - Free $5 Credit)**
 [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/crysnova-ai)
@@ -296,7 +296,7 @@ Click "Restart" button in platform dashboard
 
 ---
 
-##HOW TO GET CRYSNOVA_AI RUNNING ON PANNEL:
+### HOW TO GET CRYSNOVA_AI RUNNING ON PANNEL:
 USE START UP SCRIPT 
 ♻️ `create a new file`
 paste:
