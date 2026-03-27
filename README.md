@@ -50,7 +50,7 @@ ___
 </p>
 <p align="center">
   <a href="https://youtube.com/@crysnovax?si=Zfl2Ov79lHy4kgWD">
-    <img src="https://capsule-render.vercel.app/api?type=rect&color=ff0000&height=60&section=header&text=▶%20CRYSNOVA%20YOUTUBE&fontSize=20&fontColor=ffffff&animation=blinking"/>
+    <img src="https://readme-typing-svg.herokuapp.com?size=26&duration=1800&pause=700&color=FF0000&center=true&vCenter=true&width=500&lines=▶+Subscribe+to+Crysnova;🔥+Elite+Content+Only;🚀+Join+Now!" />
   </a>
 </p>
 
