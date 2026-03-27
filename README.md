@@ -1,4 +1,4 @@
-## ✦ CRYSNOVA AI V2.8.8.1
+## ✦ CRYSN⚉VA AI V2.8.8.1
 
 
 <!-- CRYSNOVA WA BOT | Modern Profile README  -->
@@ -28,7 +28,7 @@
 
   <div align="center"> 
   <a href="https://git.io/typing-svg"> 
-    <img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=50&pause=1000&color=ff0000&center=true&width=910&height=100&lines=CRYSNOVA+AI;Best+Choice;Don't+Forget+to+Star+My+Repo;Click+Below+To+Join+Channel;Always+Stay+Updated;By+crysnovax" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=50&pause=1000&color=ff0000&center=true&width=910&height=100&lines=CRYSN⚉VA+AI;Best+Choice;Don't+Forget+to+Star+My+Repo;Click+Below+To+Join+Channel;Always+Stay+Updated;By+crysnovax" alt="Typing SVG" />
   </a> 
 </div>
 <div align="center">
