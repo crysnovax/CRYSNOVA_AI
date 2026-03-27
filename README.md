@@ -152,14 +152,19 @@ Follow along with the tutorial series: Each episode introduces 1–2 new command
 
 > 🔔 Stay Connected For Updates Feature Drops And Tutorials!
 
-<a href="https://youtu.be/xPZri7IGku4?si=t44dgWTrSOwxcJQO" target="_blank">
-  <img src="Shaban/youtube.svg" alt="YouTube" width="250"/>
-</a>
-
 <p align="center">
-  <img src="https://i.imgur.com/LyHic3i.gif" alt="footer divider"/>
+  <a href="https://youtube.com/@crysnovax?si=Zfl2Ov79lHy4kgWD">
+    <img src="https://capsule-render.vercel.app/api?type=rect&color=0:000000,100:ff0000&height=80&section=header&text=▶%20CRYSNOVA%20SUBSCRIBE&fontSize=22&fontColor=ffffff&animation=fadeIn&stroke=ff0000&strokeWidth=2"/>
+  </a>
 </p>
-- **WhatsApp Channel**: [Official Channel](https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38)
+
+- **SUPPORT GROUP**:
+<p align="center">
+  <a href="https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax?mode=gi_t">
+    <img src="https://capsule-render.vercel.app/api?type=rect&color=0:000000,100:25D366&height=80&section=header&text=💬%20CRYSNOVA%20SUPPORT%20GROUP&fontSize=22&fontColor=ffffff&animation=blinking"/>
+  </a>
+</p>
+
 
 ## 🚀 Getting Started
 1. Clone the repository: `git clone https://github.com/crysnovax/CRYSNOVA_AI`
