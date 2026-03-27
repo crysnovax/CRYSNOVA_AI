@@ -25,6 +25,19 @@
 
 <p align="center">
   <strong>CRYSN⚉VA AI V2</strong><br>
+
+  <div align="center"> 
+  <a href="https://git.io/typing-svg"> 
+    <img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=50&pause=1000&color=ff0000&center=true&width=910&height=100&lines=CRYSNOVA+AI;Multifunctional+WhatsApp+Bot;Advanced+Group+Management;Entertainment+%26+Utility;By+crysnovax" alt="Typing SVG" />
+  </a> 
+</div>
+<div align="center">
+  <img src="https://img.shields.io/github/stars/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=yellow" alt="GitHub Stars"/>
+  <img src="https://img.shields.io/github/forks/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=blue" alt="GitHub Forks"/>
+  <img src="https://img.shields.io/github/issues/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=red" alt="GitHub Issues"/>
+  <img src="https://img.shields.io/github/license/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=green" alt="License"/>
+</div>
+
 ______
 
 ___ 
