@@ -49,6 +49,14 @@ ___
   </a>
 </p>
 <p align="center">
+  <a href="https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38">
+    <!-- Main Button -->
+    <img src="https://capsule-render.vercel.app/api?type=rect&color=0:000000,100:128C7E&height=120&section=header&text=📢%20FOLLOW%20CRYSNOVA%20CHANNEL&fontSize=32&fontColor=ffffff&animation=fadeIn"/>
+  </a>
+  <!-- Logo Watermark Top-Right -->
+  <img src="https://media.crysnovax.workers.dev/e88c0d22-d1c8-4f99-8586-f3f32b56d5ac.png" width="50" style="position: relative; margin-left:-70px; margin-top:-110px;" />
+</p>
+<p align="center">
   <a href="https://youtube.com/@crysnovax?si=Zfl2Ov79lHy4kgWD">
     <img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f0f0f,100:ff0000&height=90&section=header&text=🚀%20CRYSNOVA%20CHANNEL&fontSize=22&fontColor=ffffff&animation=blinking"/>
   </a>
