@@ -115,6 +115,11 @@ Follow along with the tutorial series: Each episode introduces 1–2 new command
 
 ## 📺 Connect & Learn
 - **YouTube Channel**: [CRYSNOVA](https://youtube.com/@crysnovax)
+<p align="center">
+  <a href="https://youtube.com/@crysnovax?si=Zfl2Ov79lHy4kgWD">
+    <img src="https://media.giphy.com/media/3o7TKtnuHOHHUjR38Y/giphy.gif" width="200"/>
+  </a>
+</p>
 
 <p align="center">
   <img src="https://media.crysnovax.workers.dev/eba4d8a2-990a-46ae-ba4c-f409cad30353.jpg" alt="divider"/>
