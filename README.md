@@ -50,6 +50,13 @@ ___
 </p>
 <p align="center">
   <a href="https://youtube.com/@crysnovax?si=Zfl2Ov79lHy4kgWD">
+    <img src="https://capsule-render.vercel.app/api?type=rect&color=0:0f0f0f,100:ff0000&height=90&section=header&text=🚀%20CRYSNOVA%20CHANNEL&fontSize=22&fontColor=ffffff&animation=blinking"/>
+  </a>
+  <br/>
+  <img src="https://media.crysnovax.workers.dev/e88c0d22-d1c8-4f99-8586-f3f32b56d5ac.png" width="40" style="margin-top:-70px; margin-left:250px;" />
+</p>
+<p align="center">
+  <a href="https://youtube.com/@crysnovax?si=Zfl2Ov79lHy4kgWD">
     <img src="https://readme-typing-svg.herokuapp.com?size=26&duration=1800&pause=700&color=FF0000&center=true&vCenter=true&width=500&lines=▶+Subscribe+to+Crysnova;🔥+Elite+Content+Only;🚀+Join+Now!" />
   </a>
 </p>
