@@ -72,6 +72,28 @@ it's completely user friendly and requires less labor compared to V1.0 everythin
   <img src="https://img.shields.io/github/issues/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=red" alt="GitHub Issues"/>
   <img src="https://img.shields.io/github/license/crysnovax/CRYSNOVA_AI?style=for-the-badge&color=green" alt="License"/>
 </div>
+<div align="center">
+  <svg width="300" height="300" viewBox="0 0 300 300">
+    <!-- Robot face with SMIL animations -->
+    <rect x="50" y="50" width="200" height="220" rx="30" fill="#1a1a2e" stroke="#ff0000" stroke-width="3">
+      <animate attributeName="stroke-opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <!-- Eyes -->
+    <circle cx="100" cy="120" r="25" fill="#000" stroke="#ff0000" stroke-width="2">
+      <animate attributeName="fill-opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="200" cy="120" r="25" fill="#000" stroke="#ff0000" stroke-width="2">
+      <animate attributeName="fill-opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Antenna -->
+    <line x1="150" y1="50" x2="150" y2="20" stroke="#ff0000" stroke-width="3">
+      <animate attributeName="stroke-opacity" values="1;0.5;1" dur="1s" repeatCount="indefinite"/>
+    </line>
+    <circle cx="150" cy="15" r="8" fill="#ff0000">
+      <animate attributeName="r" values="8;12;8" dur="1s" repeatCount="indefinite"/>
+    </circle>
+  </svg>
+</div>
 
 ## 💡 Key Features
 - **Dynamic Plugin System**: Simply add .js files for new commands — no complex setup required.
