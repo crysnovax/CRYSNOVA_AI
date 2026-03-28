@@ -1,7 +1,7 @@
 // ttsvoices.js - Fixed version
 module.exports = {
     name: 'listvoice',
-    alias: ['ttv', 'voicelist'],
+    alias: ['voicelist'],
     desc: 'List available TTS voices',
     category: 'AI',
 
@@ -30,8 +30,8 @@ ${voiceList}
 
 _...and ${voices.length - 15} more_
 
-☬ Use: .tts <voice_number> <text>
-☬ Example: .tts 3 Hello world`;
+☬ Use: .ttsm <voice_number> <text>
+☬ Example: .ttsm 3 Hello world`;
 
             await reply(message);
 
