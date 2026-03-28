@@ -8,8 +8,8 @@ module.exports = {
         try {
             if (args.length < 2) {
                 return reply(`🎙️ Usage:
-.tts <voice_number> <text>
-.tts 13 Hello world
+.ttsm <voice_number> <text>
+.ttsm 13 Hello world
 
 ⚠️ Audio files expire quickly!`);
             }
