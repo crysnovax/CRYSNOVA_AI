@@ -25,6 +25,7 @@
     "@google/generative-ai": "^0.24.1",
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "@hapi/boom": "^10.0.1",
+    "groq-sdk": "^1.1.2",
     "adm-zip": "^0.5.16",
     "archiver": "^7.0.1",
     "js-confuser": "^2.0.0",
