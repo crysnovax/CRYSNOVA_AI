@@ -14,7 +14,7 @@ const IGNORE = [
   "node_modules",
   "sessions",
   ".env",
-  "settings/config.js
+  "settings/config.js",
   "database/runtime-config.json",
   "database/user-config.json",
   "database/ai-memory.json",
