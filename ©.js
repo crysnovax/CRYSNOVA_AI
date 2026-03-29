@@ -170,4 +170,4 @@ function getAllFiles(dir) {
 })();
 
 module.exports = { registerIfNeeded, verifyLoop, checkCorrupted };
-            
+        
