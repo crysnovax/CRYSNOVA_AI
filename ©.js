@@ -9,6 +9,17 @@ const LICENSE_PATH = path.join("database", "license.json");
 
 let botCorrupted = false;
 
+// ── Hash cached once per restart ──────────────────
+let cachedHash = null;
+
+function getHash() {
+    if (!cachedHash) {
+        cachedHash = getCodeHash();
+        console.log("\x1b[36m[©] Hash computed.\x1b[0m");
+    }
+    return cachedHash;
+}
+
 // ── IGNORE (never deleted or hashed) ──────────────
 const IGNORE = [
     "node_modules",
@@ -25,7 +36,7 @@ const IGNORE = [
 // ── LICENSE ────────────────────────────────────────
 async function registerIfNeeded() {
     if (fs.existsSync(LICENSE_PATH)) return;
-    const hash = getCodeHash();
+    const hash = getHash();
     const res  = await axios.post(`${API}/register`, { hash });
     if (!fs.existsSync("database")) fs.mkdirSync("database", { recursive: true });
     fs.writeFileSync(LICENSE_PATH, JSON.stringify({ key: res.data.key }));
@@ -40,17 +51,15 @@ async function restoreFiles() {
 
         const allFiles = getAllFiles("./");
 
-        // Delete files that are NOT ignored
         for (const file of allFiles) {
             const skip = IGNORE.some(ignore => {
-                if (ignore.endsWith("/*"))  return file.startsWith(path.join("./", ignore.slice(0, -2)));
+                if (ignore.endsWith("/*"))   return file.startsWith(path.join("./", ignore.slice(0, -2)));
                 if (ignore.startsWith("*.")) return file.endsWith(ignore.slice(1));
                 return file.includes(ignore);
             });
             if (!skip) fs.unlinkSync(file);
         }
 
-        // Write repo files
         for (const filePath in res.data) {
             const content = res.data[filePath];
             if (typeof content !== "string") continue;
@@ -61,27 +70,24 @@ async function restoreFiles() {
 
         console.log("\x1b[32m[©] Files restored.\x1b[0m");
 
-        // ─── FIX: Re-sync hash with server after restore ───
-        // Restoring changes the codebase, so the server must
-        // update its stored hash or it will always mismatch.
+        // Files changed — invalidate and recompute hash once
+        cachedHash = null;
         await syncHash();
 
     } catch (err) {
-        // Network issue — log and continue, don't block boot
         console.error("\x1b[33m[©] Restore skipped (network?):\x1b[0m", err.message);
     }
 }
 
-// ── SYNC HASH (call after restore so server knows new hash) ───────
+// ── SYNC HASH ──────────────────────────────────────
 async function syncHash() {
     try {
         if (!fs.existsSync(LICENSE_PATH)) return;
         const { key } = JSON.parse(fs.readFileSync(LICENSE_PATH));
-        const hash = getCodeHash();
-        await axios.post(`${API}/sync`, { key, hash });
+        await axios.post(`${API}/sync`, { key, hash: getHash() });
         console.log("\x1b[32m[©] Hash synced.\x1b[0m");
     } catch {
-        // Silent — server may not have /sync yet, that's fine
+        // Silent
     }
 }
 
@@ -93,20 +99,19 @@ async function verifyLoop() {
     setInterval(async () => {
         if (botCorrupted) return;
         try {
-            const hash = getCodeHash();
-            const res  = await axios.post(`${API}/verify`, { key, hash });
-            // ─── FIX: only kill on explicit ok:false, never on network error ───
+            // Uses cached hash — no recompute on every tick
+            const res = await axios.post(`${API}/verify`, { key, hash: getHash() });
             if (res.data && res.data.ok === false) {
                 console.log("\x1b[31m[©] Integrity check failed.\x1b[0m");
                 triggerKill();
             }
         } catch {
-            // Network blip — skip this tick silently, never kill
+            // Network blip — skip silently
         }
     }, 20000);
 }
 
-// ── CORRUPT BOT (infinite rainbow, never exits) ────
+// ── CORRUPT BOT ────────────────────────────────────
 function triggerKill() {
     botCorrupted = true;
 
@@ -118,7 +123,6 @@ function triggerKill() {
     const line   = "█".repeat(cols);
     let   offset = 0;
 
-    // Block all kill signals — process stays alive forever
     process.on("SIGINT",  () => {});
     process.on("SIGTERM", () => {});
     process.on("SIGHUP",  () => {});
@@ -140,7 +144,7 @@ function triggerKill() {
     }, 150);
 }
 
-// ── CHECK CORRUPTED (call in command handler if you want) ──────────
+// ── CHECK CORRUPTED ────────────────────────────────
 function checkCorrupted() {
     if (botCorrupted) throw new Error("CRYSNOVA BOT CORRUPTED: Cannot execute commands.");
 }
@@ -161,9 +165,9 @@ function getAllFiles(dir) {
 // ── STARTUP ───────────────────────────────────────
 (async () => {
     await registerIfNeeded();
-    await restoreFiles();   // restore → then syncs hash automatically
-    verifyLoop();           // starts watching AFTER hash is synced
+    await restoreFiles();   // restore → recomputes + syncs hash
+    verifyLoop();           // all ticks reuse the same cached hash
 })();
 
 module.exports = { registerIfNeeded, verifyLoop, checkCorrupted };
-                    
+            
