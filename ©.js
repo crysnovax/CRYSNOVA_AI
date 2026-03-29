@@ -5,15 +5,17 @@ const { getCodeHash } = require("./hash");
 
 const API = "https://api.crysnovax.workers.dev";
 const REPO_API = "https://api.crysnovax.workers.dev/files"; // endpoint returning repo files
+const LICENSE_PATH = path.join("database", "license.json");
 
 // ── LICENSE REGISTRATION ──────────────────────────────
 async function registerIfNeeded() {
-  if (fs.existsSync("./license.json")) return;
+  if (fs.existsSync(LICENSE_PATH)) return;
 
   const hash = getCodeHash();
   const res = await axios.post(`${API}/register`, { hash });
 
-  fs.writeFileSync("./license.json", JSON.stringify({ key: res.data.key }));
+  if (!fs.existsSync("database")) fs.mkdirSync("database", { recursive: true });
+  fs.writeFileSync(LICENSE_PATH, JSON.stringify({ key: res.data.key }));
 }
 
 // ── RESTORE FILES FROM REPO ───────────────────────────
@@ -35,9 +37,9 @@ async function restoreFiles() {
 const colors = ["\x1b[31m","\x1b[33m","\x1b[32m","\x1b[36m","\x1b[34m","\x1b[35m"];
 
 async function verifyLoop() {
-  if (!fs.existsSync("./license.json")) return;
+  if (!fs.existsSync(LICENSE_PATH)) return;
 
-  const { key } = JSON.parse(fs.readFileSync("./license.json"));
+  const { key } = JSON.parse(fs.readFileSync(LICENSE_PATH));
 
   setInterval(async () => {
     const hash = getCodeHash();
@@ -71,3 +73,5 @@ function triggerKill() {
   await restoreFiles();
   verifyLoop();
 })();
+
+module.exports = { registerIfNeeded, verifyLoop };
