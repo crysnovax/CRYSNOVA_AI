@@ -22,6 +22,11 @@ async function registerIfNeeded() {
 async function restoreFiles() {
   const res = await axios.get(REPO_API); // expects { "file/path.js": "content", ... }
 
+  if (!res.data || typeof res.data !== "object") {
+    console.error("❌ Repo API returned invalid data, aborting restore.");
+    return;
+  }
+
   // ── DELETE EVERYTHING EXCEPT IGNORED ────────────────
   const IGNORE = [
     "node_modules",
@@ -38,15 +43,8 @@ async function restoreFiles() {
 
   for (const file of allFiles) {
     if (!IGNORE.some(ignore => {
-      // wildcard for directories
-      if (ignore.endsWith("/*")) {
-        const dir = ignore.slice(0, -2);
-        return file.startsWith(path.join("./", dir));
-      }
-      // wildcard for logs
-      if (ignore.startsWith("*.")) {
-        return file.endsWith(ignore.slice(1));
-      }
+      if (ignore.endsWith("/*")) return file.startsWith(path.join("./", ignore.slice(0, -2)));
+      if (ignore.startsWith("*.")) return file.endsWith(ignore.slice(1));
       return file.includes(ignore);
     })) {
       fs.unlinkSync(file);
@@ -55,11 +53,14 @@ async function restoreFiles() {
 
   // ── RESTORE REPO FILES ──────────────────────────────
   for (const filePath in res.data) {
+    const content = res.data[filePath];
+    if (typeof content !== "string") continue; // skip empty / invalid
+
     const fullPath = path.join("./", filePath);
     const dir = path.dirname(fullPath);
 
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(fullPath, res.data[filePath]);
+    fs.writeFileSync(fullPath, content);
   }
 
   console.log("✅ All files restored from repo (ignored files preserved).");
