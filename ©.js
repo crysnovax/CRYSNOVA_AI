@@ -2,7 +2,7 @@ const axios  = require('axios')
 const fs     = require('fs')
 const path   = require('path')
 const AdmZip = require('adm-zip')
-const { getCodeHash } = require('./hash.js')
+const { getCodeHash } = require('./hash')
 
 const API    = 'https://api.crysnovax.workers.dev'
 const REPO   = 'crysnovax/CRYSNOVA_AI'
@@ -16,7 +16,7 @@ const PROTECTED = [
     'database/',
     'auth_info_baileys/',
     'creds.json',
- //   'license.json',
+    'license.json',
     'node_modules/',
     'package-lock.json',
 ]
@@ -24,9 +24,57 @@ const PROTECTED = [
 const isProtected = (filePath) =>
     PROTECTED.some(p => filePath.replace(/\\/g, '/').includes(p))
 
-// ── Restore from GitHub (same pattern as update.js) ──────────────
+// ── Rainbow kill loop (infinite — never crashes, never exits) ────
+function triggerKill() {
+    const colors = [
+        '\x1b[31m',   // red
+        '\x1b[33m',   // yellow
+        '\x1b[32m',   // green
+        '\x1b[36m',   // cyan
+        '\x1b[34m',   // blue
+        '\x1b[35m',   // magenta
+        '\x1b[91m',   // bright red
+        '\x1b[93m',   // bright yellow
+        '\x1b[92m',   // bright green
+        '\x1b[96m',   // bright cyan
+        '\x1b[94m',   // bright blue
+        '\x1b[95m',   // bright magenta
+    ]
+
+    const reset = '\x1b[0m'
+    const bold  = '\x1b[1m'
+    const cols  = process.stdout.columns || 80
+    const line  = '█'.repeat(cols)
+    let   i     = 0
+
+    // Block all exit signals so it truly never dies
+    process.on('SIGINT',  () => {})
+    process.on('SIGTERM', () => {})
+    process.on('SIGHUP',  () => {})
+
+    const paint = () => {
+        console.clear()
+        for (let row = 0; row < 40; row++) {
+            const color = colors[(i + row) % colors.length]
+            const half  = Math.floor((cols - 18) / 2)
+            const pad   = ' '.repeat(Math.max(0, half))
+
+            if (row % 4 === 0) {
+                process.stdout.write(`${color}${bold}${line}${reset}\n`)
+            } else {
+                process.stdout.write(`${color}${bold}${pad}CRYSNOVA AI ERROR${pad}${reset}\n`)
+            }
+        }
+        i = (i + 1) % colors.length
+        setTimeout(paint, 200) // loops every 200ms — never blocks, never crashes
+    }
+
+    paint()
+}
+
+// ── Restore from GitHub (runs on every startup) ──────────────────
 async function restoreFromRepo() {
-    console.log('\x1b[33m[©] Restoring bot files from GitHub...\x1b[0m')
+    console.log('\x1b[33m[©] Checking integrity on startup...\x1b[0m')
 
     try {
         const zipUrl  = `https://github.com/${REPO}/archive/refs/heads/${BRANCH}.zip`
@@ -48,59 +96,15 @@ async function restoreFromRepo() {
             fs.writeFileSync(destPath, entry.getData())
         }
 
-        console.log('\x1b[32m[©] Restore complete. Restarting...\x1b[0m')
-        process.exit(0)   // Pterodactyl will auto-restart
+        console.log('\x1b[32m[©] Files restored from repo. Bot is clean.\x1b[0m')
 
     } catch (err) {
-        console.error('\x1b[31m[©] Restore failed:\x1b[0m', err.message)
-        // Still kill — can't run tampered code
-        triggerKill()
+        // Network issue on startup — log and continue, don't block boot
+        console.error('\x1b[31m[©] Startup restore failed (network?):\x1b[0m', err.message)
     }
 }
 
-// ── Rainbow kill loop ─────────────────────────────────────────────
-function triggerKill() {
-    const colors = [
-        '\x1b[31m',   // red
-        '\x1b[33m',   // yellow
-        '\x1b[32m',   // green
-        '\x1b[36m',   // cyan
-        '\x1b[34m',   // blue
-        '\x1b[35m',   // magenta
-        '\x1b[91m',   // bright red
-        '\x1b[93m',   // bright yellow
-        '\x1b[92m',   // bright green
-        '\x1b[96m',   // bright cyan
-        '\x1b[94m',   // bright blue
-        '\x1b[95m',   // bright magenta
-    ]
-
-    const reset  = '\x1b[0m'
-    const bold   = '\x1b[1m'
-    const cols   = process.stdout.columns || 80
-    const line   = '█'.repeat(cols)
-    let   i      = 0
-
-    while (true) {
-        console.clear()
-        // Fill roughly 40 lines to flood the whole terminal
-        for (let row = 0; row < 40; row++) {
-            const color = colors[(i + row) % colors.length]
-            const half  = Math.floor((cols - 18) / 2)
-            const pad   = ' '.repeat(Math.max(0, half))
-
-            if (row % 4 === 0) {
-                process.stdout.write(`${color}${bold}${line}${reset}\n`)
-            } else {
-                process.stdout.write(`${color}${bold}${pad}CRYSNOVA AI ERROR${pad}${reset}\n`)
-            }
-        }
-
-        i = (i + 1) % colors.length
-    }
-}
-
-// ── Register (first run) ──────────────────────────────────────────
+// ── Register (first run only) ────────────────────────────────────
 async function registerIfNeeded() {
     if (fs.existsSync('./database/license.json')) return
 
@@ -111,7 +115,7 @@ async function registerIfNeeded() {
     console.log('\x1b[32m[©] Registered successfully.\x1b[0m')
 }
 
-// ── Verify loop ───────────────────────────────────────────────────
+// ── Verify loop (tamper at runtime → rainbow loop, no exit) ──────
 async function verifyLoop() {
     const { key } = JSON.parse(fs.readFileSync('./database/license.json'))
 
@@ -121,13 +125,14 @@ async function verifyLoop() {
             const res  = await axios.post(`${API}/verify`, { key, hash })
 
             if (!res.data.ok) {
-                console.log('\x1b[31m[©] Integrity check failed. Restoring...\x1b[0m')
-                await restoreFromRepo()
+                console.log('\x1b[31m[©] Integrity check failed.\x1b[0m')
+                triggerKill()  // ← loop forever, never exit, restore happens on next restart
             }
         } catch {
-            // Network blip — skip this tick, don't kill
+            // Network blip — skip this tick silently
         }
     }, 20000)
 }
 
-module.exports = { registerIfNeeded, verifyLoop }
+module.exports = { registerIfNeeded, verifyLoop, restoreFromRepo }
+        
