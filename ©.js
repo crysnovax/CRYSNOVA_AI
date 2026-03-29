@@ -32,6 +32,7 @@ async function restoreFiles() {
     "node_modules",
     "sessions",
     ".env",
+    "settings/config.js",
     "database/runtime-config.json",
     "database/user-config.json",
     "database/ai-memory.json",
