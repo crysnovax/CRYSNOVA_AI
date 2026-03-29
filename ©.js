@@ -1,53 +1,42 @@
+// license.js
+const { getCodeHash } = require("./hash.js");
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
 
-// ── IGNORE (never deleted or hashed) ──────────────
-const IGNORE = [
-    "node_modules",
-    "sessions",
-    ".env",
-    "settings/config.js",
-    "database/runtime-config.json",
-    "database/user-config.json",
-    "database/ai-memory.json",
-    "src/assets/",
-    ".log"
-];
+// Example storage for registration state
+const LICENSE_FILE = path.join(__dirname, "license.json");
 
-
-function getAllFiles(dir) {
-  let results = [];
-
-  const list = fs.readdirSync(dir);
-
-  for (const file of list) {
-    const fullPath = path.join(dir, file);
-    const stat = fs.statSync(fullPath);
-
-    // skip ignored
-    if (IGNORE.some(i => fullPath.includes(i))) continue;
-
-    if (stat && stat.isDirectory()) {
-      results = results.concat(getAllFiles(fullPath));
-    } else {
-      results.push(fullPath);
+async function registerIfNeeded() {
+    let data = {};
+    if (fs.existsSync(LICENSE_FILE)) {
+        data = JSON.parse(fs.readFileSync(LICENSE_FILE, "utf-8"));
     }
-  }
 
-  return results;
+    // Compute current code hash
+    const currentHash = getCodeHash();
+
+    if (data.hash !== currentHash) {
+        console.log("Registering code...");
+        // Save new hash
+        data.hash = currentHash;
+        fs.writeFileSync(LICENSE_FILE, JSON.stringify(data, null, 2));
+    } else {
+        console.log("Already registered.");
+    }
 }
 
-function getCodeHash() {
-  const files = getAllFiles("./");
+function verifyLoop() {
+    setInterval(() => {
+        const currentHash = getCodeHash();
+        const data = fs.existsSync(LICENSE_FILE)
+            ? JSON.parse(fs.readFileSync(LICENSE_FILE, "utf-8"))
+            : {};
 
-  let content = "";
-
-  for (const file of files) {
-    content += fs.readFileSync(file);
-  }
-
-  return crypto.createHash("sha256").update(content).digest("hex");
+        if (data.hash !== currentHash) {
+            console.log("Code changed! Exiting...");
+            process.exit(1);
+        }
+    }, 5000); // check every 5 seconds
 }
 
-module.exports = { getCodeHash };
+module.exports = { registerIfNeeded, verifyLoop };
