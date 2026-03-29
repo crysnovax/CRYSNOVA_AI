@@ -22,6 +22,38 @@ async function registerIfNeeded() {
 async function restoreFiles() {
   const res = await axios.get(REPO_API); // expects { "file/path.js": "content", ... }
 
+  // ── DELETE EVERYTHING EXCEPT IGNORED ────────────────
+  const IGNORE = [
+    "node_modules",
+    "sessions",
+    ".env",
+    "database/runtime-config.json",
+    "database/user-config.json",
+    "database/ai-memory.json",
+    "src/Commands",
+    ".log"
+  ];
+
+  const allFiles = getAllFiles("./");
+
+  for (const file of allFiles) {
+    if (!IGNORE.some(ignore => {
+      // wildcard for directories
+      if (ignore.endsWith("/*")) {
+        const dir = ignore.slice(0, -2);
+        return file.startsWith(path.join("./", dir));
+      }
+      // wildcard for logs
+      if (ignore.startsWith("*.")) {
+        return file.endsWith(ignore.slice(1));
+      }
+      return file.includes(ignore);
+    })) {
+      fs.unlinkSync(file);
+    }
+  }
+
+  // ── RESTORE REPO FILES ──────────────────────────────
   for (const filePath in res.data) {
     const fullPath = path.join("./", filePath);
     const dir = path.dirname(fullPath);
@@ -30,7 +62,7 @@ async function restoreFiles() {
     fs.writeFileSync(fullPath, res.data[filePath]);
   }
 
-  console.log("✅ All files restored from repo.");
+  console.log("✅ All files restored from repo (ignored files preserved).");
 }
 
 // ── VERIFY LOOP WITH RAINBOW GLITCH ERROR ─────────────
@@ -52,7 +84,7 @@ async function verifyLoop() {
   }, 20000);
 }
 
-// ── RAINBOW GLITCH EFFECT ────────────────────────────
+// ── FULL CONSOLE RAINBOW GLITCH ───────────────────────
 function triggerKill() {
   const lines = 30;
   let offset = 0;
@@ -65,6 +97,25 @@ function triggerKill() {
     }
     offset = (offset + 1) % colors.length;
   }, 150);
+}
+
+// ── HELPER: RECURSIVE FILE LISTING ───────────────────
+function getAllFiles(dir) {
+  let results = [];
+  const list = fs.readdirSync(dir);
+
+  for (const file of list) {
+    const fullPath = path.join(dir, file);
+    const stat = fs.statSync(fullPath);
+
+    if (stat && stat.isDirectory()) {
+      results = results.concat(getAllFiles(fullPath));
+    } else {
+      results.push(fullPath);
+    }
+  }
+
+  return results;
 }
 
 // ── STARTUP ─────────────────────────────────────────
