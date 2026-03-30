@@ -10,8 +10,8 @@ const { setupStatusHandler } = require('./src/Plugin/statusHandler');
 const { getVar }             = require('./src/Plugin/configManager');
 
 // BOTFONT IMPORTS
-const styles = require("./src/Commands/Core/'.js");
-const botFont = require("./src/Commands/Bot/botfont.js");
+const styles  = require("./src/Commands/Core/'.js");
+const botFont = require('./src/Commands/Bot/botfont.js');
 
 const ignoredErrors = [
     'Socket connection timeout', 'EKEYTYPE', 'item-not-found',
@@ -33,7 +33,7 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                     content.text = styles[font](content.text);
                 }
             }
-        } catch (e) {}
+        } catch {}
         return originalSend(jid, content, options);
     };
 
@@ -101,6 +101,14 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             } catch {}
 
             // ─────────────────────────────────────────────────────────────
+            //                   ANTI TAG  ← FIX #2: was never called
+            // ─────────────────────────────────────────────────────────────
+            try {
+                const antitag = require('./src/Commands/Tools/antitag.js');
+                if (antitag?.handleAntiTag) await antitag.handleAntiTag(sock, m);
+            } catch {}
+
+            // ─────────────────────────────────────────────────────────────
             //                   MAIN COMMAND ENGINE
             // ─────────────────────────────────────────────────────────────
             await handleMessage(sock, m, customStore);
@@ -110,24 +118,18 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             // ─────────────────────────────────────────────────────────────
             try {
                 const crysnova = require('./src/Commands/AI/crysnova.js');
+                const msgText  = (m.text || '').toLowerCase().trim();
 
-                const msgText = (m.text || '').toLowerCase().trim();
-
-                // Prevent auto-reply from triggering on command prefixes
-                // → let handleMessage() take care of .crysnova / .ai / .crys commands
                 if (
                     msgText.startsWith('.crysnova') ||
                     msgText.startsWith('.ai') ||
                     msgText.startsWith('.crys')
                 ) {
-                    // do nothing here → command already handled above
+                    // handled above by handleMessage
                 } else if (crysnova?.onMessage) {
                     await crysnova.onMessage(sock, m);
                 }
-            } catch (err) {
-                // silent fail by default – only log when debugging
-                // console.error('[CRYSNOVA AUTO]', err?.message || err);
-            }
+            } catch {}
 
             // ─────────────────────────────────────────────────────────────
             //                   OTHER FEATURES
@@ -142,8 +144,8 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             // Auto React on Tag
             try {
                 if (m.isGroup && m.mentionedJid?.length) {
-                    const botJid   = (sock.user?.id || '').replace(/:\d+@/, '@');
-                    const tagged   = m.mentionedJid.some(j => j.replace(/:\d+@/, '@') === botJid);
+                    const botJid = (sock.user?.id || '').replace(/:\d+@/, '@');
+                    const tagged = m.mentionedJid.some(j => j.replace(/:\d+@/, '@') === botJid);
                     if (tagged) {
                         const emoji = getVar('TAG_REACT_EMOJI') || process.env.TAG_REACT_EMOJI || '';
                         if (emoji) {
@@ -162,24 +164,28 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
         }
     });
 
-    // AntiDelete System
+    // AntiDelete + messages.update
     sock.ev.on('messages.update', async (updates) => {
+
+        // Anti-Delete
         try {
             const antidelete = require('./src/Commands/Tools/antidelete.js');
             if (antidelete?.onDelete) await antidelete.onDelete(sock, updates, customStore);
         } catch {}
 
+        // FIX #3: quoted.js lives in library/, NOT src/Commands/Tools/
         try {
-            const quoted = require('./src/Commands/Tools/quoted.js');
+            const quoted = require('./library/quoted.js');
             if (quoted?.onDelete) await quoted.onDelete(sock, updates, customStore);
         } catch {}
     });
 };
 
 // Auto-clean quoted temp store
+// FIX #3 continued: same wrong path fixed here too
 setInterval(() => {
     try {
-        const quoted = require('./src/Commands/Tools/quoted.js');
+        const quoted = require('./library/quoted.js');
         if (quoted?.cleanUp) quoted.cleanUp();
     } catch {}
 }, 60000);
