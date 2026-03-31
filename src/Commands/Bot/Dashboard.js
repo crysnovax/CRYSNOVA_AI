@@ -1,8 +1,8 @@
 const { generateWAMessageFromContent } = require('@itsliaaa/baileys');
 
 module.exports = {
-  name: 'botmenu',
-  alias: ['hp', 'dashboard', 'start', 'cyber'],
+  name: 'dashboard',
+  alias: ['hp', 'dashboard','cyber'],
   category: 'general',
 
   execute: async (sock, m, { reply, prefix = '!' }) => {
