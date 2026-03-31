@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs    = require('fs');
+const path  = require('path');
 const chalk = require('chalk');
 
 const { addCommand, clearRegistry } = require('./crysCmd');
@@ -11,7 +11,7 @@ const loadCommands = () => {
     const cmdPath = path.join(__dirname, '../Commands');
 
     if (!fs.existsSync(cmdPath)) {
-        console.log(chalk.red("❌ Commands folder not found"));
+        console.log(chalk.red('❌ Commands folder not found'));
         return 0;
     }
 
@@ -32,15 +32,18 @@ const loadCommands = () => {
 
             try {
 
-                const filePath = path.join(catPath, file);
+                const filePath     = path.join(catPath, file);
+                const resolvedPath = require.resolve(filePath);
 
-                // ⭐ Prevent duplicate file loading
-                if (loadedFiles.has(filePath)) continue;
+                // Prevent same file loading twice in one cycle
+                if (loadedFiles.has(resolvedPath)) continue;
+                loadedFiles.add(resolvedPath);
+
+                // FIX: delete cache BEFORE require so reload always
+                // picks up the latest version of the file on disk
+                delete require.cache[resolvedPath];
 
                 const cmd = require(filePath);
-                loadedFiles.add(filePath);
-
-                delete require.cache[require.resolve(filePath)];
 
                 cmd.category = cat;
 
@@ -54,7 +57,7 @@ const loadCommands = () => {
         }
     }
 
-    console.log(chalk.green(`✅ Reloaded ${total} commands`));
+    console.log(chalk.green(`✅ Loaded ${total} commands`));
 
     return total;
 };
