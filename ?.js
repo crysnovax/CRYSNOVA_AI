@@ -46,6 +46,12 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
         if (vv?.setup) vv.setup(sock, customStore);
     } catch {}
 
+    // Restore mute schedules after sock is ready
+    try {
+        const muteCmd = require('./src/Commands/Admin/Mute.js');
+        if (muteCmd?.setupMuteSchedules) muteCmd.setupMuteSchedules(sock);
+    } catch {}
+
     // messages.upsert
     sock.ev.on('messages.upsert', async (chatUpdate) => {
         try {
@@ -95,6 +101,15 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                 const mutePlugin = require('./src/Commands/Group/muteuser.js');
                 if (mutePlugin?.handleMutedMessage) {
                     const wasDeleted = await mutePlugin.handleMutedMessage(sock, m, m.isGroup);
+                    if (wasDeleted) return;
+                }
+            } catch {}
+
+            // Mute Sticker Check
+            try {
+                const mutesticker = require('./src/Commands/Group/mutesticker.js');
+                if (mutesticker?.handleMutedSticker) {
+                    const wasDeleted = await mutesticker.handleMutedSticker(sock, m, m.isGroup);
                     if (wasDeleted) return;
                 }
             } catch {}
