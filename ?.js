@@ -40,6 +40,12 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
     // Auto Status View + Like
     setupStatusHandler(sock);
 
+    // VV Reaction Listener — must start at boot with store access
+    try {
+        const vv = require('./src/Commands/Converter/view-once.js');
+        if (vv?.setup) vv.setup(sock, customStore);
+    } catch {}
+
     // messages.upsert
     sock.ev.on('messages.upsert', async (chatUpdate) => {
         try {
@@ -134,6 +140,18 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             // ─────────────────────────────────────────────────────────────
             //                   OTHER FEATURES
             // ─────────────────────────────────────────────────────────────
+
+            // Anti Group Mention
+            try {
+                const antigm = require('./src/Commands/Tools/antigm.js');
+                if (antigm?.handleAntiGM) await antigm.handleAntiGM(sock, m);
+            } catch {}
+
+            // VV Reply Trigger
+            try {
+                const vvcmd = require('./src/Commands/Converter/vvcmd.js');
+                if (vvcmd?.handleVVReply) await vvcmd.handleVVReply(sock, m);
+            } catch {}
 
             // Anti-Link
             try {
