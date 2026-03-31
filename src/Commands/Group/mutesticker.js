@@ -273,10 +273,11 @@ module.exports.handleMutedSticker = async (sock, m, isGroup) => {
    }
    
    /* ================= CHECK IF STICKER ================= */
-   
-   const msgType = Object.keys(m.message || {})[0];
-   const isSticker = msgType === 'stickerMessage';
-   
+
+   // Use m.mtype (set by serializer) — more reliable than Object.keys
+   const isSticker = m.mtype === 'stickerMessage' ||
+                     Object.keys(m.message || {})[0] === 'stickerMessage'
+
    if (!isSticker) return false;
    
    /* ================= DELETE STICKER ================= */
@@ -304,3 +305,4 @@ module.exports.getStickerMuteInfo = (chatId, userId) => {
    const db = getMutedDb();
    return db[chatId]?.[userId] || null;
 };
+              
