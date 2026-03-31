@@ -1,58 +1,117 @@
 module.exports = {
     name: 'promote',
     alias: ['admin'],
-    desc: 'Promote a user to admin',
-    category: 'group',
-    usage: '.promote @user',
+    desc: 'Promote user(s) to admin',
+    category: 'Admin',
+    groupOnly: true,
+    adminOnly: true,
+    botAdmin: false,
+    reactions: { start: '♾️', success: '🎉' },
 
     execute: async (sock, m, { args, reply }) => {
 
-        if (!m.isGroup)
-            return reply('𓉤 ⚉ This command works only in groups');
+        const meta     = await sock.groupMetadata(m.chat).catch(() => null)
+        if (!meta) return reply('✘ Could not fetch group info')
 
-        let target;
+        const participants = meta.participants
+        const admins       = participants.filter(p => p.admin).map(p => p.id.replace(/:\d+@/, '@'))
+        const botJid       = (sock.user?.id || '').replace(/:\d+@/, '@')
 
-        if (m.mentionedJid?.length) {
-            target = m.mentionedJid[0];
-        } else if (args[0]) {
-            const number = args[0].replace(/[^0-9]/g, '');
-            if (number.length < 10)
-                return reply('✘ ⚉ Invalid number format');
-            target = number + '@s.whatsapp.net';
-        } else {
-            return reply('𓄄 ⚉ Tag a user to promote\n✪ `.promote @user`');
-        }
+        // ── @all — promote everyone who is NOT already admin ──
+        if (args[0]?.toLowerCase() === 'all') {
+            const targets = participants
+                .map(p => p.id)
+                .filter(id => {
+                    const norm = id.replace(/:\d+@/, '@')
+                    return !admins.includes(norm) && norm !== botJid
+                })
 
-        try {
+            if (!targets.length) return reply('✘ Everyone is already admin')
 
-            await sock.groupParticipantsUpdate(m.chat, [target], 'promote');
+            await reply(`⚉ Promoting ${targets.length} members...`)
 
-            await new Promise(r => setTimeout(r, 1500));
-
-            const promotedNumber = target.split('@')[0];
-
-            await reply('✓ ✪ `Promoted successfully`');
-
-            await sock.sendMessage(m.chat, {
-                text: `✪ @${promotedNumber} is now admin`,
-                mentions: [target]
-            });
-
-        } catch (err) {
-
-            console.error('[PROMOTE ERROR]', err?.message || err);
-
-            let msg = '✘ ⚉ Failed to promote user\n\n';
-
-            if (err.message?.includes('admin') || err.message?.includes('permission')) {
-                msg += '𓉤 Bot lacks admin permission';
-            } else if (err.message?.includes('not-authorized')) {
-                msg += '𓉤 Cannot promote this user';
-            } else {
-                msg += `𓉤 <${err.message || 'Unknown error'}>`;
+            let success = 0
+            for (const jid of targets) {
+                try {
+                    await sock.groupParticipantsUpdate(m.chat, [jid], 'promote')
+                    await new Promise(r => setTimeout(r, 500))
+                    success++
+                } catch {}
             }
 
-            reply(msg);
+            const mentions = targets
+            await sock.sendMessage(m.chat, {
+                text: `✪ Promoted *${success}/${targets.length}* members to admin\n` +
+                      mentions.map(j => `@${j.split('@')[0]}`).join(' '),
+                mentions
+            })
+            return
+        }
+
+        // ── Build target list ─────────────────────────────────
+        let targets = []
+
+        // Reply to a message
+        if (m.quoted?.sender) {
+            targets.push(m.quoted.sender)
+        }
+
+        // @mentions
+        if (m.mentionedJid?.length) {
+            for (const jid of m.mentionedJid) {
+                if (!targets.includes(jid)) targets.push(jid)
+            }
+        }
+
+        // Phone numbers from args
+        for (const arg of args) {
+            const num = arg.replace(/[^0-9]/g, '')
+            if (num.length >= 7) {
+                const jid = num + '@s.whatsapp.net'
+                if (!targets.includes(jid)) targets.push(jid)
+            }
+        }
+
+        if (!targets.length) {
+            return reply(
+                `𓄄 *How to use .promote:*\n\n` +
+                `• Reply to a message → promotes that person\n` +
+                `• .promote @user\n` +
+                `• .promote 2348012345678\n` +
+                `• .promote all → promotes everyone`
+            )
+        }
+
+        // ── Promote each target ───────────────────────────────
+        let success = 0
+        const promoted = []
+        const failed   = []
+
+        for (const jid of targets) {
+            const norm = jid.replace(/:\d+@/, '@')
+            if (admins.includes(norm)) {
+                failed.push(`@${jid.split('@')[0]} (already admin)`)
+                continue
+            }
+            try {
+                await sock.groupParticipantsUpdate(m.chat, [jid], 'promote')
+                await new Promise(r => setTimeout(r, 600))
+                promoted.push(jid)
+                success++
+            } catch (err) {
+                failed.push(`@${jid.split('@')[0]} (${err.message || 'failed'})`)
+            }
+        }
+
+        if (promoted.length) {
+            await sock.sendMessage(m.chat, {
+                text: `✪ *Promoted to admin:*\n` +
+                      promoted.map(j => `✦ @${j.split('@')[0]}`).join('\n') +
+                      (failed.length ? `\n\n✘ *Failed:*\n${failed.join('\n')}` : ''),
+                mentions: promoted
+            })
+        } else {
+            reply(`✘ Could not promote:\n${failed.join('\n')}`)
         }
     }
-};
+}
