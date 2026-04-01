@@ -12,8 +12,8 @@ const path = require('path');
 const FILE = path.join(__dirname, "../../../database/botfont.json");
 
 module.exports = {
-    name: 'remfonts',
-    alias: ['deletefonts', 'clearfonts', 'rmfonts'],
+    name: 'delfonts',
+    alias: ['remfonts', 'clearfonts', 'rmfonts'],
     desc: 'Delete botfont.json (removes all saved fonts)',
     category: 'tools',
     usage: '.remfonts',
