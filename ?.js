@@ -156,10 +156,10 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             } catch {}
 
             // ─────────────────────────────────────────────────────────────
-            //                   ANTI TAG  ← FIX #2: was never called
+            //                   ANTI TAG  ← FIX #2:
             // ─────────────────────────────────────────────────────────────
             try {
-                const antitag = require('./src/Commands/Tools/antitag.js');
+                const antitag = require('./src/Commands/Admin/antitag.js');
                 if (antitag?.handleAntiTag) await antitag.handleAntiTag(sock, m);
             } catch {}
 
@@ -249,7 +249,7 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
 };
 
 // Auto-clean quoted temp store
-// FIX #3 continued: same wrong path fixed here too
+// FIX #3 continued:
 setInterval(() => {
     try {
         const quoted = require('./library/quoted.js');
