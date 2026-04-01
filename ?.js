@@ -40,6 +40,20 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
     // Auto Status View + Like
     setupStatusHandler(sock);
 
+    // Anti Call — reject incoming calls if enabled
+    sock.ev.on('call', async (calls) => {
+        try {
+            const { getVar } = require('./src/Plugin/configManager');
+            if (!getVar('ANTI_CALL', true)) return;
+
+            for (const call of calls) {
+                if (call.status !== 'offer') continue;
+                await sock.rejectCall(call.id, call.from).catch(() => {});
+                console.log(`[ANTICALL] Rejected call from ${call.from}`);
+            }
+        } catch {}
+    });
+
     // VV Reaction Listener — must start at boot with store access
     try {
         const vv = require('./src/Commands/Converter/view-once.js');
@@ -52,7 +66,17 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
         if (muteCmd?.setupMuteSchedules) muteCmd.setupMuteSchedules(sock);
     } catch {}
 
-    // messages.upsert
+    // Presence tracking for listonline
+    sock.ev.on('presence.update', ({ id, presences }) => {
+        if (!global.onlineUsers) global.onlineUsers = new Set();
+        for (const [jid, presence] of Object.entries(presences)) {
+            if (['available', 'composing', 'recording'].includes(presence.lastKnownPresence)) {
+                global.onlineUsers.add(jid);
+            } else {
+                global.onlineUsers.delete(jid);
+            }
+        }
+    });
     sock.ev.on('messages.upsert', async (chatUpdate) => {
         try {
             const mek = chatUpdate.messages[0];
@@ -70,6 +94,12 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             if (mek.key?.remoteJid && mek.key?.id) {
                 customStore.messages.set(mek.key.remoteJid + ':' + mek.key.id, mek);
             }
+
+            // Cache message for antidelete (own cache, more reliable than store)
+            try {
+                const antidelete = require('./src/Commands/Tools/antidelete.js');
+                if (antidelete?.cacheMessage) antidelete.cacheMessage(mek);
+            } catch {}
 
             global.crysStats.messages++;
 
@@ -114,9 +144,13 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                 }
             } catch {}
 
-            // Fake Typing
+            // Fake Typing — only when a command is actually being processed
+            const bodyCheck  = (mek.message?.conversation || mek.message?.extendedTextMessage?.text || '').trim();
+            const prefixCheck = getVar('PREFIX', '.');
+            const isCommand  = bodyCheck.startsWith(prefixCheck);
+
             try {
-                if (getVar('FAKE_TYPING', true) !== false) {
+                if (isCommand && getVar('FAKE_TYPING') !== false) {
                     await sock.sendPresenceUpdate('composing', m.key.remoteJid);
                 }
             } catch {}
@@ -202,7 +236,7 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
 
         // Anti-Delete
         try {
-            const antidelete = require('./src/Commands/Tools/antidelete.js');
+            const antidelete = require('./src/Commands/Admin/antidelete.js');
             if (antidelete?.onDelete) await antidelete.onDelete(sock, updates, customStore);
         } catch {}
 
@@ -222,3 +256,4 @@ setInterval(() => {
         if (quoted?.cleanUp) quoted.cleanUp();
     } catch {}
 }, 60000);
+                    
