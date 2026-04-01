@@ -192,7 +192,7 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
 
             // Anti Group Mention
             try {
-                const antigm = require('./src/Commands/Tools/antigm.js');
+                const antigm = require('./src/Commands/Admin/antigm.js');
                 if (antigm?.handleAntiGM) await antigm.handleAntiGM(sock, m);
             } catch {}
 
@@ -236,7 +236,7 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
 
         // Anti-Delete
         try {
-            const antidelete = require('./src/Commands/Admin/antidelete.js');
+            const antidelete = require('./src/Commands/Tools/antidelete.js');
             if (antidelete?.onDelete) await antidelete.onDelete(sock, updates, customStore);
         } catch {}
 
