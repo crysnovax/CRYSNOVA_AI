@@ -1,6 +1,6 @@
 module.exports = {
-    name: 'delcmd',
-    alias: ['cmd', 'file'],
+    name: 'remcmd',
+    alias: [],
     desc: 'Delete a specific command from generated commands.',
     category: 'Tools',
     execute: async (sock, m, { args, reply }) => {
