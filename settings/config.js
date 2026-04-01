@@ -85,9 +85,9 @@ const config = {
     // BOT STATUS / MODE (ZEE BOT .env style)
     // ════════════════════════════════════════════
     status: {
-        public:   (process.env.PUBLIC_MODE   === 'true') ?? getVar('PUBLIC_MODE')   ?? userConfig?.bot?.public   ?? true,
-        terminal: (process.env.TERMINAL_MODE !== 'false') ?? getVar('TERMINAL_MODE') ?? userConfig?.bot?.terminal ?? true,
-        reactsw:  (process.env.REACT_STATUS  !== 'false') ?? getVar('REACT_STATUS')  ?? userConfig?.bot?.reactsw  ?? true
+        public:   process.env.PUBLIC_MODE   !== undefined ? process.env.PUBLIC_MODE   === 'true'  : (getVar('PUBLIC_MODE')   ?? userConfig?.bot?.public   ?? true),
+        terminal: process.env.TERMINAL_MODE !== undefined ? process.env.TERMINAL_MODE !== 'false' : (getVar('TERMINAL_MODE') ?? userConfig?.bot?.terminal ?? true),
+        reactsw:  process.env.REACT_STATUS  !== undefined ? process.env.REACT_STATUS  !== 'false' : (getVar('REACT_STATUS')  ?? userConfig?.bot?.reactsw  ?? true)
     },
 
     // ════════════════════════════════════════════
@@ -257,3 +257,4 @@ const config = {
 };
 
 module.exports = config;
+            
