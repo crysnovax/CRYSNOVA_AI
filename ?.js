@@ -164,6 +164,33 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             } catch {}
 
             // ─────────────────────────────────────────────────────────────
+            //                   STICKER COMMAND HANDLER
+            // ─────────────────────────────────────────────────────────────
+            try {
+                if (m.mtype === 'stickerMessage') {
+                    const { stickerCmds } = require('./src/Commands/Owner/setcmd.js');
+                    
+                    const stickerData = m.message?.stickerMessage;
+                    const fileSha256 = stickerData?.fileSha256;
+                    
+                    if (fileSha256) {
+                             const hash = Buffer.isBuffer(fileSha256) 
+                            ? fileSha256.toString('hex') 
+                            : String(fileSha256);
+                        
+                        
+                        if (hash && stickerCmds[hash]) {
+                            const boundCmd = stickerCmds[hash];
+                            console.log(`[STICKER CMD] ${m.sender.split('@')[0]} → ${boundCmd}`);
+                            
+                            m.body = `.${boundCmd}`;
+                            m.text = `.${boundCmd}`;
+                        }
+                    }
+                }
+            } catch {}
+
+            // ─────────────────────────────────────────────────────────────
             //                   MAIN COMMAND ENGINE
             // ─────────────────────────────────────────────────────────────
             await handleMessage(sock, m, customStore);
@@ -256,4 +283,4 @@ setInterval(() => {
         if (quoted?.cleanUp) quoted.cleanUp();
     } catch {}
 }, 60000);
-                    
+        
