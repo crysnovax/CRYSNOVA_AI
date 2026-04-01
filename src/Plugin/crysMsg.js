@@ -163,7 +163,10 @@ const handleMessage = async (sock, m, store) => {
 
         const reply = (txt) => sock.sendMessage(m.chat, { text: txt }, { quoted: m });
 
-        if (!cfg.status.public && !isSudo) {
+        // MODIFIED: Allow 'appeal' command for everyone even in private mode
+        const isPublicCommand = cmdName === 'appeal';
+        
+        if (!cfg.status.public && !isSudo && !isPublicCommand) {
             if (autoReact) {
                 await sock.sendMessage(m.chat, { react: { text: '⚉', key: m.key } }).catch(() => {});
             }
@@ -177,7 +180,8 @@ const handleMessage = async (sock, m, store) => {
         if (cmd.adminOnly   && !isAdmin && !isSudo)  return reply(cfg.message.admin   || 'Admin only!');
         if (cmd.botAdmin    && !isBotAdmin)          return reply('𓉤 Make me an admin first!');
 
-        if (!isSudo && cooldown > 0) {
+        // MODIFIED: Skip cooldown for public commands like appeal
+        if (!isSudo && cooldown > 0 && !isPublicCommand) {
             const cdKey = `${m.sender}:${cmdName}`;
             const now   = Date.now();
             const exp   = cooldowns.get(cdKey);
@@ -209,4 +213,4 @@ const handleMessage = async (sock, m, store) => {
 };
 
 module.exports = { handleMessage };
-                
+            
