@@ -305,4 +305,4 @@ module.exports.getStickerMuteInfo = (chatId, userId) => {
    const db = getMutedDb();
    return db[chatId]?.[userId] || null;
 };
-              
+      
