@@ -158,7 +158,7 @@ const handleMessage = async (sock, m, store) => {
             const botJid    = normalizeJid(sock.user?.id || '');
 
             isAdmin    = admins.includes(senderJid);
-            isBotAdmin = admins.includes(senderJid); // FIX: was senderJid — wrong
+            isBotAdmin = isAdmin; // bot = your own account, always has same rights as sender
         }
 
         const reply = (txt) => sock.sendMessage(m.chat, { text: txt }, { quoted: m });
@@ -213,4 +213,5 @@ const handleMessage = async (sock, m, store) => {
 };
 
 module.exports = { handleMessage };
+
             
