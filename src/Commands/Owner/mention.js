@@ -56,7 +56,7 @@ module.exports = {
         }
 
         // STATUS
-        if (option === '-status' || option === 'status') {
+        if (option === 'status' || option === '-status') {
             return reply(
                 `╭─❍ *MENTION STATUS*\n│\n` +
                 `│ ⚉ Active : ${mentionConfig.active ? '✓ ON' : '✗ OFF'}\n` +
@@ -68,9 +68,9 @@ module.exports = {
         }
 
         // REACT
-        if (option === '-react' || option === 'react') {
+        if (option === 'react' || option === '-react') {
             if (!value) {
-                return reply('╭─❍ *MENTION*\n│\n│ ✘ Provide an emoji\n│ ⚉ Example: .mention -react 🤍\n╰──────────────────');
+                return reply('╭─❍ *MENTION*\n│\n│ ✘ Provide an emoji\n│ ⚉ Example: .mention -react ❤️‍🔥\n╰──────────────────');
             }
             mentionConfig.active = true;
             mentionConfig.action = 'react';
@@ -81,7 +81,7 @@ module.exports = {
         }
 
         // TEXT
-        if (option === '-text' || option === 'text') {
+        if (option === 'text' || option === '-text') {
             if (!value) {
                 return reply('╭─❍ *MENTION*\n│\n│ ✘ Provide text\n│ ⚉ Example: .mention -text Busy, back later\n╰──────────────────');
             }
@@ -104,7 +104,7 @@ module.exports = {
             `│   Show current configuration\n│\n` +
             `│ ➫ ${prefix}mention -react <emoji>\n` +
             `│   Auto-react when mentioned\n` +
-            `│   Example: ${prefix}mention -react 🤍\n│\n` +
+            `│   Example: ${prefix}mention -react ❤️‍🔥\n│\n` +
             `│ ➫ ${prefix}mention -text <message>\n` +
             `│   Auto-reply when mentioned\n` +
             `│   Example: ${prefix}mention -text Busy, back later\n│\n` +
