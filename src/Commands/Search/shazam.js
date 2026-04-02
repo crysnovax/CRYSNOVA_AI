@@ -49,8 +49,9 @@ const audioCut = async (inputPath, start, duration) => {
     }
 };
 
+// ─────────── TEMP FOLDER & AUTO CLEAN ───────────
 const ensureTempDir = () => {
-    const tempDir = path.join(__dirname, '../../../temp');
+    const tempDir = path.join(__dirname, '../../../tmp'); // changed to tmp
     if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
     }
@@ -63,9 +64,31 @@ const cleanupFiles = (files) => {
             if (file && fs.existsSync(file)) {
                 fs.unlinkSync(file);
             }
-        } catch (e) {}
+        } catch {}
     });
 };
+
+// Auto-clean tmp folder every 2 minutes
+setInterval(() => {
+    try {
+        const tempDir = path.join(__dirname, '../../../tmp');
+        if (!fs.existsSync(tempDir)) return;
+
+        const files = fs.readdirSync(tempDir);
+        const now = Date.now();
+
+        files.forEach(file => {
+            const filePath = path.join(tempDir, file);
+            const stat = fs.statSync(filePath);
+
+            // Delete files older than 2 minutes
+            if (now - stat.mtimeMs > 2 * 60 * 1000) {
+                fs.unlinkSync(filePath);
+            }
+        });
+
+    } catch {}
+}, 120000);
 
 // ═══════════════════════════════════════════════════
 // YouTube Download Helpers
@@ -122,7 +145,6 @@ const handleShazamReply = async (sock, m, reply) => {
     activeShazamSessions.delete(sessionKey);
     
     const response = m.text?.toLowerCase().trim();
-  //  console.log(`[SHAZAM] Got reply: ${response}`);
     
     // Validate response
     if (!['1', '2', 'audio', 'video'].includes(response)) {
@@ -168,7 +190,6 @@ const handleShazamReply = async (sock, m, reply) => {
         }).catch(() => {});
         
     } catch (error) {
-  //      console.error('[SHAZAM DOWNLOAD ERROR]', error);
         await reply(`╭─❍ *SHA⚉AM*\n│\n│ ✘ Download failed\n│ ⚉ ${error.message}\n╰──────────────────`);
     }
     
@@ -196,18 +217,12 @@ module.exports = {
         let cutAudio = null;
         
         try {
-            // Check for quoted message
-      //      console.log('[SHAZAM] Checking m.quoted:', m.quoted ? 'exists' : 'null');
-       //     console.log('[SHAZAM] m.quoted.mtype:', m.quoted?.mtype);
-            
             const isAudio = m.quoted?.mtype === 'audioMessage' || 
                            m.quoted?.mtype === 'ptvMessage' ||
                            m.quoted?.mimetype?.startsWith('audio/');
                            
             const isVideo = m.quoted?.mtype === 'videoMessage' ||
                            m.quoted?.mimetype?.startsWith('video/');
-            
-        //    console.log('[SHAZAM] Detection:', { isAudio, isVideo, mtype: m.quoted?.mtype });
             
             if (!isAudio && !isVideo) {
                 return reply(
@@ -225,16 +240,11 @@ module.exports = {
                 react: { text: '🔍', key: m.key }
             }).catch(() => {});
             
-            // Download using m.quoted.download()
-        //    console.log('[SHAZAM] Starting download...');
-            
             if (!m.quoted.download) {
                 throw new Error('Download method not available on quoted message');
             }
             
             const stream = await m.quoted.download();
-    //        console.log('[SHAZAM] Downloaded bytes:', stream?.length);
-            
             if (!stream || stream.length === 0) {
                 throw new Error('Downloaded stream is empty');
             }
@@ -243,11 +253,9 @@ module.exports = {
             const ext = isVideo ? 'mp4' : 'mp3';
             mediaPath = path.join(tempDir, `shazam_${Date.now()}.${ext}`);
             fs.writeFileSync(mediaPath, stream);
-   //         console.log('[SHAZAM] Saved to:', mediaPath);
             
             // Cut audio to 15 seconds
             cutAudio = await audioCut(mediaPath, 0, 15);
-   //         console.log('[SHAZAM] Audio cut, bytes:', cutAudio.data.length);
             
             // Build ACRCloud request
             const timestamp = Math.floor(Date.now() / 1000);
@@ -276,8 +284,6 @@ module.exports = {
             
             // Send to ACRCloud
             const acrUrl = `http://${ACR_CLOUD.host}${ACR_CLOUD.endpoint}`;
-      //      console.log(`[SHAZAM] Sending to ACRCloud...`);
-            
             const response = await fetch(acrUrl, {
                 method: 'POST',
                 body: form,
@@ -285,9 +291,7 @@ module.exports = {
             });
             
             const result = await response.json();
-      //      console.log('[SHAZAM] ACRCloud status:', result.status);
             
-            // Check result
             if (result.status.code !== 0) {
                 return reply(
                     `╭─❍ *SHA𓄄AM*\n│\n` +
@@ -344,13 +348,6 @@ module.exports = {
                 responseText += `│   🔗 YT Search: ${ytInfo.url}\n`;
             }
             
-            // YouTube stats if available
-            if (ytInfo) {
-                responseText += `│\n│ *➫ YouTube Stats:*\n`;
-                responseText += `│  ಠ_ಠ ${ytInfo.views?.toLocaleString() || 'N/A'} views\n`;
-                responseText += `│   彡 ${ytInfo.duration?.timestamp || 'N/A'}\n`;
-            }
-            
             responseText += `│\n│ ⚉ *Reply with:*\n`;
             responseText += `│   1 → download audio\n`;
             responseText += `│   2 → download video\n`;
@@ -393,8 +390,6 @@ module.exports = {
             }).catch(() => {});
             
         } catch (error) {
-         //   console.error('[SHAZAM ERROR]', error);
-            
             let errorMsg = error.message;
             if (error.message.includes('ffmpeg')) {
                 errorMsg = 'FFmpeg not installed or failed';
@@ -417,4 +412,3 @@ module.exports = {
         }
     }
 };
-
