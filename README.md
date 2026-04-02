@@ -76,9 +76,10 @@ ___
 -------------
   <em>Professional WhatsApp Bot • Built by crysnova</em>
 </p>
-A modular WhatsApp bot built using Node.js and Baileys — the perfect foundation for my YouTube tutorial series.  
+A modular WhatsApp bot built using Node.js and Baileys — the perfect companion for your business and day to day activities.  
 This is a More integrated version of CRYSNOVA AI V1.0 with Amazing Customizable features tagging along the much more established WhatsApp bot.
 it's completely user friendly and requires less labor compared to V1.0 everything is now sorted for easy access and manipulation 
+
 > crysnovax
 
 
