@@ -5,7 +5,7 @@ module.exports = {
     desc: 'Get a runtime config variable',
     category: 'Owner',
     ownerOnly: true,
-    reactions: { start: '🔍', success: '✅' },
+    reactions: { start: '🔍', success: '👾' },
     execute: async (sock, m, { args, reply }) => {
         if (!args[0]) {
             const all = allVars();
