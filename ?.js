@@ -325,6 +325,27 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             } catch (e) {
         //        console.error('[MENTION HANDLER ERROR]', e.message, e.stack);
             }
+            // In your command handler/index.js
+         //   const shazamCmd = require('./src/Commands/Search/Shazam.js');
+         //   commands.set(shazamCmd.name, shazamCmd);
+       //     shazamCmd.alias.forEach(a => aliases.set(a, shazamCmd.name));
+            // ─────────────────────────────────────────────────────────────
+//                   SHAZAM REPLY HANDLER
+// ─────────────────────────────────────────────────────────────
+try {
+    const { handleShazamReply } = require('./src/Commands/Search/shazam.js');
+    const handled = await handleShazamReply(sock, m, reply);
+    if (handled) return; // Reply was handled by shazam
+} catch (e) {
+    // Not a shazam reply or error
+}
+
+// ─────────────────────────────────────────────────────────────
+//                   MAIN COMMAND ENGINE
+// ─────────────────────────────────────────────────────────────
+//await handleMessage(sock, m, customStore);
+            
+            
 
             // ─────────────────────────────────────────────────────────────
             //                   MAIN COMMAND ENGINE
@@ -418,4 +439,4 @@ setInterval(() => {
         if (quoted?.cleanUp) quoted.cleanUp();
     } catch {}
 }, 60000);
-                        
+                    
