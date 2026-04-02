@@ -6,7 +6,7 @@ module.exports = {
     desc: 'Toggle fake typing indicator when processing commands',
     category: 'Bot',
     ownerOnly: true,
-    reactions: { start: '⌨️', success: '✓' },
+    reactions: { start: '⌨️', success: '🤧' },
 
     execute: async (sock, m, { args, reply }) => {
         const sub = args[0]?.toLowerCase();
