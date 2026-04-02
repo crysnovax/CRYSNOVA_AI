@@ -185,10 +185,12 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                     }
                 }
             } catch {}
-
-            // ─────────────────────────────────────────────────────────────
-            //                   OWNER MENTION HANDLER (FIXED FOR LID)
-            // ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+//                   OWNER MENTION HANDLER (FIXED)
+// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+//                   OWNER MENTION HANDLER (FINAL)
+// ─────────────────────────────────────────────────────────────
 try {
     const { mentionConfig } = require('./src/Commands/Owner/mention.js');
 
@@ -196,13 +198,15 @@ try {
         const config = require('./settings/config');
         const ownerNumber = (process.env.OWNER_NUMBER || config.owner || '').replace(/[^0-9]/g, '');
         
-        if (!ownerNumber) {
-        } else {
+        if (ownerNumber) {
             
             const ownerJid = `${ownerNumber}@s.whatsapp.net`;
-            
             const botPnJid = (sock.user?.id || '').replace(/:\d+@/, '@s.whatsapp.net');
             const botLid = sock.user?.lid || '';
+            
+            // 🚫 Ignore messages sent by owner/bot
+            const sender = (m.sender || '').replace(/:\d+@/, '@s.whatsapp.net');
+            if (sender === botPnJid) return;
             
             const norm = (j) => (j || '').replace(/:\d+@/, '@').toLowerCase().trim();
             
@@ -246,11 +250,9 @@ try {
                 } catch {}
                 
                 const participantAlt = ctxInfo.participantAlt || m.msg?.contextInfo?.participantAlt;
-                if (participantAlt) {
-                    if (norm(participantAlt) === norm(ownerJid)) {
-                        isMentioned = true;
-                        break;
-                    }
+                if (participantAlt && norm(participantAlt) === norm(ownerJid)) {
+                    isMentioned = true;
+                    break;
                 }
             }
 
@@ -293,13 +295,7 @@ try {
         }
     }
 } catch {}
-   //         console.error('[MENTION HANDLER ERROR]', e.message, e.stack);
-   //         }
-            // In your command handler/index.js
-         //   const shazamCmd = require('./src/Commands/Search/Shazam.js');
-         //   commands.set(shazamCmd.name, shazamCmd);
-       //     shazamCmd.alias.forEach(a => aliases.set(a, shazamCmd.name));
-            // ─────────────────────────────────────────────────────────────
+//─────────────────────────────────────────────────────────────
 //                   SHAZAM REPLY HANDLER
 // ─────────────────────────────────────────────────────────────
 try {
@@ -409,4 +405,4 @@ setInterval(() => {
         if (quoted?.cleanUp) quoted.cleanUp();
     } catch {}
 }, 60000);
-            
+                
