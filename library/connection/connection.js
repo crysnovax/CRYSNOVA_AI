@@ -1,7 +1,7 @@
 
 // © 2026 CRYSNOVA. All Rights Reserved.
-// respect the work, don’t just copy-paste.
- 
+// respect the work, don't just copy-paste.
+
 const chalk = require("chalk")
 
 module.exports = {
@@ -9,33 +9,31 @@ module.exports = {
         const { connection, lastDisconnect } = update;
         if (connection === 'close') {
             let reason = new Boom(lastDisconnect?.error)?.output.statusCode;
-            if (reason === DisconnectReason.badSession) {
-                console.log(chalk.bold.red(`bad session file, please delete session and scan again`))
-                process.exit();
-            } else if (reason === DisconnectReason.connectionClosed) {
-                console.log(chalk.bold.red("connection closed, reconnecting...."))
-                clientstart();
-            } else if (reason === DisconnectReason.connectionLost) {
-                console.log(chalk.bold.red("connection lost from server, reconnecting..."))
-                clientstart();
-            } else if (reason === DisconnectReason.connectionReplaced) {
-                console.log(chalk.bold.red("connection replaced, another new session opened, please restart bot"))
-                process.exit();
-            } else if (reason === DisconnectReason.loggedOut) {
-                console.log(chalk.bold.red(`device loggedout, please delete folder session and scan again.`))
-                process.exit();
-            } else if (reason === DisconnectReason.restartRequired) {
-                console.log(chalk.bold.red("restart required, restarting..."))
-                clientstart();
-            } else if (reason === DisconnectReason.timedOut) {
-                console.log(chalk.bold.red("connection timedout, reconnecting..."))
-                clientstart();
-            } else {
-                console.log(chalk.bold.red(`unknown disconnectReason: ${reason}|${connection}`))
-                clientstart();
+
+            if (reason === DisconnectReason.loggedOut) {
+                // Only hard-exit on actual logout — session is truly dead
+                console.log(chalk.bold.red('🚫 Logged out. Delete session folder and restart.'));
+                process.exit(1);
             }
+
+            if (reason === DisconnectReason.connectionReplaced) {
+                // Another instance opened — exit so PM2/Pterodactyl restarts once cleanly
+                console.log(chalk.bold.red('⚠️ Connection replaced. Exiting...'));
+                process.exit(1);
+            }
+
+            if (reason === DisconnectReason.badSession) {
+                console.log(chalk.bold.red('❌ Bad session. Delete session folder and re-pair.'));
+                process.exit(1);
+            }
+
+            // All other reasons (timeout, closed, lost, restartRequired, unknown)
+            // are already handled by index.js setTimeout(clientstart, 3000)
+            // DO NOT call clientstart() here — causes double-instance → connectionReplaced loop
+            console.log(chalk.yellow(`🔄 Disconnected (code: ${reason}) — reconnecting in 3s...`));
+
         } else if (connection === "open") {
-            console.log(chalk.bold.green('successfully connected to bot'))
+            console.log(chalk.bold.green('✓ Bot connected successfully'));
         }
     }
-              }
+}
