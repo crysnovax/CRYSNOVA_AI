@@ -299,7 +299,7 @@ try {
 //                   SHAZAM REPLY HANDLER
 // ─────────────────────────────────────────────────────────────
 try {
-    const { handleShazamReply } = require('./src/Commands/Search/shazam');
+    const { handleShazamReply } = require('./src/Commands/Search/shazam.js');
     const handled = await handleShazamReply(sock, m, reply);
     if (handled) return; // Reply was handled by shazam
 } catch (e) {
