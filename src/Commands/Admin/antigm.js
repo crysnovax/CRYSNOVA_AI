@@ -13,28 +13,16 @@ function saveDB(data) {
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2))
 }
 
-// Get all mentions from every possible location
-function getMentions(m) {
-    const raw = m.message || {}
-
-    const ext = raw.extendedTextMessage
-    if (ext?.contextInfo?.mentionedJid?.length) return ext.contextInfo.mentionedJid
-
-    for (const type of ['imageMessage', 'videoMessage', 'documentMessage', 'audioMessage', 'stickerMessage']) {
-        if (raw[type]?.contextInfo?.mentionedJid?.length) return raw[type].contextInfo.mentionedJid
-    }
-
-    if (Array.isArray(m.mentionedJid) && m.mentionedJid.length) return m.mentionedJid
-    if (m.msg?.contextInfo?.mentionedJid?.length) return m.msg.contextInfo.mentionedJid
-
-    return []
+function isStatusMention(mek) {
+    const raw = mek?.message || {}
+    return !!raw.groupStatusMentionMessage
 }
 
 // ── Command ────────────────────────────────────────────────────
 module.exports = {
     name: 'antigm',
     alias: ['antigroupmention', 'antigroupmsg', 'antieveryone'],
-    desc: 'Prevent group mentions in group',
+    desc: 'Prevent status mentions in group',
     category: 'Tools',
     groupOnly: true,
     adminOnly: true,
@@ -43,59 +31,45 @@ module.exports = {
     execute: async (sock, m, { args, reply }) => {
         const db    = loadDB()
         const group = m.chat
-        if (!db[group]) db[group] = { enabled: false, action: 'warn', minMentions: 1 }
+        if (!db[group]) db[group] = { enabled: false, action: 'warn' }
 
         const sub = args[0]?.toLowerCase()
 
         if (!sub) {
             const cfg = db[group]
             return reply(
-                `ಠ_ಠ *Anti Group Mention Settings*\n\n` +
-                `• Status      : ${cfg.enabled ? '✓ ON' : '✘ OFF'}\n` +
-                `• Action      : ${cfg.action || 'warn'}\n` +
-                `• Min mentions: ${cfg.minMentions || 2} to trigger\n\n` +
+                `ಠ_ಠ *Anti Status Mention Settings*\n\n` +
+                `• Status : ${cfg.enabled ? '✓ ON' : '✘ OFF'}\n` +
+                `• Action : ${cfg.action || 'warn'}\n\n` +
                 `Commands:\n` +
                 `• .antigm on\n• .antigm off\n` +
-                `• .antigm warn  → delete + warn\n` +
-                `• .antigm kick  → delete + kick\n` +
-                `• .antigm min 3 → set minimum`
+                `• .antigm warn → delete + warn\n` +
+                `• .antigm kick → delete + kick`
             )
         }
 
-        if (sub === 'on')  { db[group].enabled = true;  saveDB(db); return reply(`_*✓ Anti Group Mention*_ *ON*\nAction: *${db[group].action}*\nMin: *${db[group].minMentions}*`) }
-        if (sub === 'off') { db[group].enabled = false; saveDB(db); return reply('_*✘ Anti Group Mention*$ *OFF*') }
+        if (sub === 'on')   { db[group].enabled = true;  saveDB(db); return reply(`_*✓ Anti Status Mention*_ *ON*\nAction: *${db[group].action}*`) }
+        if (sub === 'off')  { db[group].enabled = false; saveDB(db); return reply('_*✘ Anti Status Mention*_ *OFF*') }
         if (sub === 'warn') { db[group].action = 'warn'; saveDB(db); return reply('_*✓ Action*_ → *WARN*') }
         if (sub === 'kick') { db[group].action = 'kick'; saveDB(db); return reply('_*✓ Action*_ → *KICK*') }
-        if (sub === 'min' && args[1]) {
-            const num = parseInt(args[1])
-            if (isNaN(num) || num < 1) return reply('✘ Must be a number greater than 0')
-            db[group].minMentions = num
-            saveDB(db)
-            return reply(`✓ Min mentions → *${num}*`)
-        }
 
-        reply('Usage: .antigm on | off | warn | kick | min <number>')
+        reply('Usage: .antigm on | off | warn | kick')
     }
 }
 
 // ── Message Handler ────────────────────────────────────────────
-module.exports.handleAntiGM = async function(sock, m) {
+module.exports.handleAntiGM = async function(sock, m, mek) {
     try {
         if (!m.isGroup || m.key?.fromMe) return
+
+        // Only fire on status mentions
+        if (!isStatusMention(mek)) return
 
         const db    = loadDB()
         const group = m.chat
         if (!db[group]?.enabled) return
 
-        const minMentions = db[group].minMentions || 2
-        const action      = db[group].action || 'warn'
-
-        // Use mentionedJid — this is what WhatsApp actually populates
-        const mentions = getMentions(m)
-
-        console.log(`[ANTI GM DEBUG] mentions: ${mentions.length} | min: ${minMentions} | sender: ${m.sender?.split('@')[0]}`)
-
-        if (mentions.length < minMentions) return
+        const action = db[group].action || 'warn'
 
         // Admins are exempt
         const meta = await sock.groupMetadata(group).catch(() => null)
@@ -111,23 +85,22 @@ module.exports.handleAntiGM = async function(sock, m) {
 
         if (action === 'warn') {
             await sock.sendMessage(group, {
-                text: `ಥ⁠‿⁠ಥ @${sender.split('@')[0]} _*Group mentions are not allowed here!*_`,
+                text: `ಥ⁠‿⁠ಥ @${sender.split('@')[0]} _*Status mentions are not allowed here!*_`,
                 mentions: [sender]
             })
         }
 
         if (action === 'kick') {
             await sock.sendMessage(group, {
-                text: `ᄒ⁠ᴥ⁠ᄒ⁠ _*@${sender.split('@')[0]} was removed for group mentioning!*_`,
+                text: `ᄒ⁠ᴥ⁠ᄒ⁠ _*@${sender.split('@')[0]} was removed for status mentioning!*_`,
                 mentions: [sender]
             })
             await sock.groupParticipantsUpdate(group, [sender], 'remove').catch(() => {})
         }
 
-        console.log(`[ANTI GM] ${action} → ${sender.split('@')[0]} | mentions: ${mentions.length}`)
+        console.log(`[ANTI GM] ${action} → ${sender.split('@')[0]} | status mention`)
 
     } catch (err) {
         console.error('[ANTI GM ERROR]', err.message)
     }
-}
-
+            }
