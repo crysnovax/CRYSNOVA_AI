@@ -162,7 +162,7 @@ module.exports = {
     category: 'News',
     usage: '.news | .news 1-5 | .news tech',
     
-    reactions: { start: '✨', success: '📰', read: '📖' },
+    reactions: { start: '🗞️', success: '❔', read: '📰' },
 
     execute: async (sock, m, { args, reply }) => {
         try {
