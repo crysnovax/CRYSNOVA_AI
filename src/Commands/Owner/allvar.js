@@ -6,6 +6,12 @@ module.exports = {
     desc: 'List all runtime variables',
     category: 'Owner',
     ownerOnly: true,
+     // ⭐ Reaction config
+    reactions: {
+        start: '❇',
+        success: '❔'
+    },
+    
     execute: async (sock, m, { reply }) => {
         const runtime = allVars();
         if (!Object.keys(runtime).length) {
