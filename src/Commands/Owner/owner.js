@@ -6,7 +6,7 @@ module.exports = {
      // ⭐ Reaction config
     reactions: {
         start: '💬',
-        success: '✨'
+        success: '❔'
     },
     
     execute: async (sock, m) => {
