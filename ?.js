@@ -92,6 +92,11 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             const m = await smsg(sock, mek, customStore);
             if (!m) return;
 
+            // ── Auto Read ─────────────────────────────────────────────────
+            if (getVar('AUTO_READ', true)) {
+                await sock.readMessages([mek.key]).catch(() => {});
+            }
+
             if (mek.key?.remoteJid && mek.key?.id) {
                 customStore.messages.set(mek.key.remoteJid + ':' + mek.key.id, mek);
             }
@@ -185,133 +190,119 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                     }
                 }
             } catch {}
-// ─────────────────────────────────────────────────────────────
-//                   OWNER MENTION HANDLER (FIXED)
-// ─────────────────────────────────────────────────────────────
-// ─────────────────────────────────────────────────────────────
-//                   OWNER MENTION HANDLER (FINAL)
-// ─────────────────────────────────────────────────────────────
-try {
-    const { mentionConfig } = require('./src/Commands/Owner/mention.js');
 
-    if (mentionConfig.active) {
-        const config = require('./settings/config');
-        const ownerNumber = (process.env.OWNER_NUMBER || config.owner || '').replace(/[^0-9]/g, '');
-        
-        if (ownerNumber) {
-            
-            const ownerJid = `${ownerNumber}@s.whatsapp.net`;
-            const botPnJid = (sock.user?.id || '').replace(/:\d+@/, '@s.whatsapp.net');
-            const botLid = sock.user?.lid || '';
-            
-            // 🚫 Ignore messages sent by owner/bot
-            const sender = (m.sender || '').replace(/:\d+@/, '@s.whatsapp.net');
-            if (sender === botPnJid) return;
-            
-            const norm = (j) => (j || '').replace(/:\d+@/, '@').toLowerCase().trim();
-            
-            // ─── 1. COLLECT ALL MENTIONS ───
-            const rawMsg = mek.message || {};
-            const ctxInfo = rawMsg.extendedTextMessage?.contextInfo || 
-                           rawMsg.imageMessage?.contextInfo ||
-                           rawMsg.videoMessage?.contextInfo || 
-                           rawMsg.documentMessage?.contextInfo || {};
-            
-            const allMentions = [
-                ...(ctxInfo.mentionedJid || []),
-                ...(m.mentionedJid || []),
-                ...(m.msg?.contextInfo?.mentionedJid || []),
-            ];
-            
-            const uniqueMentions = [...new Set(allMentions)].filter(Boolean);
+            // ─────────────────────────────────────────────────────────────
+            //                   OWNER MENTION HANDLER
+            // ─────────────────────────────────────────────────────────────
+            try {
+                const { mentionConfig } = require('./src/Commands/Owner/mention.js');
 
-            // ─── 2. CHECK IF OWNER IS MENTIONED ───
-            let isMentioned = false;
-            
-            for (const jid of uniqueMentions) {
-                const normalized = norm(jid);
-                
-                if (normalized === norm(ownerJid) || normalized === norm(botPnJid)) {
-                    isMentioned = true;
-                    break;
-                }
-                
-                if (botLid && normalized === norm(botLid)) {
-                    isMentioned = true;
-                    break;
-                }
-                
-                try {
-                    const decoded = sock.decodeJid(jid);
-                    if (decoded && norm(decoded) === norm(ownerJid)) {
-                        isMentioned = true;
-                        break;
+                if (mentionConfig.active) {
+                    const config = require('./settings/config');
+                    const ownerNumber = (process.env.OWNER_NUMBER || config.owner || '').replace(/[^0-9]/g, '');
+
+                    if (ownerNumber) {
+                        const ownerJid = `${ownerNumber}@s.whatsapp.net`;
+                        const botPnJid = (sock.user?.id || '').replace(/:\d+@/, '@s.whatsapp.net');
+                        const botLid   = sock.user?.lid || '';
+
+                        const sender = (m.sender || '').replace(/:\d+@/, '@s.whatsapp.net');
+                        if (sender === botPnJid) return;
+
+                        const norm = (j) => (j || '').replace(/:\d+@/, '@').toLowerCase().trim();
+
+                        // ─── 1. COLLECT ALL MENTIONS ───
+                        const rawMsg  = mek.message || {};
+                        const ctxInfo = rawMsg.extendedTextMessage?.contextInfo ||
+                                        rawMsg.imageMessage?.contextInfo         ||
+                                        rawMsg.videoMessage?.contextInfo         ||
+                                        rawMsg.documentMessage?.contextInfo      || {};
+
+                        const allMentions = [
+                            ...(ctxInfo.mentionedJid       || []),
+                            ...(m.mentionedJid             || []),
+                            ...(m.msg?.contextInfo?.mentionedJid || []),
+                        ];
+
+                        const uniqueMentions = [...new Set(allMentions)].filter(Boolean);
+
+                        // ─── 2. CHECK IF OWNER IS MENTIONED ───
+                        let isMentioned = false;
+
+                        for (const jid of uniqueMentions) {
+                            const normalized = norm(jid);
+
+                            if (normalized === norm(ownerJid) || normalized === norm(botPnJid)) {
+                                isMentioned = true;
+                                break;
+                            }
+
+                            if (botLid && normalized === norm(botLid)) {
+                                isMentioned = true;
+                                break;
+                            }
+
+                            try {
+                                const decoded = sock.decodeJid(jid);
+                                if (decoded && norm(decoded) === norm(ownerJid)) {
+                                    isMentioned = true;
+                                    break;
+                                }
+                            } catch {}
+
+                            const participantAlt = ctxInfo.participantAlt || m.msg?.contextInfo?.participantAlt;
+                            if (participantAlt && norm(participantAlt) === norm(ownerJid)) {
+                                isMentioned = true;
+                                break;
+                            }
+                        }
+
+                        // ─── 3. CHECK TEXT CONTENT ───
+                        const allText = [
+                            rawMsg.conversation,
+                            rawMsg.extendedTextMessage?.text,
+                            rawMsg.imageMessage?.caption,
+                            rawMsg.videoMessage?.caption,
+                            m.text,
+                            m.body
+                        ].filter(Boolean).join(' ');
+
+                        const waLink1 = `wa.me/${ownerNumber}`;
+                        const waLink2 = `https://wa.me/${ownerNumber}`;
+                        const waLink3 = `https://api.whatsapp.com/send?phone=${ownerNumber}`;
+
+                        const textHasOwner =
+                            allText.includes(ownerNumber)      ||
+                            allText.includes(`@${ownerNumber}`) ||
+                            allText.includes(ownerJid)         ||
+                            allText.includes(waLink1)          ||
+                            allText.includes(waLink2)          ||
+                            allText.includes(waLink3);
+
+                        // ─── 4. EXECUTE ───
+                        if (isMentioned || textHasOwner) {
+                            if (mentionConfig.action === 'react' && mentionConfig.emoji) {
+                                await sock.sendMessage(m.chat, {
+                                    react: { text: mentionConfig.emoji, key: m.key }
+                                }).catch(() => {});
+                            } else if (mentionConfig.action === 'text' && mentionConfig.text) {
+                                await sock.sendMessage(m.chat, {
+                                    text: mentionConfig.text
+                                }, { quoted: m }).catch(() => {});
+                            }
+                        }
                     }
-                } catch {}
-                
-                const participantAlt = ctxInfo.participantAlt || m.msg?.contextInfo?.participantAlt;
-                if (participantAlt && norm(participantAlt) === norm(ownerJid)) {
-                    isMentioned = true;
-                    break;
                 }
-            }
+            } catch {}
 
-            // ─── 3. CHECK TEXT CONTENT ───
-            const allText = [
-                rawMsg.conversation,
-                rawMsg.extendedTextMessage?.text,
-                rawMsg.imageMessage?.caption,
-                rawMsg.videoMessage?.caption,
-                m.text,
-                m.body
-            ].filter(Boolean).join(' ');
-
-            const waLink1 = `wa.me/${ownerNumber}`;
-            const waLink2 = `https://wa.me/${ownerNumber}`;
-            const waLink3 = `https://api.whatsapp.com/send?phone=${ownerNumber}`;
-            
-            const textHasOwner =
-                allText.includes(ownerNumber) ||
-                allText.includes(`@${ownerNumber}`) ||
-                allText.includes(ownerJid) ||
-                allText.includes(waLink1) ||
-                allText.includes(waLink2) ||
-                allText.includes(waLink3);
-
-            // ─── 4. EXECUTE ───
-            if (isMentioned || textHasOwner) {
-                
-                if (mentionConfig.action === 'react' && mentionConfig.emoji) {
-                    await sock.sendMessage(m.chat, {
-                        react: { text: mentionConfig.emoji, key: m.key }
-                    }).catch(() => {});
-                    
-                } else if (mentionConfig.action === 'text' && mentionConfig.text) {
-                    await sock.sendMessage(m.chat, {
-                        text: mentionConfig.text
-                    }, { quoted: m }).catch(() => {});
-                }
-            }
-        }
-    }
-} catch {}
-//─────────────────────────────────────────────────────────────
-//                   SHAZAM REPLY HANDLER
-// ─────────────────────────────────────────────────────────────
-try {
-    const { handleShazamReply } = require('./src/Commands/Search/shazam.js');
-    const handled = await handleShazamReply(sock, m, reply);
-    if (handled) return; // Reply was handled by shazam
-} catch (e) {
-    // Not a shazam reply or error
-}
-
-// ─────────────────────────────────────────────────────────────
-//                   MAIN COMMAND ENGINE
-// ─────────────────────────────────────────────────────────────
-//await handleMessage(sock, m, customStore);
-            
-            
+            // ─────────────────────────────────────────────────────────────
+            //                   SHAZAM REPLY HANDLER
+            // ─────────────────────────────────────────────────────────────
+            try {
+                const { handleShazamReply } = require('./src/Commands/Search/shazam.js');
+                const handled = await handleShazamReply(sock, m, reply);
+                if (handled) return;
+            } catch {}
 
             // ─────────────────────────────────────────────────────────────
             //                   MAIN COMMAND ENGINE
@@ -327,7 +318,7 @@ try {
 
                 if (
                     msgText.startsWith('.crysnova') ||
-                    msgText.startsWith('.ai') ||
+                    msgText.startsWith('.ai')       ||
                     msgText.startsWith('.crys')
                 ) {
                     // handled above by handleMessage
@@ -405,4 +396,4 @@ setInterval(() => {
         if (quoted?.cleanUp) quoted.cleanUp();
     } catch {}
 }, 60000);
-                
+    
