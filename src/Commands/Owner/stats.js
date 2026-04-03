@@ -4,7 +4,7 @@ module.exports = {
     desc: 'Show bot statistics',
     category: 'Owner',
     ownerOnly: true,
-    reactions: { start: '📊', success: '♎' },
+    reactions: { start: '📊', success: '❔' },
     execute: async (sock, m, { reply }) => {
         const s = process.uptime();
         const h = Math.floor(s / 3600), min = Math.floor((s % 3600) / 60), sec = Math.floor(s % 60);
