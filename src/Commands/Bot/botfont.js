@@ -46,11 +46,11 @@ module.exports = {
     /* ---------- LIST FONTS ---------- */
     if (!args[0] || args[0].toLowerCase() === "list") {
 
-      let text = "📚 Available Fonts:\n\n";
+      let text = "📚 ✐ Available Fonts ⌘:\n\n";
 
       styleList.forEach((s, i) => {
         const preview = styles[s]("CRYSNOVA");
-        text += `${i + 1}. ${s}\n   ➜ ${preview}\n\n`;
+        text += `${i + 1}. ${s}\n  ❏ ➜ ${preview}\n\n`;
       });
 
       return reply(text);
@@ -58,11 +58,11 @@ module.exports = {
 
     const index = parseInt(args[0]);
     if (isNaN(index)) {
-      return reply("Use:\n.botfont list\n.botfont <number>\n.botfont group <number>");
+      return reply("𓀀 Use:\n.botfont list\n.botfont <number>\n.botfont group <number>");
     }
 
     const fontName = styleList[index - 1];
-    if (!fontName) return reply("Invalid font number.");
+    if (!fontName) return reply("_*❔Invalid font number*_.");
 
     const db = loadDB();
 
@@ -70,12 +70,12 @@ module.exports = {
     if (args[0].toLowerCase() === "group") {
       const groupIndex = parseInt(args[1]);
       const groupFont = styleList[groupIndex - 1];
-      if (!groupFont) return reply("Invalid group font number.");
+      if (!groupFont) return reply("_*𒆜 Invalid group font number.*_");
 
       db.groups[jid] = groupFont;
       saveDB(db);
 
-      return reply(`✓ Group font set to: ${groupFont}`);
+      return reply(`_✓ Group font set to: ${groupFont}_`);
     }
 
     /* ---------- GLOBAL FONT ---------- */
