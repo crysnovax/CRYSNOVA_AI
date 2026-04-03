@@ -1,49 +1,71 @@
-const { generateWAMessageFromContent } = require('@itsliaaa/baileys');
+const { getByCategory } = require('../../Plugin/crysCmd');
+const { getVar } = require('../../Plugin/configManager');
+const examples = require('../Core/Example.js');
 
 module.exports = {
-  name: 'dashboard',
-  alias: ['hp', 'dashboard','cyber'],
-  category: 'general',
+  name: 'guide',
+  alias: ['menutv', 'dash', 'dashboard'],
+  category: 'Bot',
 
-  execute: async (sock, m, { reply, prefix = '!' }) => {
+  execute: async (sock, m, { reply, prefix = '.' }) => {
     const jid = m.key.remoteJid;
 
-    const boot = await reply('```\n> NEURAL GRID BOOTING...\n> TRACE MASKED | LATENCY 47ms```');
-    setTimeout(() => sock.sendMessage(jid, { delete: boot.key }).catch(() => {}), 1400);
+    const botName = getVar('BOT_NAME', 'CRYSNOVA AI');
+    const userName = m.pushName || m.sender.split('@')[0] || 'User';
 
-    const headerUrl = 'https://media.crysnovax.workers.dev/230e81dc-61f3-41aa-9850-6d17c8a6b281.jpg';
+    const categories = getByCategory();
 
-    const sections = [
-      {
-        title: '◢◤ N E U R A L C O R E ◢◤',
-        rows: [
-          { title: 'Chat Core', rowId: `${prefix}ai`, description: 'Direct thought uplink' },
-          { title: 'Vision Decode', rowId: `${prefix}vision`, description: 'Image / video matrix scan' },
-          { title: 'Voice Decrypt', rowId: `${prefix}transcribe`, description: 'Audio waveform breach' }
-        ]
-      },
-      // Other section data...
-    ];
+    // build sections with examples
+    const sections = Object.entries(categories).map(([cat, cmds]) => ({
+      title: cat.toUpperCase(),
+      rows: cmds.map(c => {
+        const example = examples[c.name] || '';
+        const fullCmd = `${prefix}${c.name}${example ? ' ' + example : ''}`;
+
+        return {
+          title: fullCmd, // shown
+          rowId: fullCmd, // fills input
+          description: c.desc || 'no description'
+        };
+      })
+    }));
+
+    const headerUrl = getVar(
+      'THUMB_URL',
+      'https://files.catbox.moe/z2rqc1.jpg'
+    );
 
     try {
-      await sock.sendMessage(jid, {
-        text: '```\nCRYSNOVA v3 // DARKNET ACCESS\nSYSTEM STATUS: ONLINE\n> ENTER CATEGORY MATRIX```',
-        footer: 'crysnova • Benin Node 🔥 [ SECURED ]',
-        title: 'NEURAL GRID ACCESS',
-        buttonText: 'BREACH GRID',
-        sections: sections,
-        header: {
-          imageMessage: {
-            url: headerUrl,
-            mimetype: 'image/jpeg'
-          }
-        }
-      }, { quoted: m });
+      await sock.sendMessage(
+        jid,
+        {
+          text:
+            `╭─❍ *${botName.toUpperCase()}*\n` +
+           ` | ಠ_ಠ *𝓬𝓻𝔂𝓼𝓷𝓸𝓿𝓪 𝓿𝓮𝓻𝓲𝓯𝓲𝓮𝓭* _use in DM only_\n`+
+            `│ ❏◦ User: ${userName}\n` +
+            `│ ❏◦ Prefix: ${prefix}\n` +
+            `│ ❏◦ Categories: ${Object.keys(categories).length}\n` +
+            `╰──────────────────`,
 
-      await reply('> Grid breached. Select access vector.');
+          footer: '✧ crysnova • Neural Node 🔥 [ 𓊈𝑽꯭𝑰꯭𝑷ࠡࠡࠡࠡࠢ𓊉 ]',
+          title: '彡TV GRID GUIDE',
+          buttonText: '◥◣SELECT COMMAND◢◤',
+
+          sections,
+
+          header: {
+            imageMessage: {
+              url: headerUrl,
+              mimetype: 'image/jpeg'
+            }
+          }
+        },
+        { quoted: m }
+      );
+
     } catch (err) {
       console.error('[MENU ERROR]', err);
-      await reply(`> BREACH FAILED: ${err.message}`);
+      await reply(`> FAILED: ${err.message}`);
     }
   }
 };
