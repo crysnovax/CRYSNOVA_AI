@@ -3,7 +3,7 @@ module.exports = {
     alias: ['online', 'bot'],
     desc: 'Check if ZEE BOT is alive',
     category: 'Bot',
-    reactions: { start: '🌀', success: '👾' },
+    reactions: { start: '🌀', success: '❔' },
     execute: async (sock, m, { reply, config }) => {
         const uptime = process.uptime();
         const h = Math.floor(uptime / 3600);
