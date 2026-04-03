@@ -10,13 +10,13 @@ module.exports = {
         const min = Math.floor((uptime % 3600) / 60);
         const s = Math.floor(uptime % 60);
         await reply(
-            `╭─❍ *ZEE BOT V2*\n` +
+            `╭─❍ ಥ⁠‿⁠ಥ *ZEE BOT V2*\n` +
             `│ ⚉ Status: _Online_\n` +
-            `│ ⏱ Uptime: ${h}h ${min}m ${s}s\n` +
+            `│ 𓀀 Uptime: ${h}h ${min}m ${s}s\n` +
             `│ ✦ Prefix: ${config.settings?.prefix || '.'}\n` +
-            `│ ☬ Mode: ${config.status?.public ? 'Public' : 'Private'}\n` +
+            `│ ✐ Mode: ${config.status?.public ? 'Public' : 'Private'}\n` +
             `│ ✪ Version: 2.0.0\n` +
-            `╰─ 𓄄 Powered by CRYSNOVA AI\`\`\``
+            `╰─ 𓄄 Powered by CRYSNOVA AI`
         );
     }
 };
