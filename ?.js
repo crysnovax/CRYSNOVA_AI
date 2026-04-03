@@ -338,7 +338,7 @@ try {
             // Anti Group Mention
             try {
                 const antigm = require('./src/Commands/Admin/antigm.js');
-                if (antigm?.handleAntiGM) await antigm.handleAntiGM(sock, m);
+                if (antigm?.handleAntiGM) await antigm.handleAntiGM(sock, m, mek);
             } catch {}
 
             // VV Reply Trigger
