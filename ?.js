@@ -164,6 +164,11 @@ try {
     }
     // false = do nothing
 } catch {}
+            // ── AFK Handler ───────────────────────────────────────────────
+try {
+    const afk = require('./src/Commands/Owner/afk.js')
+    if (afk?.handleAFK) await afk.handleAFK(sock, m)
+} catch {}
 
             // ─────────────────────────────────────────────────────────────
             //                   ANTI TAG
