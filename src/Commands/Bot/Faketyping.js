@@ -1,39 +1,48 @@
-const { setVar, getVar } = require('../../Plugin/configManager');
+const { getVar, setVar } = require('../../Plugin/configManager');
 
 module.exports = {
-    name: 'faketyp',
-    alias: ['ftyp','ftyping','typing'],
-    desc: 'Toggle fake typing indicator when processing commands',
-    category: 'Bot',
-    ownerOnly: true,
-    reactions: { start: '⌨️', success: '🤧' },
+    name: 'faketyping',
+    alias: ['typing'],
+    desc: 'Control fake typing behavior',
+    category: 'Owner',
+    sudoOnly: true,
+    reactions: { start: '⌨️', success: '📝' },
 
     execute: async (sock, m, { args, reply }) => {
-        const sub = args[0]?.toLowerCase();
+        const current = getVar('FAKE_TYPING', 'cmd');
 
-        // Show current status if no arg
-        if (!sub) {
-            const current = getVar('FAKE_TYPING') !== false;
+        if (!args[0]) {
+            const status =
+                current === 'all' ? '_*❏◦ ON (all messages)✓*_' :
+                current === 'cmd' ? '_*■⋆⁩⁩ ON (commands only)✓*_' :
+                                    '_*ಠ_ಠ OFF*_';
             return reply(
                 `⌨️ *Fake Typing*\n\n` +
-                `• Status : ${current ? '✓ ON' : '✘ OFF'}\n\n` +
-                `Commands:\n` +
-                `• .faketyping on\n` +
-                `• .faketyping off`
+                `Status: ${status}\n\n` +
+                `Usage:\n` +
+                `• .faketyping on — fire on all messages\n` +
+                `• .faketyping on cmd — fire on commands only\n` +
+                `• .faketyping off — disabled`
             );
         }
 
-        if (sub === 'on') {
-            setVar('FAKE_TYPING', true);
-            return reply('⌨️ _*Fake Typing →*_ *ON*\n_Bot will show typing... when processing commands_');
+        const input = args.join(' ').toLowerCase().trim();
+
+        if (input === 'on') {
+            setVar('FAKE_TYPING', 'all');
+            return reply('_*❏◦ Fake typing*_: *ON* _(all messages)_');
         }
 
-        if (sub === 'off') {
+        if (input === 'on cmd') {
+            setVar('FAKE_TYPING', 'cmd');
+            return reply('_*■⋆⁩⁩ Fake typing*_: *ON* _(commands only)_');
+        }
+
+        if (input === 'off') {
             setVar('FAKE_TYPING', false);
-            return reply('⌨️ _*Fake Typing →*_ *OFF*');
+            return reply('_*ಠ_ಠ Fake typing*_: *OFF*');
         }
 
-        reply('⚉ _Usage: .faketyping on | off_');
+        reply('ಥ⁠‿⁠ಥ _*Usage: .faketyping on | .faketyping on cmd | .faketyping off*_');
     }
 };
-
