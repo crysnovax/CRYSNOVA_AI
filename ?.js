@@ -150,16 +150,20 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                 }
             } catch {}
 
-            // Fake Typing — only when a command is being processed
-            const bodyCheck   = (mek.message?.conversation || mek.message?.extendedTextMessage?.text || '').trim();
-            const prefixCheck = getVar('PREFIX', '.');
-            const isCommand   = bodyCheck.startsWith(prefixCheck);
-
-            try {
-                if (isCommand && getVar('FAKE_TYPING') !== false) {
-                    await sock.sendPresenceUpdate('composing', m.key.remoteJid);
-                }
-            } catch {}
+            // Fake Typing
+try {
+    const typingMode = getVar('FAKE_TYPING', 'cmd');
+    if (typingMode === 'all') {
+        await sock.sendPresenceUpdate('composing', m.key.remoteJid);
+    } else if (typingMode === 'cmd') {
+        const bodyCheck   = (mek.message?.conversation || mek.message?.extendedTextMessage?.text || '').trim();
+        const prefixCheck = getVar('PREFIX', '.');
+        if (bodyCheck.startsWith(prefixCheck)) {
+            await sock.sendPresenceUpdate('composing', m.key.remoteJid);
+        }
+    }
+    // false = do nothing
+} catch {}
 
             // ─────────────────────────────────────────────────────────────
             //                   ANTI TAG
@@ -396,4 +400,4 @@ setInterval(() => {
         if (quoted?.cleanUp) quoted.cleanUp();
     } catch {}
 }, 60000);
-    
+                            
