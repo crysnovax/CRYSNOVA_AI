@@ -208,7 +208,7 @@ const handleMessage = async (sock, m, store) => {
 
     } catch (err) {
         console.log(chalk.red('[MSG ERROR]'), err.message);
-        sock.sendMessage(m.chat, { react: { text: '🙈', key: m.key } }).catch(() => {});
+        sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } }).catch(() => {});
     }
 };
 
