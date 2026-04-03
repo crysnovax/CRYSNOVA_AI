@@ -10,6 +10,12 @@ name: 'deploy',
 alias: [],
 category: 'tools',
 desc: 'Save or return deploy script',
+   // ⭐ Reaction config
+    reactions: {
+        start: '💬',
+        success: '❔'
+    },
+  
 
 execute: async (sock, m, { args, text, reply }) => {
 
