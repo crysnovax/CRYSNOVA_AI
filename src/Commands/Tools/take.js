@@ -24,7 +24,7 @@ module.exports = {
             // Create new sticker with packname
             const sticker = new Sticker(buffer, {
                 pack: 'CRYSNOVA AI',
-                author: 'CRYSNOVA',
+                author: 'crysnovax',
                 type: 'full'
             });
             const stickerBuffer = await sticker.toBuffer();
