@@ -13,6 +13,14 @@ const { getVar }             = require('./src/Plugin/configManager');
 const styles  = require("./src/Commands/Core/'.js");
 const botFont = require('./src/Commands/Bot/botfont.js');
 
+// ────────── NEW: AUTO‑TRANSLATION IMPORTS ──────────
+const { translate } = require('./src/Commands/Tools/translate-helper.js');
+const { getLang }   = require('./src/Commands/Bot/botlang.js');
+
+// Translation cache (optional, avoids repeated API calls)
+const translationCache = new Map();
+const CACHE_TTL = 3600000; // 1 hour
+
 const ignoredErrors = [
     'Socket connection timeout', 'EKEYTYPE', 'item-not-found',
     'rate-overlimit', 'Connection Closed', 'Timed Out', 'Value not found',
@@ -23,17 +31,49 @@ const ignoredErrors = [
 
 module.exports = function setupMessageHandler(sock, customStore, handleMessage, smsg, io, config) {
 
-    // BOTFONT OVERRIDE (GLOBAL)
+    // ────────── MODIFIED: BOTFONT + AUTO‑TRANSLATION OVERRIDE ──────────
     const originalSend = sock.sendMessage.bind(sock);
     sock.sendMessage = async (jid, content, options = {}) => {
         try {
-            if (content?.text) {
+            if (content?.text && typeof content.text === 'string') {
+                let text = content.text;
+
+                // 1️⃣ AUTO‑TRANSLATION (if target language is set for this chat)
+                const targetLang = getLang(jid);
+                if (targetLang && text.trim().length > 0) {
+                    // Optional: skip very short messages or command usage strings
+                    const skipPatterns = ['.setlang', '.tr', 'Usage:', '╭─', '╰─'];
+                    if (!skipPatterns.some(p => text.includes(p))) {
+                        const cacheKey = `${text}|${targetLang}`;
+                        let translatedText = translationCache.get(cacheKey);
+                        if (!translatedText) {
+                            try {
+                                const result = await translate(text, targetLang);
+                                if (result?.translated) {
+                                    translatedText = result.translated;
+                                    translationCache.set(cacheKey, translatedText);
+                                    setTimeout(() => translationCache.delete(cacheKey), CACHE_TTL);
+                                }
+                            } catch (err) {
+                                console.error('[TRANSLATE ERROR]', err.message);
+                            }
+                        }
+                        if (translatedText) text = translatedText;
+                    }
+                }
+
+                // 2️⃣ BOTFONT STYLING (your original code)
                 const font = botFont.getFont(jid);
                 if (font && styles[font]) {
-                    content.text = styles[font](content.text);
+                    text = styles[font](text);
                 }
+
+                content.text = text;
             }
-        } catch {}
+        } catch (err) {
+            // Don't break the message if translation/font fails
+            console.error('[SEND OVERRIDE ERROR]', err.message);
+        }
         return originalSend(jid, content, options);
     };
 
@@ -405,4 +445,3 @@ setInterval(() => {
         if (quoted?.cleanUp) quoted.cleanUp();
     } catch {}
 }, 60000);
-                            
