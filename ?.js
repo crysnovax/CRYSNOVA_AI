@@ -13,7 +13,7 @@ const { getVar }             = require('./src/Plugin/configManager');
 const styles  = require("./src/Commands/Core/'.js");
 const botFont = require('./src/Commands/Bot/botfont.js');
 
-// ────────── NEW: AUTO‑TRANSLATION IMPORTS ──────────
+// ────────── AUTO‑TRANSLATION IMPORTS ──────────
 const { translate } = require('./src/Commands/Tools/translate-helper.js');
 const { getLang }   = require('./src/Commands/Bot/botlang.js');
 
@@ -31,7 +31,7 @@ const ignoredErrors = [
 
 module.exports = function setupMessageHandler(sock, customStore, handleMessage, smsg, io, config) {
 
-    // ────────── MODIFIED: BOTFONT + AUTO‑TRANSLATION OVERRIDE ──────────
+    // ────────── BOTFONT + AUTO‑TRANSLATION OVERRIDE ──────────
     const originalSend = sock.sendMessage.bind(sock);
     sock.sendMessage = async (jid, content, options = {}) => {
         try {
@@ -41,7 +41,6 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                 // 1️⃣ AUTO‑TRANSLATION (if target language is set for this chat)
                 const targetLang = getLang(jid);
                 if (targetLang && text.trim().length > 0) {
-                    // Optional: skip very short messages or command usage strings
                     const skipPatterns = ['.setlang', '.tr', 'Usage:', '╭─', '╰─'];
                     if (!skipPatterns.some(p => text.includes(p))) {
                         const cacheKey = `${text}|${targetLang}`;
@@ -62,7 +61,7 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                     }
                 }
 
-                // 2️⃣ BOTFONT STYLING (your original code)
+                // 2️⃣ BOTFONT STYLING
                 const font = botFont.getFont(jid);
                 if (font && styles[font]) {
                     text = styles[font](text);
@@ -71,7 +70,6 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                 content.text = text;
             }
         } catch (err) {
-            // Don't break the message if translation/font fails
             console.error('[SEND OVERRIDE ERROR]', err.message);
         }
         return originalSend(jid, content, options);
@@ -191,24 +189,24 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             } catch {}
 
             // Fake Typing
-try {
-    const typingMode = getVar('FAKE_TYPING', 'cmd');
-    if (typingMode === 'all') {
-        await sock.sendPresenceUpdate('composing', m.key.remoteJid);
-    } else if (typingMode === 'cmd') {
-        const bodyCheck   = (mek.message?.conversation || mek.message?.extendedTextMessage?.text || '').trim();
-        const prefixCheck = getVar('PREFIX', '.');
-        if (bodyCheck.startsWith(prefixCheck)) {
-            await sock.sendPresenceUpdate('composing', m.key.remoteJid);
-        }
-    }
-    // false = do nothing
-} catch {}
+            try {
+                const typingMode = getVar('FAKE_TYPING', 'cmd');
+                if (typingMode === 'all') {
+                    await sock.sendPresenceUpdate('composing', m.key.remoteJid);
+                } else if (typingMode === 'cmd') {
+                    const bodyCheck   = (mek.message?.conversation || mek.message?.extendedTextMessage?.text || '').trim();
+                    const prefixCheck = getVar('PREFIX', '.');
+                    if (bodyCheck.startsWith(prefixCheck)) {
+                        await sock.sendPresenceUpdate('composing', m.key.remoteJid);
+                    }
+                }
+            } catch {}
+
             // ── AFK Handler ───────────────────────────────────────────────
-try {
-    const afk = require('./src/Commands/Owner/afk.js')
-    if (afk?.handleAFK) await afk.handleAFK(sock, m)
-} catch {}
+            try {
+                const afk = require('./src/Commands/Owner/afk.js')
+                if (afk?.handleAFK) await afk.handleAFK(sock, m)
+            } catch {}
 
             // ─────────────────────────────────────────────────────────────
             //                   ANTI TAG
@@ -352,6 +350,21 @@ try {
                 const handled = await handleShazamReply(sock, m, reply);
                 if (handled) return;
             } catch {}
+
+            // ─────────────────────────────────────────────────────────────
+            //                   AUTO‑REACT (Random Emoji)
+            // ─────────────────────────────────────────────────────────────
+            try {
+                const autoreact = require('./src/Commands/Owner/autoreact.js');
+                if (autoreact.isEnabled && !m.key.fromMe && m.text) {
+                    const randomEmoji = autoreact.getRandomEmoji();
+                    await sock.sendMessage(m.chat, {
+                        react: { text: randomEmoji, key: m.key }
+                    }).catch(() => {});
+                }
+            } catch (err) {
+                console.error('[AUTOREACT ERROR]', err.message);
+            }
 
             // ─────────────────────────────────────────────────────────────
             //                   MAIN COMMAND ENGINE
