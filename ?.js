@@ -352,11 +352,12 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
             } catch {}
 
             // ─────────────────────────────────────────────────────────────
-            //                   AUTO‑REACT (Random Emoji)
+            //                   AUTO‑REACT (Random Emoji) - FIXED
             // ─────────────────────────────────────────────────────────────
             try {
                 const autoreact = require('./src/Commands/Owner/autoreact.js');
-                if (autoreact.isEnabled && !m.key.fromMe && m.text) {
+                // ✅ Fixed: call isEnabled() as a function
+                if (autoreact.isEnabled() && !m.key.fromMe && m.text) {
                     const randomEmoji = autoreact.getRandomEmoji();
                     await sock.sendMessage(m.chat, {
                         react: { text: randomEmoji, key: m.key }
