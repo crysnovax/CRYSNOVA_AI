@@ -1,7 +1,7 @@
-//const fs = require('fs');
-//const path = require('path');
+const fs = require('fs');
+const path = require('path');
 
-//const DB_PATH = path.join(__dirname, '../../../database/lang_prefs.json');
+const DB_PATH = path.join(__dirname, '../../../database/lang_prefs.json');
 
 // Language code → full name mapping
 const LANG_NAMES = {
@@ -31,14 +31,12 @@ function savePrefs(data) {
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 }
 
-// Get target language for a chat (group or global)
 function getLang(jid) {
     const db = loadPrefs();
     if (jid?.endsWith('@g.us') && db.groups[jid]) return db.groups[jid];
-    return db.global || null;  // null = no translation
+    return db.global || null;
 }
 
-// Set target language
 function setLang(jid, langCode, isGroup = false) {
     const db = loadPrefs();
     if (isGroup && jid?.endsWith('@g.us')) db.groups[jid] = langCode;
@@ -54,7 +52,6 @@ function formatLanguageList() {
     const lines = [];
     for (const code of SUPPORTED_LANGS) {
         const name = LANG_NAMES[code];
-        // Create dots to fill up to 12 characters after the code
         const dotCount = 12 - code.length;
         const dots = '.'.repeat(dotCount > 0 ? dotCount : 1);
         lines.push(`𒆜❏◦ ${code}${dots}✐ ${name}`);
@@ -106,7 +103,6 @@ module.exports = {
         return reply(`_✓ Auto‑translation set to ${langName} (${targetLang}) [${where}]_`);
     },
 
-    // Export helpers for the message handler
     getLang,
     setLang
 };
