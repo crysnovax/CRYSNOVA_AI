@@ -8,7 +8,7 @@ module.exports = {
     execute: async (sock, m, { args, reply }) => {
 
         if (!m.isGroup)
-            return reply('𓉤 ⚉ This command works only in groups');
+            return reply('`⟁⃝GROUP ONLY!!`');
 
         let target;
 
@@ -17,10 +17,10 @@ module.exports = {
         } else if (args[0]) {
             const number = args[0].replace(/[^0-9]/g, '');
             if (number.length < 10)
-                return reply('✘ ⚉ Invalid number format');
+                return reply('`ⓘ INVALID FORMAT!`');
             target = number + '@s.whatsapp.net';
         } else {
-            return reply('𓄄 ⚉ Tag a user to remove\n✪ `.kick @user`');
+            return reply('`𓋎 MENTION A USER!`\n_✪ .kick @user_');
         }
 
         try {
@@ -31,10 +31,10 @@ module.exports = {
 
             const removedNumber = target.split('@')[0];
 
-            await reply('✓ ✪ `Kicked successfully`');
+            await reply('_*ಥ⁠‿⁠ಥ Kicked successfully*_');
 
             await sock.sendMessage(m.chat, {
-                text: `✪ @${removedNumber} removed from group`,
+                text: `_*—͟͟͞͞𖣘 @${removedNumber} removed from group*_`,
                 mentions: [target]
             });
 
@@ -42,12 +42,12 @@ module.exports = {
 
             console.error('[KICK ERROR]', err?.message || err);
 
-            let msg = '✘ ⚉ Failed to remove user\n\n';
+            let msg = '_*✘ Failed to remove user*_\n\n';
 
             if (err.message?.includes('admin') || err.message?.includes('permission')) {
-                msg += '𓉤 Bot lacks admin permission';
+                msg += 'ಠ_ಠ _Bot lacks admin permission_';
             } else if (err.message?.includes('not-authorized')) {
-                msg += '𓉤 Cannot remove this user';
+                msg += '𓃼 _Cannot remove this user_';
             } else {
                 msg += `𓉤 <${err.message || 'Unknown error'}>`;
             }
