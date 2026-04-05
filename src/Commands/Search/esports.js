@@ -54,7 +54,7 @@ const formatMatchTime = (matchTime, userTimezone) => {
 
 module.exports = {
     name: 'esports',
-    alias: ['esport', 'match', 'live'],
+    alias: ['esport'],
     desc: 'eSports matches in your timezone',
     category: 'Entertainment',
     usage: '.esports [game] (e.g., .esports, .esports LOL, .esports CS2)',
