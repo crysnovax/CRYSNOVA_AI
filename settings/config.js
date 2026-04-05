@@ -85,7 +85,7 @@ const config = {
     // BOT STATUS / MODE (ZEE BOT .env style)
     // ════════════════════════════════════════════
     status: {
-        public:   process.env.PUBLIC_MODE   !== undefined ? process.env.PUBLIC_MODE   === 'true'  : (getVar('PUBLIC_MODE')   ?? userConfig?.bot?.public   ?? true),
+        public:   process.env.PUBLIC_MODE   !== undefined ? process.env.PUBLIC_MODE   === 'false'  : (getVar('PUBLIC_MODE')   ?? userConfig?.bot?.public   ?? true),
         terminal: process.env.TERMINAL_MODE !== undefined ? process.env.TERMINAL_MODE !== 'false' : (getVar('TERMINAL_MODE') ?? userConfig?.bot?.terminal ?? true),
         reactsw:  process.env.REACT_STATUS  !== undefined ? process.env.REACT_STATUS  !== 'false' : (getVar('REACT_STATUS')  ?? userConfig?.bot?.reactsw  ?? true)
     },
@@ -95,7 +95,7 @@ const config = {
     // ════════════════════════════════════════════
     mode: {
         autoRead:      process.env.AUTO_READ      !== 'false',
-        autoTyping:    process.env.AUTO_TYPING    === 'true',
+        autoTyping:    process.env.AUTO_TYPING    === 'false',
         autoRecording: process.env.AUTO_RECORDING === 'true',
         alwaysOnline:  process.env.ALWAYS_ONLINE  !== 'false',
         selfBot:       process.env.SELF_BOT       === 'true'
@@ -154,14 +154,14 @@ const config = {
     // MESSAGES (CRYSNOVA V2 style)
     // ════════════════════════════════════════════
     message: {
-        owner:   'no, this is for owners only ☠️',
-        group:   'this is for groups only ☠️',
-        admin:   'this command is for admins only ☠️',
-        private: 'this is for private chat only ☠️'
+        owner:   '`ⓘ OWNER ONLY 彡`',
+        group:   '❔ _*GROUP ONLY!℘*_',
+        admin:   '⚠︎ _*ADMIN ONLY!*_ 𓃼',
+        private: 'ಠ_ಠ_*USE THIS IN DM*_ 𓀀'
     },
 
     mess: {
-        owner: 'This command is only for the bot owner!',
+        owner: 'ಥ⁠‿⁠ಥ _*OWNER ONLY!*_',
         done:  'Mode changed successfully! ✓𓄄',
         error: 'Something went wrong! ✘𓄄',
         wait:  'Please wait... ⚉'
@@ -242,8 +242,8 @@ const config = {
     branding: {
         footer:  '© ZEE BOT | Powered by CRYSNOVA AI',
         channel: 'https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38',
-        group:   process.env.GROUP_LINK || 'https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax',
-        repo:    'https://github.com/crysnovax/ZEE_BOT'
+        group:   process.env.GROUP_LINK || 'https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax?mode=gi_t',
+        repo:    'https://github.com/crysnovax/CRYSNOVA_AI'
     },
 
     // ════════════════════════════════════════════
