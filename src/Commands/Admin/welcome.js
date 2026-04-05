@@ -12,12 +12,12 @@ module.exports = {
     groupOnly: true,
     adminOnly: true,
     execute: async (sock, m, { text, reply }) => {
-        if (!text) return reply('Usage: .setwelcome Your welcome text here\nUse @user for member name');
+        if (!text) return reply('✐ Usage: _.setwelcome Your welcome text here_\n_Use @user for member name_');
         const db = readDB();
         if (!db[m.chat]) db[m.chat] = {};
         db[m.chat].enabled = true;
         db[m.chat].welcome = text;
         writeDB(db);
-        await reply(`✅ Welcome message set!\n\n"${text}"`);
+        await reply(`—͟͟͞͞𖣘 _*Welcome message set!*_`);
     }
 };
