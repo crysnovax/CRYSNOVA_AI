@@ -1,61 +1,100 @@
+const fetch = require('node-fetch');
+
 module.exports = {
     name: 'add',
-    alias: ['invite'],
-    desc: 'Add a user to the group',
-    category: 'group',
-    usage: '.add @user or .add 234xxxxxxxxxx',
+    alias: ['adduser'],
+    category: 'Admin',
+    admin: true,
+    group: true,
 
     execute: async (sock, m, { args, reply }) => {
-
-        if (!m.isGroup)
-            return reply('𓉤 ⚉ This command works only in groups');
-
-        let number = args[0]?.replace(/[^0-9]/g, '');
-
-        if (!number) {
-            if (m.mentionedJid?.length) {
-                number = m.mentionedJid[0].split('@')[0];
-            } else {
-                return reply('𓉤 ⚉ Tag or enter full number\nExample: .add 234xxxxxxxxxx');
-            }
-        }
-
-        if (number.length < 10)
-            return reply('✘ ⚉ Number too short — use full format (e.g. 234xxxxxxxxxx)');
-
-        const jid = number + '@s.whatsapp.net';
-
         try {
-
-            await sock.groupParticipantsUpdate(m.chat, [jid], 'add');
-
-            // Small delay for smoothness
-            await new Promise(r => setTimeout(r, 1500));
-
-            await reply(`✓ ✪ Successfully added <${number}>`);
-
-            await sock.sendMessage(m.chat, {
-                text: `𓄄 ✪ Welcome @${number} 🎉\nIntroduce yourself!`,
-                mentions: [jid]
-            });
-
-        } catch (err) {
-
-            console.error('[ADD ERROR]', err?.message || err);
-
-            let msg = '✘ ⚉ Failed to add user\n\n';
-
-            if (err.message?.includes('admin') || err.message?.includes('permission')) {
-                msg += '• Bot needs admin rights\nMake me full admin';
-            } else if (err.message?.includes('401') || err.message?.includes('forbidden')) {
-                msg += '• User privacy settings block adding';
-            } else if (err.message?.includes('404')) {
-                msg += '• Number not on WhatsApp';
-            } else {
-                msg += `• Error: <${err.message || 'Unknown'}>`;
+            if (!m.isGroup) return reply('`—͟͟͞͞𖣘 GROUP ONLY`');
+            if (!args.length) {
+                return reply('_*📞 Provide a phone number*_\n_Example: .add 0807 752 8901_');
             }
 
-            reply(`𓉤 ${msg}`);
+            // ✅ FORMAT NUMBER (handles spaces, +, etc)
+            let number = args.join(' ').replace(/[^0-9]/g, '');
+            if (number.startsWith('0')) number = '234' + number.slice(1);
+            if (!number.startsWith('234')) number = '234' + number;
+
+            const jid = number + '@s.whatsapp.net';
+
+            const meta = await sock.groupMetadata(m.chat);
+            const groupName = meta.subject;
+
+            // ✅ TRY DIRECT ADD
+            let res = await sock.groupParticipantsUpdate(m.chat, [jid], 'add');
+            const status = res?.[0]?.status;
+
+            // ✅ SUCCESS
+            if (status == 200 || status == '200') {
+                return await sock.sendMessage(m.chat, {
+                    text: `_*⟁⃝  @${number} has been added to the group.*_`,
+                    mentions: [jid]
+                }, { quoted: m });
+            }
+
+            // ❌ PRIVACY BLOCK → SEND INVITE (NO SPIN BUG)
+            if (['403', '401', '409'].includes(String(status))) {
+
+                // 🔥 fresh invite
+                const freshCode = await sock.groupInviteCode(m.chat);
+                const inviteLink = `https://chat.whatsapp.com/${freshCode}`;
+
+                // thumbnail
+                let thumbnail = null;
+                try {
+                    const pp = await sock.profilePictureUrl(m.chat, 'image');
+                    thumbnail = await fetch(pp).then(r => r.buffer());
+                } catch {}
+
+                try {
+                    // ✅ Send invite WITHOUT quoting anything
+                    await sock.sendMessage(jid, {
+                        text: `👋 You were invited to join *${groupName}*\n 🥏_*CRYSNOVA AI*_\n   ${inviteLink} 𓊈𝑽꯭𝑰꯭𝑷ࠡࠡࠡࠡࠢ𓊉`,
+                        contextInfo: {
+                            externalAdReply: {
+                                title: groupName,
+                                body: 'Tap to join WhatsApp group',
+                                thumbnail: thumbnail || null,
+                                sourceUrl: inviteLink,
+                                mediaType: 1,
+                                renderLargerThumbnail: true,
+                                showAdAttribution: true
+                            }
+                        }
+                    }); // No { quoted: m } here
+
+                    // ✅ CONFIRM IN GROUP (this can keep quoting if you want, it's not the invite link)
+                    await sock.sendMessage(m.chat, {
+                        text: `_*📩 Invite sent to @${number}—͟͟͞͞𖣘*_`,
+                        mentions: [jid]
+                    }, { quoted: m });
+
+                } catch (err) {
+                    console.log('DM FAILED:', err);
+
+                    // ❗ FALLBACK → Send invite link in group WITHOUT quoting
+                    await sock.sendMessage(m.chat, {
+                        text: `🔗 Couldn't DM @${number}\n${inviteLink}`,
+                        mentions: [jid]
+                    }); // No { quoted: m } here
+                }
+
+                return;
+            }
+
+            // ❌ OTHER ERROR
+            return await sock.sendMessage(m.chat, {
+                text: `_*✘ Failed to add @${number} (status: ${status})*_`,
+                mentions: [jid]
+            }, { quoted: m });
+
+        } catch (e) {
+            console.error('ADD ERROR:', e);
+            reply(`❌ Error: ${e.message}`);
         }
     }
 };
