@@ -8,10 +8,13 @@ module.exports = {
     execute: async (sock, m, { args, reply }) => {
         try {
             const teamFilter = args.join(' ') || '';
-
-            const url = `https://live-kord.vercel.app/api/live-matches?team=${encodeURIComponent(teamFilter)}`;
-            const res = await axios.get(url);
-            const matches = res.data.data.matches;
+            // Use your Worker URL, pass team filter as query param
+            const url = `https://livematch.crysnovax.workers.dev/?team=${encodeURIComponent(teamFilter)}`;
+            const res = await axios.get(url, {
+                headers: { 'Accept': 'application/json' } // ensures JSON response
+            });
+            // Worker returns array directly, not { data: { matches: [...] } }
+            const matches = res.data;
 
             if (!matches || matches.length === 0) {
                 return reply(`_*ಥ⁠‿⁠ಥ No live matches found*_`);
