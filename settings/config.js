@@ -155,7 +155,7 @@ const config = {
     // ════════════════════════════════════════════
     message: {
         owner:   '`ⓘ OWNER ONLY 彡`',
-        group:   '❔ _*GROUP ONLY!℘*_',
+        group:   '`⟁⃝GROUP ONLY!℘`',
         admin:   '⚠︎ _*ADMIN ONLY!*_ 𓃼',
         private: 'ಠ_ಠ_*USE THIS IN DM*_ 𓀀'
     },
