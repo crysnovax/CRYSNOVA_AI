@@ -1,4 +1,4 @@
-const { loadDefaults, saveDefaults, langName } = require('./translate-helper');
+const { loadDefaults, saveDefaults, langName } = require('../Core/✐');
 
 module.exports = {
     name: 'settrd',
