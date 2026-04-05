@@ -14,7 +14,7 @@ const styles  = require("./src/Commands/Core/'.js");
 const botFont = require('./src/Commands/Bot/botfont.js');
 
 // ────────── AUTO‑TRANSLATION IMPORTS ──────────
-const { translate } = require('./src/Commands/Tools/translate-helper.js');
+const { translate } = require('./src/Commands/Core/✐.js');
 const { getLang }   = require('./src/Commands/Bot/botlang.js');
 
 // Translation cache (optional, avoids repeated API calls)
