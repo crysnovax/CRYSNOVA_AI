@@ -5,6 +5,12 @@ module.exports = {
     category: 'Admin',
     groupOnly: true,
     adminOnly: true,
+     // ⭐ Reaction config
+    reactions: {
+        start: '💬',
+        success: '📢'
+    },
+    
     execute: async (sock, m, { text, groupMeta }) => {
         const members = groupMeta.participants.map(p => p.id);
         const msg = text || '`ⓘ EVERYONE!!`';
