@@ -24,39 +24,39 @@ module.exports = {
 
             if (!option) {
                 return await reply(
-`⚉ *GROUP EVENTS SYSTEM* ⚉
+`⟁⃝  *GROUP EVENTS SYSTEM* 
 
 Usage:  
 .events on  
 .events off
 
 Available Features:  
-• Premium Welcome Card  
-• Goodbye Messages  
-• Editable Welcome Text  
-• Member Count Display  
-• Join Time Display  
-• @User Tagging  
-• Future: Online Tracker`
+❏• Premium Welcome Card  
+❏• Goodbye Messages  
+❏• Editable Welcome Text  
+❏• Member Count Display  
+❏• Join Time Display  
+❏• @User Tagging  
+❏• Online Tracker`
                 );
             }
 
             if (option === 'on') {
                 db[m.chat].enabled = true;
                 fs.writeFileSync(path, JSON.stringify(db, null, 2));
-                return await reply('✓ *Group Events Enabled Successfully!*𓄄');
+                return await reply('_*✓ Group Events Enabled Successfully!*_');
             }
 
             if (option === 'off') {
                 db[m.chat].enabled = false;
                 fs.writeFileSync(path, JSON.stringify(db, null, 2));
-                return await reply('✘ *Group Events Disabled!*⚉𓄄');
+                return await reply('_*✘ Group Events Disabled!*_');
             }
 
             return await reply('✘ *Invalid option!* Use "on" or "off"𓄄');
         } catch (e) {
             console.error('Events Plugin Error:', e);
-            return await reply('✘ *Something went wrong!*⚉𓄄');
+            return await reply('✘ *Something went wrong!* 𓄄');
         }
     }
 };
