@@ -70,7 +70,7 @@ module.exports = {
 
         if (cmd === 'online') {
             if (alwaysOnlineEnabled) {
-                return reply('⚉ _Bot is already in_ *always online** _mode_');
+                return reply('⚉ _Bot is already in_ *always online* _mode_');
             }
 
             alwaysOnlineEnabled = true;
