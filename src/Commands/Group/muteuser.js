@@ -230,7 +230,7 @@ delete db[chatId][targetJid];
 saveMutedDb(db);
 
 await sock.sendMessage(chatId,{
-text:`🔊 ${targetJid.split('@')[0]} auto unmuted`,
+text:`_*⁠☞⁠ ͡⁠°⁠ ͜⁠ʖ⁠ ͡⁠°⁠)⁠☞ ${targetJid.split('@')[0]} auto unmuted*_`,
 mentions:[targetJid]
 }).catch(()=>{});
 }
@@ -241,10 +241,10 @@ mentions:[targetJid]
 
 await sock.sendMessage(chatId,{
 text:
-`_*亗 USER MUTED*_\n\n`+
-`✦ Target: @${targetJid.split('@')[0]}\n`+
-`⚉ Reason: ${reason}\n`+
-`⏱️ Duration: ${formatTime(timeMs)}`,
+`_*⟁⃝ USER MUTED 彡*_\n\n`+
+`—͟͟͞͞𖣘 Target: @${targetJid.split('@')[0]}\n`+
+`✐   Reason: ${reason}\n`+
+`ⓘ Duration: ${formatTime(timeMs)}`,
 
 mentions:[targetJid]
 
