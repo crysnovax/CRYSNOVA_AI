@@ -4,6 +4,12 @@ module.exports = {
     desc: 'Remove a user from the group',
     category: 'group',
     usage: '.kick @user',
+     // ⭐ Reaction config
+    reactions: {
+        start: '🤬',
+        success: '😤'
+    },
+    
 
     execute: async (sock, m, { args, reply }) => {
 
