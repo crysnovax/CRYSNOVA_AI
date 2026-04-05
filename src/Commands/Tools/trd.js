@@ -1,4 +1,4 @@
-const { translate, formatResult, loadDefaults, langName } = require('./translate-helper');
+const { translate, formatResult, loadDefaults, langName } = require('../Core/✐');
 
 module.exports = {
     name: 'trd',
