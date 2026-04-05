@@ -70,7 +70,7 @@ module.exports = {
 
         if (cmd === 'online') {
             if (alwaysOnlineEnabled) {
-                return reply('⚉ _Bot is already in_ **always online** _mode_');
+                return reply('⚉ _Bot is already in_ *always online** _mode_');
             }
 
             alwaysOnlineEnabled = true;
@@ -78,18 +78,18 @@ module.exports = {
             startPresenceLoop(sock);
 
             await reply(
-                '✪ `Always Online mode activated`\n\n' +
-                '**Bot will now appear online 24/7 while connected**.\n' +
-                '_*Turn off with*_: _.offline_'
+                '—͟͟͞͞𖣘 `Always Online mode activated`\n\n' +
+                '_*Bot will now appear online 24/7 while connected*_.\n\n' +
+                '_Turn off with_: _.offline_'
             );
 
             await sock.sendMessage(m.chat, {
-                react: { text: '🟢', key: m.key }
+                react: { text: '👁️‍🗨️', key: m.key }
             });
 
         } else if (cmd === 'offline') {
             if (!alwaysOnlineEnabled) {
-                return reply('𓉤 **Always online mode is already off**');
+                return reply('𓊈𖣘𓊉 _*Always online mode is already off*_');
             }
 
             alwaysOnlineEnabled = false;
@@ -100,20 +100,20 @@ module.exports = {
             await sock.sendPresenceUpdate('available');
 
             await reply(
-                '𓄄 `Always Online mode disabled`\n\n' +
+                'ಠ_ಠ `Always Online mode disabled`\n\n' +
                 '_*Bot now shows normal presence (online when active, unavailable when idle)*_.'
             );
 
             await sock.sendMessage(m.chat, {
-                react: { text: '🔴', key: m.key }
+                react: { text: '🐾', key: m.key }
             });
 
         } else {
             // Check status
-            const status = alwaysOnlineEnabled ? '🟢 *ON*' : '🔴 *OFF*';
-            await reply(`Always Online mode: **${status}**\n\n` +
-                        `Use **.online** to enable\n` +
-                        `Use **.offline** to disable`);
+            const status = alwaysOnlineEnabled ? '_*—͟͟͞͞𖣘 ON*_' : '_*𓊈𖣘𓊉 OFF*_';
+            await reply(`Always Online mode: *${status}*\n\n` +
+                        `_Use *.online* to enable_\n` +
+                        `_Use *.offline* to disable_`);
         }
     }
 };
