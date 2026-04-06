@@ -30,51 +30,60 @@ const ignoredErrors = [
 ];
 
 module.exports = function setupMessageHandler(sock, customStore, handleMessage, smsg, io, config) {
+// ────────── BOTFONT + AUTO‑TRANSLATION OVERRIDE (FIXED FOR CAPTIONS) ──────────
+const originalSend = sock.sendMessage.bind(sock);
+sock.sendMessage = async (jid, content, options = {}) => {
+    try {
+        // Helper to apply translation + font styling to a string
+        const processText = async (inputText) => {
+            if (!inputText || typeof inputText !== 'string') return inputText;
+            let text = inputText;
 
-    // ────────── BOTFONT + AUTO‑TRANSLATION OVERRIDE ──────────
-    const originalSend = sock.sendMessage.bind(sock);
-    sock.sendMessage = async (jid, content, options = {}) => {
-        try {
-            if (content?.text && typeof content.text === 'string') {
-                let text = content.text;
-
-                // 1️⃣ AUTO‑TRANSLATION (if target language is set for this chat)
-                const targetLang = getLang(jid);
-                if (targetLang && text.trim().length > 0) {
+            // 1️⃣ AUTO‑TRANSLATION
+            const targetLang = getLang(jid);
+            if (targetLang && text.trim().length > 0) {
+                
                     const skipPatterns = ['.setlang', '.tr', 'Usage:', '╭─', '╰─', '⌘', '𒆜', '❏◦', '╔', '║', '╚', '╭─❍', '┌', '└', '│'];
-                    if (!skipPatterns.some(p => text.includes(p))) {
-                        const cacheKey = `${text}|${targetLang}`;
-                        let translatedText = translationCache.get(cacheKey);
-                        if (!translatedText) {
-                            try {
-                                const result = await translate(text, targetLang);
-                                if (result?.translated) {
-                                    translatedText = result.translated;
-                                    translationCache.set(cacheKey, translatedText);
-                                    setTimeout(() => translationCache.delete(cacheKey), CACHE_TTL);
-                                }
-                            } catch (err) {
-                                console.error('[TRANSLATE ERROR]', err.message);
+                if (!skipPatterns.some(p => text.includes(p))) {
+                    const cacheKey = `${text}|${targetLang}`;
+                    let translatedText = translationCache.get(cacheKey);
+                    if (!translatedText) {
+                        try {
+                            const result = await translate(text, targetLang);
+                            if (result?.translated) {
+                                translatedText = result.translated;
+                                translationCache.set(cacheKey, translatedText);
+                                setTimeout(() => translationCache.delete(cacheKey), CACHE_TTL);
                             }
+                        } catch (err) {
+                            console.error('[TRANSLATE ERROR]', err.message);
                         }
-                        if (translatedText) text = translatedText;
                     }
+                    if (translatedText) text = translatedText;
                 }
-
-                // 2️⃣ BOTFONT STYLING
-                const font = botFont.getFont(jid);
-                if (font && styles[font]) {
-                    text = styles[font](text);
-                }
-
-                content.text = text;
             }
-        } catch (err) {
-            console.error('[SEND OVERRIDE ERROR]', err.message);
-        }
-        return originalSend(jid, content, options);
-    };
 
+            // 2️⃣ BOTFONT STYLING
+            const font = botFont.getFont(jid);
+            if (font && styles[font]) {
+                text = styles[font](text);
+            }
+            return text;
+        };
+
+        // Process text field (normal text messages)
+        if (content?.text) {
+            content.text = await processText(content.text);
+        }
+        // Process caption field (image, video, document, sticker captions)
+        if (content?.caption) {
+            content.caption = await processText(content.caption);
+        }
+    } catch (err) {
+        console.error('[SEND OVERRIDE ERROR]', err.message);
+    }
+    return originalSend(jid, content, options);
+};
     // Auto Status View + Like
     setupStatusHandler(sock);
 
