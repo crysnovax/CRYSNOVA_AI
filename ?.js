@@ -43,7 +43,7 @@ sock.sendMessage = async (jid, content, options = {}) => {
             const targetLang = getLang(jid);
             if (targetLang && text.trim().length > 0) {
                 
-                    const skipPatterns = ['.setlang', '.tr', 'Usage:', '╭─', '╰─', '⌘', '𒆜', '❏◦', '╔', '║', '╚', '╭─❍', '┌', '└', '│'];
+                    const skipPatterns = ['.setlang', '.tr', 'Usage:'];
                 if (!skipPatterns.some(p => text.includes(p))) {
                     const cacheKey = `${text}|${targetLang}`;
                     let translatedText = translationCache.get(cacheKey);
