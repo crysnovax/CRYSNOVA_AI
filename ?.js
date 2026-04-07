@@ -96,19 +96,31 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
     setupStatusHandler(sock);
 
     // Anti Call — reject incoming calls if enabled
-    sock.ev.on('call', async (calls) => {
-        try {
-            const { getVar } = require('./src/Plugin/configManager');
-            if (!getVar('ANTI_CALL', true)) return;
+    // Anti Call - reject incoming calls and notify caller
+sock.ev.on('call', async (calls) => {
+    try {
+        const { getVar } = require('./src/Plugin/configManager');
+        if (!getVar('ANTI_CALL', true)) return;
 
-            for (const call of calls) {
-                if (call.status !== 'offer') continue;
+        for (const call of calls) {
+            if (call.status !== 'offer') continue;
+
+            // Send "call not permitted" message to the caller
+            const callerJid = call.from;
+            const message = '`📵 CALL N⚉T PERMITTED ✐`'; // appears as selected text
+            await sock.sendMessage(callerJid, { text: message }).catch(() => {});
+
+            // Attempt to reject the call (if method exists)
+            if (typeof sock.rejectCall === 'function') {
                 await sock.rejectCall(call.id, call.from).catch(() => {});
-                console.log(`[ANTICALL] Rejected call from ${call.from}`);
             }
-        } catch {}
-    });
 
+            console.log(`[ANTICALL] Rejected call from ${call.from} and sent notification`);
+        }
+    } catch (err) {
+        console.error('[ANTICALL ERROR]', err.message);
+    }
+});
     // VV Reaction Listener — must start at boot with store access
     try {
         const vv = require('./src/Commands/Converter/view-once.js');
