@@ -1,48 +1,54 @@
-const fetch = require('node-fetch');
+const axios = require("axios");
+const config = require("../../../settings/config");
+
+// Use API base from config (same as other AI tools)
+const API_BASE = process.env.TOOLS_API_BASE || config.api?.imageBase || '';
 
 module.exports = {
     name: 'tojs',
     alias: ['toj', 'convertjs', 'jsify'],
-    desc: 'Convert any code from any language to clean JavaScript',
     category: 'AI',
+    desc: 'Convert any code to clean JavaScript powered by CRYSNOVA',
 
     execute: async (sock, m, { args, reply, quoted }) => {
         try {
             // Support input from args or quoted message
             let inputCode = args.join(' ');
             if (!inputCode && m.quoted?.text) inputCode = m.quoted.text;
-            if (!inputCode) return reply('𓉤 Please provide code to convert (or reply to a message)');
+            if (!inputCode) return reply('ಠ_ಠ _*Please provide code to convert (or reply to a message)*_');
 
             await sock.sendPresenceUpdate('composing', m.chat);
+            await sock.sendMessage(m.chat, { react: { text: '🔁', key: m.key } });
 
-            // Encode input for API
-            const apiUrl = `https://apis.prexzyvilla.site/tools/tojavascript?code=${encodeURIComponent(inputCode)}&from=auto`;
+            const apiUrl = `${API_BASE}/tojavascript?code=${encodeURIComponent(inputCode)}&from=auto`;
+            const response = await axios.get(apiUrl, { timeout: 30000 });
 
-            const apiRes = await fetch(apiUrl);
-            if (!apiRes.ok) return reply(`⚉ API failed: ${apiRes.status}`);
-
-            const data = await apiRes.json();
+            const data = response.data;
             if (!data.result && !data.code) return reply('✘ Unable to convert code');
 
             const jsOutput = (data.result || data.code).trim();
 
-            // Handle very long output by splitting if > 4000 chars
-            const MAX_CHARS = 400000;
+            const MAX_CHARS = 4000;
             if (jsOutput.length > MAX_CHARS) {
+                const parts = Math.ceil(jsOutput.length / MAX_CHARS);
                 for (let i = 0; i < jsOutput.length; i += MAX_CHARS) {
+                    const partNum = Math.floor(i / MAX_CHARS) + 1;
                     await sock.sendMessage(m.chat, {
-                        text: `🧠 *Converted JS (part ${i / MAX_CHARS + 1}):*\n\`\`\`js\n${jsOutput.slice(i, i + MAX_CHARS)}\n\`\`\``
+                        text: `𖣘 *CONVERTED JS (${partNum}/${parts})*\n\`\`\`js\n${jsOutput.slice(i, i + MAX_CHARS)}\n\`\`\`\n_⚉ CRYSNOVA_`
                     }, { quoted: m });
                 }
             } else {
                 await sock.sendMessage(m.chat, {
-                    text: `🧠 *Converted JavaScript:*\n\`\`\`js\n${jsOutput}\n\`\`\``
+                    text: `𖣘 *CONVERTED JAVASCRIPT*\n\`\`\`js\n${jsOutput}\n\`\`\`\n_⚉ CRYSNOVA_`
                 }, { quoted: m });
             }
 
+            await sock.sendMessage(m.chat, { react: { text: '✓', key: m.key } });
+
         } catch (err) {
-            console.error('[TOJS ERROR]', err);
-            reply('𓉤 Failed to convert to JavaScript');
+            console.error('[TOJS ERROR]', err.message);
+            await sock.sendMessage(m.chat, { react: { text: '✘', key: m.key } });
+            reply('✘ Failed to convert code');
         }
     }
 };
