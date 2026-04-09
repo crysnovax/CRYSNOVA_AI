@@ -1,17 +1,19 @@
+const axios = require("axios");
+const config = require("../../../settings/config");
+
+// Use AI base from config (same as image APIs, since it's the same provider)
+const AI_BASE = process.env.AI_API_BASE || config.api?.imageBase || '';
+
 module.exports = {
     name: 'story',
     alias: ['advai', 'smartgen', 'aipro'],
-    desc: 'Advanced AI text generation with modes',
     category: 'AI',
+    desc: 'Advanced AI text generation with modes powered by CRYSNOVA',
 
     execute: async (sock, m, { args, reply }) => {
         try {
             if (!args.length) {
-                return reply(`🧠 Usage:
-.story <text>
-.story creative <text>
-.story short <text>
-.story long <text>`);
+                return reply(`ಠ_ಠ *ADVANCED AI*\n\nUsage:\n.story <text>\n.story creative <text>\n.story short <text>\n.story long <text>`);
             }
 
             let length = 'medium';
@@ -27,66 +29,42 @@ module.exports = {
             }
 
             const text = textArgs.join(' ').trim();
-            if (!text) return reply('_*𓄄 Give a valid text prompt*_');
+            if (!text) return reply('✘ Give a valid text prompt');
 
             await sock.sendPresenceUpdate('composing', m.chat);
+            await sock.sendMessage(m.chat, { react: { text: '🧠', key: m.key } });
 
-            let apiUrl = `https://apis.prexzyvilla.site/ai/advanced?text=${encodeURIComponent(text)}`;
+            // Build URL with parameters
+            let apiUrl = `${AI_BASE}/advanced?text=${encodeURIComponent(text)}`;
             if (length !== 'medium') apiUrl += `&length=${length}`;
             if (isCreative) apiUrl += `&creative=true`;
 
-            const res = await fetch(apiUrl);
-            
-            if (!res.ok) {
-                return reply('_*⚉ API request failed*_');
-            }
+            const response = await axios.get(apiUrl, { timeout: 60000 });
+            const json = response.data;
 
-            const json = await res.json();
-            
-            // Deep search for any text content
+            // Deep search for any text content (same logic as original)
             let result = null;
-            
-            // Check if json is string (direct response)
             if (typeof json === 'string') {
                 result = json;
             } else {
-                // Try all possible paths
-                const paths = [
-                    'story',
-                    'result',
-                    'response',
-                    'text',
-                    'output',
-                    'message',
-                    'content',
-                    'data',
-                    'answer',
-                    'generated',
-                    'reply'
-                ];
-                
+                const paths = ['story', 'result', 'response', 'text', 'output', 'message', 'content', 'data', 'answer', 'generated', 'reply'];
                 for (const path of paths) {
                     if (json[path]) {
                         result = json[path];
-                        console.log(`[ADVANCED] Found at: ${path}`);
                         break;
                     }
                 }
-                
-                // If still nothing, check nested objects
                 if (!result && typeof json === 'object') {
                     const values = Object.values(json);
                     for (const val of values) {
                         if (typeof val === 'string' && val.length > 50) {
                             result = val;
-                            console.log('[ADVANCED] Found string value:', val.slice(0, 50));
                             break;
                         }
                     }
                 }
             }
 
-            // Handle if result is still object
             if (typeof result === 'object' && result !== null) {
                 const innerPaths = ['story', 'text', 'content', 'message', 'response'];
                 for (const path of innerPaths) {
@@ -95,29 +73,23 @@ module.exports = {
                         break;
                     }
                 }
-                if (typeof result === 'object') {
-                    result = JSON.stringify(result);
-                }
+                if (typeof result === 'object') result = JSON.stringify(result);
             }
 
             if (!result || result === '[object Object]' || result.length < 10) {
-                console.log('[ADVANCED] Full response:', JSON.stringify(json));
-                return reply('_*⚉ Could not extract text*_');
+                console.log('[STORY] Full response:', JSON.stringify(json));
+                return reply('✘ Could not extract text from response');
             }
 
-            const message = `🧠 *ADVANCED AI*
-☬ Length: ${length.toUpperCase()}${isCreative ? ' | Creative' : ''}
+            await sock.sendMessage(m.chat, {
+                text: `𖣘 *ADVANCED AI*\n\n⎙ Length: ${length.toUpperCase()}${isCreative ? ' • Creative' : ''}\n\n${result}\n\n_⚉ CRYSNOVA Gateway_`
+            }, { quoted: m });
 
-${result}
-
-𓄄 Generated by Prexzy AI`;
-
-            await reply(message);
+            await sock.sendMessage(m.chat, { react: { text: '✓', key: m.key } });
 
         } catch (err) {
-            console.error('[ADVANCED ERROR]', err);
-            reply('_*✘ Failed to generate*_');
+            console.error('[STORY ERROR]', err.message);
+            reply('✘ Failed to generate text');
         }
     }
 };
-
