@@ -238,6 +238,13 @@ module.exports = function setupMessageHandler(sock, customStore, handleMessage, 
                     }
                 }
             } catch {}
+            // Auto Recording (shows "recording..." while processing)
+try {
+    const autoRecording = getVar('AUTO_RECORDING', config?.mode?.autoRecording ?? true);
+    if (autoRecording) {
+        await sock.sendPresenceUpdate('recording', m.key.remoteJid);
+    }
+} catch {}
 
 // ========== AFK SYSTEM ==========
 const afkCmd = require('./src/Commands/Owner/afk.js');
