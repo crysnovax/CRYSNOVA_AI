@@ -461,7 +461,7 @@ if (afkUser && afkUser !== m.sender) {
             await handleMessage(sock, m, customStore);
 
             // ── CHATBOT AUTO-REPLY ─────────────────────────────────
-            const { handleIncomingMessage } = require('./src/Commands/AI/❚.js');
+            const { handleIncomingMessage } = require('./src/Commands/Core/❚.js');
             await handleIncomingMessage(sock, m, mek);
 
             // ── CRYSNOVA AI AUTO-REPLY ─────────────────────────────
