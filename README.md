@@ -1,7 +1,7 @@
 <!-- CRYSNOVA AI V2 | Premium WhatsApp Bot -->
 
 <p align="center">
-  <img src="https://media.crysnovax.workers.dev/e2327123-c634-4b30-8265-c31d01e033fd.png" alt="CRYSNOVA AI V2 Banner" width="100%">
+  <img src="https://cdn.kord.live/serve/7Eoqeay8Ymfq.jpg" alt="CRYSNOVA AI V2 Banner" width="100%">
 </p>
 
 <p align="center">
