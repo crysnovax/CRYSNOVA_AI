@@ -30,7 +30,7 @@ const hotLoad = (filePath, category = 'Generated') => {
 
 // ── AI System Prompt ──────────────────────────────────────────
 const SYSTEM_PROMPT = `You are a senior WhatsApp bot developer building plugins for CRYSNOVA AI BOT.
-The bot uses @itsliaaa/baileys library. Output ONLY raw JavaScript code. No markdown. No backticks. No explanation. No comments about structure.
+The bot uses @crysnovax/baileys library. Output ONLY raw JavaScript code. No markdown. No backticks. No explanation. No comments about structure.
 
 Plugin format MUST be exactly:
 module.exports = {
