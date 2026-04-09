@@ -1,38 +1,53 @@
+const axios = require("axios");
+const config = require("../../../settings/config");
+
+// Use AI image API base from config (or fallback to direct URL)
+const IMAGE_API_BASE = process.env.IMAGE_API_BASE || config.api?.imageBase || '';
+
 module.exports = {
     name: 'pixelart',
     alias: ['pixelai', '8bit', 'retroart'],
-    desc: 'Generate pixel art AI images',
     category: 'AI',
+    desc: 'Generate pixel art AI images powered by CRYSNOVA',
 
     execute: async (sock, m, { args, reply }) => {
         try {
             if (!args.length) {
-                return reply('👾 Usage:\n.pixelart <prompt>\n\nExamples:\n.pixelart cyberpunk city\n.pixelart cute cat');
+                return reply(`ಠ_ಠ *PIXEL ART AI*\n\nUsage: .pixelart <prompt>\nExample: .pixelart cyberpunk city`);
             }
 
             const basePrompt = args.join(' ').trim();
-            if (!basePrompt) return reply('_*𓄄 Give a valid prompt*_');
+            if (!basePrompt) return reply('✘ Give a valid prompt');
 
             await sock.sendPresenceUpdate('composing', m.chat);
+            await sock.sendMessage(m.chat, { react: { text: '👾', key: m.key } });
 
+            // Enhance prompt for pixel art style
             const enhancedPrompt = `${basePrompt}, pixel art, 8-bit style, retro gaming aesthetic, crisp pixels`;
             const negative = `blurry, smooth, realistic, 3d render, photorealistic, high resolution, anti-aliasing`;
 
-            const url = `https://apis.prexzyvilla.site/ai/pixel-art?prompt=${encodeURIComponent(enhancedPrompt)}&negative_prompt=${encodeURIComponent(negative)}`;
+            // Build URL from configurable base
+            const url = `${IMAGE_API_BASE}/pixel-art?prompt=${encodeURIComponent(enhancedPrompt)}&negative_prompt=${encodeURIComponent(negative)}`;
 
-            const res = await fetch(url);
-            if (!res.ok) return reply('_*⚉ API failed to generate pixel art*_');
+            const response = await axios.get(url, {
+                responseType: 'arraybuffer',
+                timeout: 60000
+            });
 
-            const buffer = Buffer.from(await res.arrayBuffer());
+            if (!response.data) return reply('✘ Failed to generate pixel art');
+
+            const buffer = Buffer.from(response.data);
 
             await sock.sendMessage(m.chat, {
                 image: buffer,
-                caption: `👾 *PIXEL ART GENERATED*\n📝 ${basePrompt}\n☬ 8-bit retro style`
+                caption: `𖣘 *PIXEL ART*\n\n👾 ${basePrompt}\n\n_⚉ 8-bit retro style | CRYSNOVA_`
             }, { quoted: m });
+
+            await sock.sendMessage(m.chat, { react: { text: '✓', key: m.key } });
 
         } catch (err) {
             console.error('[PIXELART ERROR]', err);
-            reply('_*✘ Failed to generate pixel art*_');
+            reply('✘ Failed to generate pixel art');
         }
     }
 };
