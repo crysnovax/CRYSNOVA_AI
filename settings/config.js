@@ -219,7 +219,7 @@ const config = {
         weather:
             process.env.WEATHER_API_KEY ||
             getVar('WEATHER_API_KEY')   ||
-            '',
+            'e6926030169752d7e0d85377e489c415',   // ⭐ Default OpenWeatherMap key
         // 🔐 CRYSNOVA Gateway (secure proxy for all AI services)
         gateway:
             process.env.GATEWAY_URL     ||
