@@ -229,7 +229,12 @@ const config = {
         cdn:
             process.env.CDN_URL         ||
             getVar('CDN_URL')           ||
-            'https://cdn.crysnovax.link'
+            'https://cdn.crysnovax.link',
+        // 🎨 Image generation API base (for pixel art, horror, etc.)
+        imageBase:
+            process.env.IMAGE_API_BASE  ||
+            getVar('IMAGE_API_BASE')    ||
+            'https://apis.prexzyvilla.site/ai'
     },
 
     // ════════════════════════════════════════════
