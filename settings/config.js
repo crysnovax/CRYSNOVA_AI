@@ -197,7 +197,7 @@ const config = {
     },
 
     // ════════════════════════════════════════════
-    // API KEYS (ZEE BOT .env style)
+// (ZEE BOT .env style)
     // ════════════════════════════════════════════
     api: {
         baseurl:
@@ -219,22 +219,27 @@ const config = {
         weather:
             process.env.WEATHER_API_KEY ||
             getVar('WEATHER_API_KEY')   ||
-            'e6926030169752d7e0d85377e489c415',   // ⭐ Default OpenWeatherMap key
-        // 🔐 CRYSNOVA Gateway (secure proxy for all AI services)
+            'e6926030169752d7e0d85377e489c415',
+        
         gateway:
             process.env.GATEWAY_URL     ||
             getVar('GATEWAY_URL')       ||
             'https://key.crysnovax.workers.dev',
-        // ❄️ CRYSNOVA CDN (self‑hosted media upload)
+
         cdn:
             process.env.CDN_URL         ||
             getVar('CDN_URL')           ||
             'https://cdn.crysnovax.link',
-        // 🎨 Image generation API base (for pixel art, horror, etc.)
+        // 
         imageBase:
             process.env.IMAGE_API_BASE  ||
             getVar('IMAGE_API_BASE')    ||
-            'https://apis.prexzyvilla.site/ai'
+            'https://apis.prexzyvilla.site/ai',
+        //
+        removebg:
+            process.env.REMOVE_BG_API_KEY ||
+            getVar('REMOVE_BG_API_KEY')   ||
+            'fy5Va5Qivw2BUQoojeSzzcHp'
     },
 
     // ════════════════════════════════════════════
