@@ -107,17 +107,17 @@ module.exports = {
         // ── Install plugin from URL ──
         if (cmd === '.plugin') {
             const url = args[0]?.trim();
-            if (!url || !url.startsWith('http')) return reply('⚠️ Provide a valid URL');
-            if (installedPlugins.includes(url)) return reply('ℹ️ Plugin already installed');
+            if (!url || !url.startsWith('http')) return reply('`⚠︎ Provide a valid URL`');
+            if (installedPlugins.includes(url)) return reply('`ⓘ Plugin already installed`');
 
             try {
-                await reply('𓉤 Downloading plugin... ⏳');
+                await reply('_*𝌆Downloading plugin...*_');
                 const { filePath, fileName, category } = await downloadAndSortPlugin(url);
 
                 installedPlugins.push(url);
                 saveInstalledPlugins();
 
-                return reply(`✓ Installed successfully!\n📄 File: ${fileName}\n📂 Folder: ${category}\n🌐 URL: ${url}`);
+                return reply(`✓ Installed successfully!\n⎙ File: ${fileName}\n📂 Folder: ${category}\n🌐 URL: ${url}`);
             } catch (err) { return reply(`✘ Failed to install plugin:\n${err.message}`); }
         }
 
@@ -127,7 +127,7 @@ module.exports = {
             if (!url) return reply('⚠️ Provide the plugin URL to remove');
 
             const index = installedPlugins.indexOf(url);
-            if (index === -1) return reply('ℹ️ Plugin not installed');
+            if (index === -1) return reply('`ⓘ Plugin not installed`');
 
             try {
                 const fileName = url.split('/').pop().replace(/[^a-z0-9._-]/gi, '_');
