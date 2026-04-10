@@ -11,7 +11,7 @@ const CONFIG = {
     requestTimeout: 60000
 };
 
-// Only these two items are preserved
+// Only these two items are preserved (never overwritten)
 const PRESERVE = ['sessions', '.env'];
 
 // Safe file operations
@@ -28,27 +28,40 @@ const safeFs = {
         if (stat.isDirectory()) {
             safeFs.mkdir(dest);
             for (const item of fs.readdirSync(src)) {
-                safeFs.copy(path.join(src, item), path.join(dest, item));
+                const srcPath = path.join(src, item);
+                const destPath = path.join(dest, item);
+                if (PRESERVE.includes(item)) continue; // never overwrite preserved items
+                safeFs.copy(srcPath, destPath);
             }
         } else {
+            const destDir = path.dirname(dest);
+            safeFs.mkdir(destDir);
             fs.copyFileSync(src, dest);
         }
     }
 };
 
-// Delete everything except preserved items
-function wipeDirectory(dir, preserveList) {
-    for (const item of fs.readdirSync(dir)) {
-        if (preserveList.includes(item)) continue;
-        const fullPath = path.join(dir, item);
-        safeFs.remove(fullPath);
+// Overwrite existing files with repo contents (no deletion)
+function overwriteWithRepo(srcDir, destDir) {
+    if (!fs.existsSync(srcDir)) return;
+    for (const item of fs.readdirSync(srcDir)) {
+        const srcPath = path.join(srcDir, item);
+        const destPath = path.join(destDir, item);
+        if (PRESERVE.includes(item)) continue;
+        if (fs.statSync(srcPath).isDirectory()) {
+            safeFs.mkdir(destPath);
+            overwriteWithRepo(srcPath, destPath);
+        } else {
+            safeFs.mkdir(path.dirname(destPath));
+            fs.copyFileSync(srcPath, destPath);
+        }
     }
 }
 
 module.exports = {
     name: 'format',
     alias: ['flash', 'cleaninstall', 'factoryreset'],
-    desc: 'Wipe bot and reinstall from GitHub (keeps only sessions & .env)',
+    desc: 'Override bot files with latest from GitHub (preserves only sessions & .env)',
     category: 'Owner',
     owner: true,
     usage: '.format confirm',
@@ -58,12 +71,12 @@ module.exports = {
 
         if (confirmWord !== 'confirm') {
             return reply(
-                `⟁⃝⚠︎ *DESTRUCTIVE OPERATION*\n\n` +
-                `This will DELETE EVERYTHING except:\n` +
+                `⟁⃝⚠︎ *OVERRIDE OPERATION*\n\n` +
+                `This will OVERWRITE all bot files with the latest from:\n` +
+                `https://github.com/${CONFIG.repo}\n\n` +
+                `Only these are PRESERVED:\n` +
                 `• \`sessions/\` folder (auth)\n` +
                 `• \`.env\` file\n\n` +
-                `After wipe, a fresh copy will be installed from:\n` +
-                `https://github.com/${CONFIG.repo}\n\n` +
                 `To proceed, type: *.format confirm*`
             );
         }
@@ -81,11 +94,7 @@ module.exports = {
             }
             await reply('`✓ Backup created.`');
 
-            // 2. Wipe current directory (except preserved)
-            wipeDirectory('.', PRESERVE);
-            await reply('`✓ Bot directory wiped.`');
-
-            // 3. Download latest repository
+            // 2. Download latest repository
             const zipUrl = `https://github.com/${CONFIG.repo}/archive/refs/heads/${CONFIG.branch}.zip`;
             const zipRes = await axios.get(zipUrl, { responseType: 'arraybuffer', timeout: CONFIG.requestTimeout });
 
@@ -95,17 +104,17 @@ module.exports = {
             fs.writeFileSync(zipPath, zipRes.data);
             await reply('`✓ Repository downloaded.`');
 
-            // 4. Extract
+            // 3. Extract
             const zip = new AdmZip(zipPath);
             zip.extractAllTo(CONFIG.tempDir, true);
             await reply('`✓ Files extracted.`');
 
-            // 5. Copy new files to project root
+            // 4. Overwrite current directory with repo contents (no wipe)
             const extractedFolder = path.join(CONFIG.tempDir, `${CONFIG.repo.split('/')[1]}-${CONFIG.branch}`);
-            safeFs.copy(extractedFolder, './');
-            await reply('`✓ Fresh installation copied.`');
+            overwriteWithRepo(extractedFolder, './');
+            await reply('`✓ Files overwritten from repository.`');
 
-            // 6. Restore preserved items
+            // 5. Restore preserved items
             for (const item of PRESERVE) {
                 const backupPath = path.join(CONFIG.backupDir, item);
                 if (fs.existsSync(backupPath)) {
@@ -115,26 +124,21 @@ module.exports = {
             }
             await reply('`✓ Sessions and .env restored.`');
 
-            // 7. Cleanup temp folders
+            // 6. Cleanup temp folders
             safeFs.remove(CONFIG.tempDir);
             safeFs.remove(CONFIG.backupDir);
 
             await reply(
                 `ಠ_ಠ *FORMAT COMPLETE*\n\n` +
-                `Bot has been reset to factory state.\n` +
+                `Bot files have been replaced with the latest from GitHub.\n` +
                 `Sessions and .env preserved.\n\n` +
                 `_Restarting in 3 seconds..._`
             );
 
-            // Graceful restart
-            setTimeout(() => {
-                process.exit(0);
-            }, 3000);
+            setTimeout(() => process.exit(0), 3000);
 
         } catch (err) {
             console.error('[FORMAT ERROR]', err);
-
-            // Attempt restore on failure
             try {
                 for (const item of PRESERVE) {
                     const backupPath = path.join(CONFIG.backupDir, item);
@@ -144,7 +148,6 @@ module.exports = {
                     }
                 }
             } catch (e) {}
-
             reply(`✘ *FORMAT FAILED*\n${err.message}\n\nBackup restored.`);
         }
     }
