@@ -1,7 +1,7 @@
 const axios = require('axios');
 const config = require('../../../settings/config');
 
-const GATEWAY_URL = config.api?.gateway || 'https://api.crysnovax.link';
+const GATEWAY_URL = config.api?.gateway || '';
 const GATEWAY_TOKEN = config.api?.gatewayToken || '';
 
 module.exports = {
@@ -36,7 +36,7 @@ module.exports = {
                 text: `𖣘 *CHAT EVERYWHERE*\n\n${response}\n\n_⚉ CRYSNOVA Gateway_`
             }, { quoted: m });
             
-            await sock.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+            await sock.sendMessage(m.chat, { react: { text: '☺️', key: m.key } });
         } catch (err) {
             console.error('[CHATEVERYWHERE]', err.message);
             reply('✘ Chat failed');
