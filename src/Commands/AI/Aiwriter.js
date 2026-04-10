@@ -56,7 +56,7 @@ module.exports = {
                 models.slice(0, 15).forEach((model, i) => {
                     const name = model.name || 'Unknown';
                     const code = model.code || '';
-                    const isPro = model.is_pro ? '🔒' : '🆓';
+                    const isPro = model.is_pro ? '🜲' : '🆓';
                     const canImage = model.is_image ? ' 🖼️' : '';
                     text += `*${i + 1}.* ${name} ${isPro}${canImage}\n   \`${code}\`\n`;
                 });
@@ -67,7 +67,7 @@ module.exports = {
                 text += `\n\n_⚉ CRYSNOVA Gateway_`;
                 
                 await sock.sendMessage(m.chat, { text }, { quoted: m });
-                await sock.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+                await sock.sendMessage(m.chat, { react: { text: '❄️', key: m.key } });
             } catch (err) {
                 console.error('[AIWRITER]', err.message);
                 reply('✘ Failed to fetch models');
@@ -137,7 +137,7 @@ module.exports = {
                 text: `𖣘 *${modelName}*\n\n${response}\n\n_⚉ CRYSNOVA Gateway_`
             }, { quoted: m });
             
-            await sock.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+            await sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
         } catch (err) {
             console.error('[AIWRITER CHAT]', err.message);
             reply(`✘ Failed to get response from ${selectedModel.name}.`);
