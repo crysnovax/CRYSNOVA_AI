@@ -1,11 +1,11 @@
 /**
  * CRYSNOVA AI V2 – Entry Point
- * ⓘ ©crysnovax all right reserved!.
+ * Handles auto‑update check before loading the main (obfuscated) bot file.
  */
 
 const fs = require('fs');
 const path = require('path');
-const chalk = require('chalk'); // Make sure chalk is installed: npm install chalk
+const chalk = require('chalk');
 
 // -------------------------------------------------------------------
 // 1. Check if auto‑update is enabled
@@ -23,33 +23,33 @@ try {
 }
 
 // -------------------------------------------------------------------
-// 2. If enabled, run the update in the background (non‑blocking)
+// 2. If enabled, run the update and WAIT for it to finish
 // -------------------------------------------------------------------
-if (autoUpdateEnabled) {
-    console.log(chalk.yellow('𝌆  updating...ⓘ'));
-    console.log(chalk.cyan('⎙ [CRYSNOVA] —͟͟͞͞𖣘❚ Starting background update...'));
+(async () => {
+    if (autoUpdateEnabled) {
+        console.log(chalk.yellow('𝌆  updating...ⓘ'));
+        console.log(chalk.cyan('⎙ [CRYSNOVA] —͟͟͞͞𖣘❚ Starting update (blocking startup)...'));
 
-    const { performUpdate } = require('./src/Plugin/updater.js');
+        const { performUpdate } = require('./src/Plugin/updater.js');
 
-    //
-    performUpdate({
-        notifyOwner: null
-    }).then(result => {
-        if (result.success) {
-            console.log(chalk.green('✓ [CRYSNOVA] Background update completed successfully.'));
-            console.log(chalk.cyan('⎙ [CRYSNOVA] —͟͟͞͞𖣘❚ Restart the bot to apply changes.'));
-        } else {
-            console.log(chalk.red('✘ [CRYSNOVA] Background update failed:'), result.error);
+        try {
+            const result = await performUpdate({ notifyOwner: null });
+            if (result.success) {
+                console.log(chalk.green('✓ [CRYSNOVA] Background update completed successfully.'));
+                console.log(chalk.cyan('⎙ [CRYSNOVA] —͟͟͞͞𖣘❚ Changes applied.'));
+            } else {
+                console.log(chalk.red('✘ [CRYSNOVA] Background update failed:'), result.error);
+            }
+        } catch (err) {
+            console.error(chalk.red('✘ [CRYSNOVA] Background update error:'), err);
         }
-    }).catch(err => {
-        console.error(chalk.red('✘ [CRYSNOVA] Background update error:'), err);
-    });
-} else {
-    console.log(chalk.gray('ⓘ Auto‑update is disabled. Skipping.'));
-}
+    } else {
+        console.log(chalk.gray('ⓘ Auto‑update is disabled. Skipping.'));
+    }
 
-// -------------------------------------------------------------------
-// . Load and start
-// -------------------------------------------------------------------
-console.log(chalk.cyan('⎙ [CRYSNOVA] —͟͟͞͞𖣘❚ Loading main bot...'));
-require('./⚉.js');  
+    // -------------------------------------------------------------------
+    // 3. Load and start 
+    // -------------------------------------------------------------------
+    console.log(chalk.cyan('⎙ [CRYSNOVA] —͟͟͞͞𖣘❚ Loading main bot...'));
+    require('./⚉.js');
+})();
