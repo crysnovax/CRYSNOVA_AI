@@ -12,10 +12,10 @@ module.exports = {
 
         if (action === 'on') {
             setVar('AUTO_RECORDING', true);
-            return reply('`✓ Auto Recording ENABLED`');
+            return reply('`✓ Recording ENABLED`');
         } else if (action === 'off') {
             setVar('AUTO_RECORDING', false);
-            return reply('`✘ Auto Recording DISABLED`');
+            return reply('`✘ Recording DISABLED`');
         } else {
             const current = getVar('AUTO_RECORDING', true);
             return reply(`Auto Recording is currently: *${current ? 'ON' : 'OFF'}*\n\nUsage: .autorecording on/off`);
