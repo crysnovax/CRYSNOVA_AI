@@ -1,8 +1,9 @@
 const axios = require("axios");
 const config = require("../../../settings/config");
 
-// Use gateway from config
-const GATEWAY_URL = process.env.GATEWAY_URL || config.api?.gateway || '';
+// Use gateway from config with token
+const GATEWAY_URL = process.env.GATEWAY_URL || config.api?.gateway || 'https://api.crysnovax.link';
+const GATEWAY_TOKEN = process.env.GATEWAY_TOKEN || config.api?.gatewayToken || '';
 
 module.exports = {
     name: "gemini",
@@ -25,23 +26,10 @@ module.exports = {
         try {
             await sock.sendMessage(jid, { react: { text: "✨", key: m.key } });
 
-            // Gemini‑style training prompt (acts like Gemini, powered by DeepSeek)
-            const GEMINI_PROMPT = `You are Gemini, a helpful AI assistant created by Google. You are known for being knowledgeable, friendly, and conversational.
-
-Rules:
-- Reply naturally and directly, as Gemini would.
-- Be helpful, intelligent, and concise.
-- Maintain a warm, approachable tone.
-- Do not reveal that you are actually a different model.
-- Always behave as Google's Gemini assistant.
-
-User Question:
-${query}`;
-
-            // Call the gateway's /deepseek endpoint (which already exists)
+            // Call the gateway's dedicated /gemini endpoint with token
             const response = await axios.post(
-                `${GATEWAY_URL}/deepseek`,
-                { query: GEMINI_PROMPT },  // The prompt becomes the "query"
+                `${GATEWAY_URL}/gemini?token=${encodeURIComponent(GATEWAY_TOKEN)}`,
+                { query },
                 {
                     headers: { 'Content-Type': 'application/json' },
                     timeout: 60000
@@ -52,16 +40,16 @@ ${query}`;
 
             if (data?.success && data?.message?.content) {
                 await sock.sendMessage(jid, {
-                    text: `ಠ_ಠ *GEMINI AI*\n\n${data.message.content}\n\n_⚉ CRYSNOVA Gateway_`
+                    text: `𖣘 *GEMINI AI*\n\n${data.message.content}\n\n_⚉ CRYSNOVA Gateway_`
                 }, { quoted: m });
                 await sock.sendMessage(jid, { react: { text: "✓", key: m.key } });
             } else {
-                reply("_*✘ Gemini response invalid*_.");
+                reply("✘ _*Gemini response invalid*_.");
             }
 
         } catch (err) {
             console.error("Gemini Plugin Error:", err.message);
-            reply("✘ Gemini AI service error.");
+            reply("_*ಠ_ಠ Gemini AI service error.*_");
         }
     }
 };
