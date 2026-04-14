@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const DB = path.join(__dirname, '../../database/deploy.txt')
+const DB = path.join(__dirname, '../../deploy.txt')
 
 if (!fs.existsSync(DB)) fs.writeFileSync(DB, '')
 
