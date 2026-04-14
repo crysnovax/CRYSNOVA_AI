@@ -31,7 +31,7 @@
     "archiver": "^7.0.1",
     "js-confuser": "^2.0.0",
     "ruhend-scraper": "^9.0.5",
-    "axios": "^1.13.5",
+    "axios": "^1.15.0",
     "wa-sticker-formatter": "^4.4.4",
     "canvas": "^3.2.1",
     "terser": "^5.46.1",
