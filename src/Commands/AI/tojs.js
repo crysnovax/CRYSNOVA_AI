@@ -1,8 +1,9 @@
 const axios = require("axios");
 const config = require("../../../settings/config");
 
-// Use API base from config (same as other AI tools)
-const API_BASE = process.env.TOOLS_API_BASE || config.api?.imageBase || '';
+// Use Apex gateway from config with token
+const GATEWAY_URL = process.env.GATEWAY_URL || config.api?.gateway || 'https://api.crysnovax.link';
+const GATEWAY_TOKEN = process.env.GATEWAY_TOKEN || config.api?.gatewayToken || '';
 
 module.exports = {
     name: 'tojs',
@@ -20,7 +21,8 @@ module.exports = {
             await sock.sendPresenceUpdate('composing', m.chat);
             await sock.sendMessage(m.chat, { react: { text: '🔁', key: m.key } });
 
-            const apiUrl = `${API_BASE}/tojavascript?code=${encodeURIComponent(inputCode)}&from=auto`;
+            // Call gateway endpoint with token
+            const apiUrl = `${GATEWAY_URL}/tools/tojavascript?token=${encodeURIComponent(GATEWAY_TOKEN)}&code=${encodeURIComponent(inputCode)}&from=auto`;
             const response = await axios.get(apiUrl, { timeout: 30000 });
 
             const data = response.data;
