@@ -2,12 +2,13 @@ const axios = require('axios');
 const FormData = require('form-data');
 const config = require('../../../settings/config');
 
-// Use gateway from config
-const GATEWAY_URL = process.env.GATEWAY_URL || config.api?.gateway || '';
+// Use gateway from config with token
+const GATEWAY_URL = process.env.GATEWAY_URL || config.api?.gateway || 'https://api.crysnovax.link';
+const GATEWAY_TOKEN = process.env.GATEWAY_TOKEN || config.api?.gatewayToken || '';
 
 module.exports = {
     name: 'caption',
-    alias: ['describe','seethis'],
+    alias: ['describe', 'seethis'],
     category: 'AI',
     desc: 'AI describes any image using CRYSNOVA Vision',
     usage: '.caption (reply to image) | .caption <question> (reply to image)',
@@ -43,15 +44,19 @@ module.exports = {
                 return reply('✘ Failed to download image');
             }
 
-            // Send to gateway /vision endpoint
+            // Send to gateway /vision endpoint with token
             const form = new FormData();
             form.append('file', buffer, { filename: 'image.jpg' });
             form.append('prompt', prompt);
 
-            const response = await axios.post(`${GATEWAY_URL}/vision`, form, {
-                headers: form.getHeaders(),
-                timeout: 60000,
-            });
+            const response = await axios.post(
+                `${GATEWAY_URL}/vision?token=${encodeURIComponent(GATEWAY_TOKEN)}`,
+                form,
+                {
+                    headers: form.getHeaders(),
+                    timeout: 60000,
+                }
+            );
 
             const description = response.data?.description;
             if (!description) {
