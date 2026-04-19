@@ -28,7 +28,7 @@ module.exports = {
 
         try {
             // Step 1: Warn and ask for confirmation
-            await reply('_*⚠️ DANGER: This will kick EVERYONE and delete the group!*_ \n\n' +
+            await reply('```⚠︎ WARNING!!!:``` _*This will kick EVERYONE and delete the group!*_ \n\n' +
                         'Reply *yes* within *10 seconds* to confirm. Any other reply cancels.');
 
             // Step 2: Wait for user reply with simple polling (more reliable than event listener in some setups)
