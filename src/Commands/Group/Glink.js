@@ -6,7 +6,7 @@ module.exports = {
 
     execute: async (sock, m, { reply }) => {
 
-        if (!m.isGroup) return reply('✘ Group only')
+        if (!m.isGroup) return reply('`⟁⃝GROUP ONLY!℘`')
 
         try {
             const metadata = await sock.groupMetadata(m.chat)
