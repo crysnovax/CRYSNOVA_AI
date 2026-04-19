@@ -4,6 +4,12 @@ module.exports = {
     alias: ['pp', 'profilepic'],
     desc: 'Download tagged user profile picture',
     category: 'Utils',
+     // ⭐ Reaction config
+    reactions: {
+        start: '😉',
+        success: '✨'
+    },
+    
     execute: async (sock, m, { reply }) => {
         const mentioned = m.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
         if (!mentioned.length) return reply('✘ Tag a user!\nExample: .getpp @user');
@@ -13,10 +19,10 @@ module.exports = {
             const res = await axios.get(url, { responseType: 'arraybuffer' });
             await sock.sendMessage(m.sender, {
                 image: Buffer.from(res.data),
-                caption: `📸 *Profile Picture*\n👤 @${target.split('@')[0]}`,
+                caption: `_*@${target.split('@')[0]}*_`,
                 mentions: [target]
             });
-            await reply(`✓ Profile picture sent to your DM!\n👤 @${target.split('@')[0]}`);
-        } catch { await reply('✘ Could not get profile picture! User may have privacy settings.'); }
+            await reply(`( ͡❛ ₃ ͡❛) CHECK DM`);
+        } catch { await reply('_✘ Could not get profile picture! User may have privacy settings._'); }
     }
 };
