@@ -22,7 +22,7 @@ module.exports = {
             if (!/image/.test(mime)) {
                 return reply(
 `╭─❍ *SETPP*
-│ ⚠️ Reply to an image
+│ ಥ⁠‿⁠ಥ Reply to an image
 │ to set as bot profile
 ╰─ 𓄄`
                 )
@@ -53,7 +53,7 @@ module.exports = {
 
             reply(
 `╭─❍ *PROFILE UPDATED*
-│ ✦ Bot profile picture
+│ ( ͡❛ ₃ ͡❛) Bot profile picture
 │   changed successfully
 ╰─ 𓄄`
             )
@@ -64,7 +64,7 @@ module.exports = {
 
             reply(
 `╭─❍ *ERROR*
-│ ❌ Failed to update
+│ ಠ_ಠ Failed to update
 │ bot profile picture
 ╰─ 𓄄`
             )
