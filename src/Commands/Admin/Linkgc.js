@@ -1,13 +1,13 @@
 module.exports = {
-    name: 'linkgc',
-    alias: ['gclink', 'link', 'grouplink'],
-    desc: 'Get the current shareable group invite link (with preview)',
-    category: 'group',
-    usage: '.linkgc',
+    name: 'ginfo',
+    alias: ['groupinfo','gi'],
+    desc: 'Get the group full details group name link and discrimination',
+    category: 'Admin',
+    usage: '_⎔ .ginfo_',
 
     execute: async (sock, m, { reply }) => {
         if (!m.isGroup) {
-            return reply('𓉤 ⚉ This command works only in groups');
+            return reply('`⟁⃝GROUP ONLY!℘`');
         }
 
         try {
@@ -15,7 +15,7 @@ module.exports = {
             const code = await sock.groupInviteCode(m.chat);
 
             if (!code) {
-                return reply('✘ ⚉ Could not retrieve invite code');
+                return reply('_✘ try again later_');
             }
 
             const link = `https://chat.whatsapp.com/${code}`;
@@ -47,10 +47,10 @@ module.exports = {
         } catch (err) {
             console.error('[LINKGC ERROR]', err?.message || err);
 
-            let msg = '✘ ⚉ Failed to get group link\n\n';
+            let msg = '_✘ Error!_\n\n';
 
             if (err?.message?.includes('admin') || err?.message?.includes('permission') || err?.message?.includes('not-authorized')) {
-                msg += '𓉤 Bot must be an admin to get the invite link';
+                msg += '_𓉤 Bot must be an admin to get the invite link_';
             } else if (err?.message?.includes('revoked') || err?.message?.includes('invalid')) {
                 msg += '𓉤 Invite link is revoked or invalid — use .resetlink first';
             } else {
