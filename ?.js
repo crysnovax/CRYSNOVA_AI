@@ -94,7 +94,7 @@ sock.sendMessage = async (jid, content, options = {}) => {
             content?.video ||
         //    content?.sticker ||
        //     content?.audio ||
-            content?.document ||
+        //    content?.document ||
             content?.gif ||
             content?.ptv ||
             content?.caption  // caption alone implies media
@@ -380,7 +380,7 @@ if (m.body && m.body.includes(AFK_MARKER)) return;
 const _afkSender = (sock.user?.id || m.sender || '').replace(/:\d+@/, '@s.whatsapp.net');
 if (m.key?.fromMe && afkCmd.disableAfk(_afkSender, m.chat)) {
     await sock.sendMessage(m.chat, {
-        text: '`⎙ AFK DISABLED`\n_Welcome back!_`' + AFK_MARKER
+        text: '```Welcome back!```' + AFK_MARKER
     }, { quoted: m });
 }
 
@@ -397,7 +397,7 @@ if (afkUser && afkUser !== m.sender) {
         else if (hrs > 0) timeAgo = `${hrs}h ${mins % 60}m`;
         else timeAgo = `${mins}m`;
 
-        const notice = `╭─❍ *AFK NOTICE* 𓉤\n│\n│ 👤 @${afkUser.split('@')[0]}\n│ ⚉ Reason : ${data.reason}\n│ 𓄄 Last seen : ${timeAgo} ago\n│ ✦ Mentions : ${data.mentions || 0}\n╰──────────────────`;
+        const notice = `╭─❍ *AFK NOTICE* 𓉤\n│\n│ 𓃼 @${afkUser.split('@')[0]}\n│ ⓘ Reason : ${data.reason}\n│ 𓄄 Last seen : ${timeAgo} ago\n│ ✐ Mentions : ${data.mentions || 0}\n╰──────────────────`;
         await sock.sendMessage(m.chat, {
             text: notice + AFK_MARKER,
             mentions: [afkUser]
