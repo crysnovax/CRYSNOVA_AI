@@ -17,27 +17,31 @@ function saveDB(data) {
 // Extract mentions from ALL possible locations in the raw message
 function getMentions(m) {
     const raw = m.message || {};
+    const mentions = [];
 
     // extendedTextMessage (most common for tagall)
     const ext = raw.extendedTextMessage;
-    if (ext?.contextInfo?.mentionedJid?.length) return ext.contextInfo.mentionedJid;
+    if (ext?.contextInfo?.mentionedJid?.length) {
+        mentions.push(...ext.contextInfo.mentionedJid);
+    }
 
     // imageMessage, videoMessage, etc with caption
     for (const type of ['imageMessage','videoMessage','documentMessage','audioMessage','stickerMessage']) {
-        if (raw[type]?.contextInfo?.mentionedJid?.length) return raw[type].contextInfo.mentionedJid;
+        if (raw[type]?.contextInfo?.mentionedJid?.length) {
+            mentions.push(...raw[type].contextInfo.mentionedJid);
+        }
     }
 
     // Already serialized by smsg
-    if (m.mentionedJid?.length) return m.mentionedJid;
-    if (m.msg?.contextInfo?.mentionedJid?.length) return m.msg.contextInfo.mentionedJid;
+    if (m.mentionedJid?.length) mentions.push(...m.mentionedJid);
+    if (m.msg?.contextInfo?.mentionedJid?.length) mentions.push(...m.msg.contextInfo.mentionedJid);
 
-    return [];
+    return [...new Set(mentions)];
 }
 
-// Detect hidetag / @all invisible pattern
-function isHideTag(m) {
-    const text = m.text || m.body || m.message?.conversation || m.message?.extendedTextMessage?.text || '';
-    return /\u200e|\u200f|\u200b|\u2060/.test(text);
+// Helper to normalize JID
+function norm(jid) {
+    return (jid || '').replace(/:\d+@/, '@').replace('@lid', '@s.whatsapp.net');
 }
 
 // ── Command ────────────────────────────────────────────────────
@@ -64,7 +68,7 @@ module.exports = {
                 `• Status   : ${cfg.enabled ? '😤 ON' : '✘ OFF'}\n` +
                 `• Action   : ${cfg.action || 'warn'}\n` +
                 `• Min tags : ${cfg.minTags || 2} mentions to trigger\n\n` +
-                `_@all / hidetag is always blocked when ON_\n\n` +
+                `_Hidetag / mass mentions always blocked when ON_\n\n` +
                 `Commands:\n` +
                 `• .antitag on\n• .antitag off\n` +
                 `• .antitag warn  → delete + warn\n` +
@@ -76,7 +80,7 @@ module.exports = {
         if (sub === 'on') {
             db[group].enabled = true;
             saveDB(db);
-            return reply(`_*亗 Anti tag*_ _*ON*_\n_*Action:*_ *${db[group].action}*\nMin mentions: *${db[group].minTags}*\n\n_@all / hidetag blocked too_`);
+            return reply(`_*亗 Anti tag*_ _*ON*_\n_*Action:*_ *${db[group].action}*\nMin mentions: *${db[group].minTags}*\n\n_Mass tagging will be deleted_`);
         }
         if (sub === 'off') {
             db[group].enabled = false;
@@ -114,57 +118,59 @@ module.exports.handleAntiTag = async function(sock, m) {
         const group = m.chat;
         if (!db[group]?.enabled) return;
 
-        // DEBUG — remove after testing
-        console.log('[ANTITAG DEBUG]', JSON.stringify({
-            sender: m.sender,
-            text: m.text,
-            body: m.body,
-            mtype: m.mtype,
-            mentionedJid: m.mentionedJid,
-            msgKeys: Object.keys(m.message || {}),
-            extMentions: m.message?.extendedTextMessage?.contextInfo?.mentionedJid,
-            convText: m.message?.conversation,
-            extText: m.message?.extendedTextMessage?.text,
-        }, null, 2));
-
         const minTags    = db[group].minTags || 2;
         const action     = db[group].action  || 'warn';
-        const mentions   = getMentions(m);
-        const hideTag    = isHideTag(m);
+        
+        // Get ALL mentions from the message
+        const mentions = getMentions(m);
+        const uniqueMentions = [...new Set(mentions)];
+        const mentionCount = uniqueMentions.length;
 
-        // Trigger if: hidetag OR enough mentions OR message contains @
-        const hasAtSign = (m.text || m.body || "").includes("@");
-        if (!hideTag && !hasAtSign && mentions.length < minTags) return;
+        // Get text for hidetag detection
+        const text = m.text || m.body || m.message?.conversation || m.message?.extendedTextMessage?.text || '';
+        const invisibleCount = (text.match(/[\u200e\u200f\u200b\u2060\u061c\ufeff]/g) || []).length;
+        const isHideTag = invisibleCount >= 2;
 
-        // Admins are exempt
+        // Trigger if: hidetag OR enough mentions
+        const shouldTrigger = isHideTag || mentionCount >= minTags;
+
+        if (!shouldTrigger) return;
+
+        // Get group metadata
         const meta = await sock.groupMetadata(group).catch(() => null);
         if (!meta) return;
 
-        const admins     = meta.participants.filter(p => p.admin).map(p => p.id.replace(/:\d+@/, '@'));
-        const senderNorm = (m.sender || '').replace(/:\d+@/, '@');
+        // Admin exemption - admins are safe
+        const admins = meta.participants.filter(p => p.admin).map(p => norm(p.id));
+        const senderNorm = norm(m.sender);
         if (admins.includes(senderNorm)) return;
 
-        const sender = m.sender;
+        // Bot exemption - bot is safe
+        const botJid = norm(sock.user?.id || '');
+        if (senderNorm === botJid) return;
 
-        // Delete immediately
+        const sender = m.sender;
+        const triggerReason = isHideTag ? 'hidetag' : `${mentionCount} tags (min: ${minTags})`;
+
+        // Delete the message
         await sock.sendMessage(group, { delete: m.key }).catch(() => {});
 
         if (action === 'warn') {
             await sock.sendMessage(group, {
-                text: `_*ಠ_ಠ @${sender.split('@')[0]}*_ _*Mass tagging / group mention is not allowed here!*_`,
+                text: `_ಠ_ಠ @${sender.split('@')[0]}_ _*Mass tagging is not allowed here!*_\n\n_${triggerReason}_`,
                 mentions: [sender]
             });
         }
 
         if (action === 'kick') {
             await sock.sendMessage(group, {
-                text: `_*ಠ_ಠ @${sender.split('@')[0]} was removed for mass tagging!*_`,
+                text: `_*ಠ_ಠ @${sender.split('@')[0]} was removed for mass tagging!*_\n\n_${triggerReason}_`,
                 mentions: [sender]
             });
             await sock.groupParticipantsUpdate(group, [sender], 'remove').catch(() => {});
         }
 
-        console.log(`[ANTI TAG] ${action} → ${sender.split('@')[0]} | mentions: ${mentions.length} | hidetag: ${hideTag}`);
+        console.log(`[ANTI TAG] ${action} → ${sender.split('@')[0]} | ${triggerReason}`);
 
     } catch (err) {
         console.error('[ANTI TAG ERROR]', err.message);
