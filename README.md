@@ -62,7 +62,7 @@
 
 **CRYSNOVA AI V2** is a premium-grade WhatsApp self-bot built on Node.js and Baileys. It runs directly on your personal WhatsApp account and delivers enterprise-level automation, AI integration, and group management — all for free.
 
-> Built and maintained by **crysnovax** · Benin City, Nigeria 🔥
+> Built and maintained by **crysnovax** · Nigeria 🔥
 
 ---
 
@@ -180,7 +180,7 @@
 
 ## ⚙️ Requirements
 
-- **Node.js** v18 or higher
+- **Node.js** v23 or higher
 - **npm** v8+
 - A WhatsApp account (self-bot — runs on your number)
 - Recommended: VPS / Linux server (AWS, Pterodactyl, etc.)
@@ -222,8 +222,14 @@ sudo swapon /swapfile
 npm install && node index.js
 ```
 ## ❔AUTO DEPLOY PANEL SCRIPT 
+
+
 `paste in panel and save as` ```
 index.js```
+
+
+
+
 ```
 const { execSync, spawn } = require('child_process');
 const fs = require('fs');
