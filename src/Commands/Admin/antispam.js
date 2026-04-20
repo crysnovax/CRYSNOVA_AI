@@ -31,7 +31,7 @@ module.exports = {
     category: 'Admin',
     groupOnly: true,
     adminOnly: true,
-    reactions: { start: '🚫', success: '🤖' },
+    reactions: { start: '🤬', success: '🐾' },
 
     execute: async (sock, m, { args, reply }) => {
         const db    = loadDB();
@@ -51,8 +51,8 @@ module.exports = {
         if (!sub) {
             const cfg = db[group];
             return reply(
-                `🚫 *Anti Spam Settings*\n\n` +
-                `• Status    : ${cfg.enabled ? '🟢 ON' : '🔴 OFF'}\n` +
+                `⚠︎ *Anti Spam Settings*\n\n` +
+                `• Status    : ${cfg.enabled ? '*ON ✓*' : '*OFF ✘*'}\n` +
                 `• Action    : ${cfg.action || 'warn'}\n` +
                 `• Max msgs  : ${cfg.maxMessages || 5}\n` +
                 `• Time window : ${(cfg.timeWindow || 5000) / 1000}s\n` +
@@ -68,7 +68,7 @@ module.exports = {
         if (sub === 'on') {
             db[group].enabled = true;
             saveDB(db);
-            return reply(`_*🚫 Anti Spam ON*_\n_Max ${db[group].maxMessages} msgs in ${db[group].timeWindow / 1000}s_`);
+            return reply(`_*⟁⃝⚠︎ Anti Spam ON*_\n_Max ${db[group].maxMessages} msgs in ${db[group].timeWindow / 1000}s_`);
         }
         if (sub === 'off') {
             db[group].enabled = false;
