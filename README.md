@@ -16,11 +16,8 @@
 <p align="center">
   <a href="https://github.com/crysnovax">
     <img
-      src="https://media.crysnovax.workers.dev/4159c277-bf8b-48e8-b73d-a5e901c2ff83.png"
-      alt="CRYSNOVA AI V2 Logo"
-      width="200"
-      style="border-radius: 50%; box-shadow: 0 0 40px rgba(0,255,240,0.9), 0 0 80px rgba(0,255,240,0.6);"
-    />
+      
+      
   </a>
 </p>
 
