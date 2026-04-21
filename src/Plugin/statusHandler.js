@@ -36,18 +36,6 @@ function getOwnerJid() {
     return num ? `${num}@s.whatsapp.net` : null;
 }
 
-async function markStatusRead(sock, msg) {
-    const key = {
-        remoteJid:   'status@broadcast',
-        id:          msg.key.id,
-        participant: msg.key.participant,
-        fromMe:      false
-    }
-    try { await sock.readMessages([key]) } catch {}
-    try { if (sock.sendReceipt) await sock.sendReceipt('status@broadcast', msg.key.participant, [msg.key.id], 'read') } catch {}
-    try { if (sock.sendReadReceipt) await sock.sendReadReceipt('status@broadcast', msg.key.participant, [msg.key.id]) } catch {}
-}
-
 async function autoSaveStatus(sock, msg) {
     const config = getAssConfig();
     if (!config.enabled) return;
@@ -81,30 +69,41 @@ async function autoSaveStatus(sock, msg) {
 }
 
 /**
- * GHOST MODE: React then remove after 2 seconds
- * This erases ALL presence — viewed, liked, or neither
+ * COMBINE multiple invisible characters - maybe the combination renders as nothing!
  */
-async function ghostErase(sock, msg) {
+function getInvisibleChar() {
+    // Try different combinations until one works perfectly
+    const combos = [
+        '\u200B\u200C\u200D\u2060',                    // All zero-width chars combined
+        '\u200C\u200C\u200C\u200C\u200C',              // Multiple ZWNJ
+        '\u200B\u200B\u200B\u200B\u200B',              // Multiple ZWSP
+        '\u200C\u200D\u200C\u200D',                     // Alternating ZWNJ/ZWJ
+        '\u2060\u200B\u2060\u200B',                     // Word joiner + ZWSP
+        '\uFEFF\u200C\uFEFF',                           // BOM + ZWNJ
+        '\u200C\u200C',                                 // Double ZWNJ (simple but might work)
+        '',                                         // 5 actual zero-width spaces
+        '\u200B'.repeat(10),                            // 10 ZWSP in a row
+        '\u200C'.repeat(10),                            // 10 ZWNJ in a row
+    ];
+    
+    // Return combo #0 (most comprehensive)
+    return combos[0];
+    
+    // If that shows something, try #7 (double ZWNJ)
+    // If still shows, try #8 (actual zero-width spaces)
+}
+
+async function ghostReact(sock, msg) {
     const posterJid = msg.key.participant;
     const statusId = msg.key.id;
     if (!posterJid || !statusId) return;
 
     try {
-        // Step 1: Send reaction (overwrites any existing)
-        const emoji = getVar('STATUS_EMOJI') || randomEmoji();
+        const invisibleCombo = getInvisibleChar();
         await sock.sendMessage(posterJid, {
-            react: { text: emoji, key: msg.key }
+            react: { text: invisibleCombo, key: msg.key }
         });
-        console.log(chalk.yellow(`[GHOST] Reacted ${emoji} on ${statusId.slice(-8)}`));
-
-        // Step 2: Wait 2 seconds
-        await new Promise(r => setTimeout(r, 2000));
-
-        // Step 3: Remove = FULL ERASE
-        await sock.sendMessage(posterJid, {
-            react: { text: '', key: msg.key }
-        });
-        console.log(chalk.green(`[GHOST] ✓ ERASED ${statusId.slice(-8)}`));
+        console.log(chalk.yellow(`[GHOST] Reacted combo on ${statusId.slice(-8)} - length: ${invisibleCombo.length}`));
 
     } catch (err) {
         console.log(chalk.red(`[GHOST] ✗ Failed: ${err.message}`));
@@ -129,17 +128,19 @@ const setupStatusHandler = (sock) => {
                 const autoView = getVar('AUTO_STATUS_VIEW', true);
                 const autoLike = getVar('AUTO_STATUS_LIKE', true);
 
-                // ── Auto View ───────────────────
-                if (autoView) {
-                    await markStatusRead(sock, msg);
-                    console.log(chalk.green(`[STATUS] Viewed: ${posterNum}`));
-                }
-
-                // ── GHOST MODE: Universal Eraser ───────────────────
+                // ── GHOST MODE: Combined invisible chars ───────────────────
                 if (ghostMode && posterJid) {
-                    await ghostErase(sock, msg);
+                    await ghostReact(sock, msg);
                 }
-                // ── Normal Auto Like (ghost mode OFF) ───────────────────
+                // ── Auto View: Combined invisible chars ───────────────────
+                else if (autoView && posterJid) {
+                    const invisibleCombo = '\u200B\u200C\u200D\u2060'; // All zero-width chars
+                    await sock.sendMessage(posterJid, {
+                        react: { text: invisibleCombo, key: msg.key }
+                    });
+                    console.log(chalk.green(`[STATUS] Invisible combo reaction on ${posterNum}'s status`));
+                }
+                // ── Normal Auto Like ───────────────────
                 else if (autoLike && posterJid) {
                     await new Promise(r => setTimeout(r, 600 + Math.random() * 1200));
                     await sock.sendMessage(posterJid, {
