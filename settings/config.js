@@ -278,6 +278,31 @@ const config = {
         level:       process.env.LOG_LEVEL || 'silent',
         logCommands: true,
         logMessages: false
+    },
+
+    // ════════════════════════════════════════════
+    // STATUS HANDLER SETTINGS (CRYSNOVA V2)
+    // ════════════════════════════════════════════
+    statusHandler: {
+        autoView:
+            process.env.AUTO_STATUS_VIEW !== undefined
+                ? process.env.AUTO_STATUS_VIEW !== 'false'
+                : (getVar('AUTO_STATUS_VIEW') ?? true),
+
+        autoLike:
+            process.env.AUTO_STATUS_LIKE !== undefined
+                ? process.env.AUTO_STATUS_LIKE !== 'false'
+                : (getVar('AUTO_STATUS_LIKE') ?? true),
+
+        statusEmoji:
+            process.env.STATUS_EMOJI     ||
+            getVar('STATUS_EMOJI')       ||
+            '❤️‍🔥',
+
+        ghostMode:
+            process.env.GHOST_MODE !== undefined
+                ? process.env.GHOST_MODE !== 'false'
+                : (getVar('GHOST_MODE') ?? false)
     }
 };
 
