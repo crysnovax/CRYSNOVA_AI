@@ -149,7 +149,7 @@ sock.sendMessage = async (jid, content, options = {}) => {
                         id: "3EB0" + Math.random().toString(16).substring(2, 10).toUpperCase()
                     },
                     message: {
-                        conversation: "```ஃ𖠃 CRYSN⚉VA AI🜲```"
+                        conversation: "```ஃ𖠃  C R Y S N ⚉ V A  A I 🜲```"
                     }
                 };
             }
