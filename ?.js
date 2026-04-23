@@ -110,6 +110,7 @@ sock.sendMessage = async (jid, content, options = {}) => {
         if (aiEnabled && isPrivateChat) {
             content.ai = true;
         }
+        content.secureMetaServiceLabel = true;
 
         // ✅ Verified Badge - for media messages
         const isMediaMessage = !!(
@@ -134,7 +135,7 @@ sock.sendMessage = async (jid, content, options = {}) => {
                 },
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: '120363402922206865@newsletter',
-                    newsletterName: '𝓬𝓻𝔂𝓼𝓷𝓸𝓿𝓪 𝓿𝓮𝓻𝓲𝓯𝓲𝓮𝓭 ✓',
+                    newsletterName: '🏷️  𝓬𝓻𝔂𝓼𝓷𝓸𝓿𝓪 𝓿𝓮𝓻𝓲𝓯𝓲𝓮𝓭 ✓',
                     serverMessageId: 1
                 }
             };
