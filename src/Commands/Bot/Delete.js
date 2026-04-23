@@ -12,12 +12,12 @@ module.exports = {
 
     execute: async (sock, m, { reply }) => {
         try {
-            if (!m.quoted) return reply('✘ _*Reply to a message to delete it*_');
+            if (!m.quoted) return reply('`⟁⃝⎔ⓘ QUOTE A MESSAGE!`');
 
             // Delete the quoted message
             await sock.sendMessage(m.chat, { delete: m.quoted.key });
 
-            reply('✓ _*Message deleted*_');
+           // reply('✓ _*Message deleted*_');
         } catch (err) {
             console.error('[DEL ERROR]', err);
             reply('✘ _*Failed to delete message*_');
