@@ -116,7 +116,7 @@ sock.sendMessage = async (jid, content, options = {}) => {
             content?.image ||
             content?.video ||
         //    content?.document ||
-         //   content?.gif ||
+            content?.gif ||
             content?.ptv ||
             content?.caption
         );
