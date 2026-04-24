@@ -552,6 +552,17 @@ try {
                 const sscmd = require('./src/Commands/Owner/⎔.js');
                 if (sscmd?.handleSSReply) await sscmd.handleSSReply(sock, m);
             } catch {}
+                        // ═══════════════════════════════════════════════════════
+            //  TIC-TAC-TOE REPLY HANDLER — Bypass private mode for game players
+            // ═══════════════════════════════════════════════════════
+            try {
+                const ttt = require('./src/Commands/Games/ttt.js'); 
+                if (ttt?.handleGameReply) {
+                    const handled = await ttt.handleGameReply(sock, m);
+                    if (handled) return; // Game 
+                }
+            } catch {}
+            
 
             // ── MAIN COMMAND ENGINE ─────────────────────────────────
             await handleMessage(sock, m, customStore);
