@@ -15,7 +15,7 @@ module.exports = {
     name: 'trivia',
     alias: ['quiz', 'question', 'triviaquestion'],
     desc: 'Get random trivia questions',
-    category: 'Games',
+    category: 'Quiz',
     usage: '.trivia',
     reactions: { start: '❓', success: '🔖', error: '💤' },
 
