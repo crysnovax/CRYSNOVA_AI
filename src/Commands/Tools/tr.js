@@ -6,7 +6,7 @@ module.exports = {
     category: 'Tools',
     desc: 'Translate text to any language',
     usage: '.tr <lang> [text] or reply to a message',
-    reactions: { start: '🌐', success: '✅', error: '❌' },
+    reactions: { start: '🌐', success: '🥏', error: '🙊' },
 
     execute: async (sock, m, { reply, args }) => {
         const lang = args[0]?.toLowerCase();
@@ -43,10 +43,10 @@ module.exports = {
                 footerText: '💡 Set default: .settrd <lang> | Use: .trd'
             }, { quoted: m });
 
-            await sock.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+            await sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
 
         } catch (err) {
-            await sock.sendMessage(m.chat, { react: { text: '❌', key: m.key } });
+            await sock.sendMessage(m.chat, { react: { text: '💤', key: m.key } });
             reply(`\`✘ Translation failed — ${err.message}\``);
         }
     }
