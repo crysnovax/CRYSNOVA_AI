@@ -1,52 +1,82 @@
 const axios = require('axios');
 
 module.exports = {
-name: 'dict',
-alias: ['dictionary','meaning','define'],
-category: 'tools',
-desc: 'Get the definition of a word',
+    name: 'dictionary',
+    alias: ['dict', 'define', 'meaning'],
+    desc: 'Get word definitions and phonetics',
+    category: 'Search',
+    usage: '.dictionary <word>',
+    reactions: { start: '📖', success: '✨', error: '❔' },
 
-execute: async (conn, m, { args, reply }) => {
+    execute: async (sock, m, { args, reply, prefix }) => {
+        const word = args[0]?.trim().toLowerCase();
+        
+        if (!word) {
+            return reply(
+                `╭─❍ *DICTIONARY*\n│\n` +
+                `│ ⚉ *Usage:* ${prefix}dictionary <word>\n│\n` +
+                `│ ✪ *Examples:*\n` +
+                `│ ${prefix}dictionary hello\n` +
+                `│ ${prefix}dictionary love\n` +
+                `│ ${prefix}dictionary serendipity\n│\n` +
+                `│ 📖 *Free Dictionary API*\n` +
+                `╰──────────────────`
+            );
+        }
 
-try {
+        await sock.sendMessage(m.chat, { react: { text: '📖', key: m.key } });
 
-const word = args.join(" ");
-if (!word) return reply('_*⚉ Provide a query.*_');
+        try {
+            const res = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`, {
+                timeout: 10000,
+                headers: { 'Accept': 'application/json' }
+            });
 
-reply(`_*✦ Searching for "${word}"...*_`);
+            const data = res.data?.[0];
+            if (!data) {
+                await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } });
+                return reply(`\`✘ No definition found for "${word}"\``);
+            }
 
-const response = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+            const phonetics = data.phonetics?.map(p => p.text).filter(Boolean).join(', ') || 'N/A';
+            const audioUrl = data.phonetics?.find(p => p.audio)?.audio || '';
+            
+            // Get first meaning
+            const meaning = data.meanings?.[0];
+            const partOfSpeech = meaning?.partOfSpeech || 'N/A';
+            const definition = meaning?.definitions?.[0]?.definition || 'No definition';
+            const example = meaning?.definitions?.[0]?.example || 'No example';
+            const synonyms = meaning?.synonyms?.slice(0, 5).join(', ') || 'None';
+            const antonyms = meaning?.antonyms?.slice(0, 5).join(', ') || 'None';
 
-if (!response.data || response.data.title === "No Definitions Found") {
-return reply('✘ _*Word not found in my brain.*_');
-}
+            const tableData = [
+                ['📖 Word', data.word],
+                ['🔊 Phonetic', phonetics],
+                ['📝 Type', partOfSpeech],
+                ['📚 Definition', definition],
+                ['💬 Example', example],
+                ['🟢 Synonyms', synonyms],
+                ['🔴 Antonyms', antonyms]
+            ];
 
-const data = response.data[0];
-const definition = data.meanings[0].definitions[0].definition;
-const example = data.meanings[0].definitions[0].example || "No example available.";
-const pos = data.meanings[0].partOfSpeech;
-const phonetic = data.phonetic || "";
+            if (audioUrl) {
+                tableData.push(['🔊 Audio', audioUrl]);
+            }
 
-let resultMsg = `*✦ DICTIONARY*\n\n`;
-resultMsg += `📚 *Word:* ${word.toUpperCase()}\n`;
-if (phonetic) resultMsg += `🔊 *Phonetic:* ${phonetic}\n`;
-resultMsg += `🏷️ *Category:* ${pos}\n\n`;
-resultMsg += `📖 *Definition:* ${definition}\n\n`;
-resultMsg += `📝 *Example:* _"${example}"_\n\n`;
-resultMsg += `*DEFINED VIA CRYSNOVA AI*`;
+            await sock.sendMessage(m.chat, {
+                headerText: `## 📖 ${data.word}`,
+                contentText: '---',
+                title: '📚 Dictionary',
+                table: tableData,
+                footerText: '💡 Powered by Free Dictionary API'
+            }, { quoted: m });
 
-reply(resultMsg);
+            await sock.sendMessage(m.chat, { react: { text: '🔖', key: m.key } });
 
-} catch (error) {
-
-if (error.response && error.response.status === 404) {
-reply('✘ _*Word not found.*_');
-} else {
-console.error(error);
-reply('✘ _*An error occurred while fetching the definition.*_');
-}
-
-}
-
-}
-}
+        } catch (error) {
+            console.error('[DICT ERROR]', error.message);
+            await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } });
+            reply('`✘ Failed to fetch definition`');
+        }
+    }
+};
