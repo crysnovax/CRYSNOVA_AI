@@ -32,7 +32,7 @@ module.exports = {
                 caption: `🎬 *${anime.title}*\n📺 ${anime.type} | ${anime.status} | ${anime.episode}`,
                 footer: `⚉ CRYSNOVA Gateway`,
                 nativeFlow: [{
-                    text: '🔗 Open Link',
+                    text: '🔖 Open Link',
                     url: anime.url
                 }, {
                     text: '📋 Copy Title',
@@ -47,7 +47,7 @@ module.exports = {
                 cards: cards
             }, { quoted: m });
 
-            await sock.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
+            await sock.sendMessage(m.chat, { react: { text: '🎭', key: m.key } });
             
         } catch (err) {
             console.error('[ANIMESEARCH]', err.message);
