@@ -40,7 +40,7 @@ module.exports = {
     usage: '.ttt start @opponent | .ttt <position 1-9> | .ttt stop',
     reactions: { start: '🎮', success: '🎭', error: '🏗️' },
 
-    execute: async (sock, m, { args, reply, prefix, mentioned }) => {
+    execute: async (sock, m, { args, reply, prefix }) => {
         const sub = args[0]?.toLowerCase();
         const chatId = m.chat;
         const userId = m.sender;
@@ -62,11 +62,33 @@ module.exports = {
 
         // ── START GAME ───────────────────────────────────────
         if (sub === 'start') {
-            if (!mentioned || !mentioned.length) {
+            let opponent = null;
+
+            // 1. Reply to a message
+            if (m.quoted?.sender) {
+                opponent = m.quoted.sender;
+            }
+
+            // 2. @mentions
+            if (!opponent && m.mentionedJid?.length) {
+                opponent = m.mentionedJid[0];
+            }
+
+            // 3. Phone numbers from args
+            if (!opponent) {
+                for (const arg of args.slice(1)) {
+                    const num = arg.replace(/[^0-9]/g, '');
+                    if (num.length >= 7) {
+                        opponent = num + '@s.whatsapp.net';
+                        break;
+                    }
+                }
+            }
+
+            if (!opponent) {
                 return reply('`✘ Tag the person you want to play with! .ttt start @user`');
             }
 
-            const opponent = mentioned[0];
             if (opponent === userId) return reply('`✘ You cannot play against yourself!`');
 
             if (games.has(chatId)) return reply('`✘ A game is already in progress! Use .ttt stop first.`');
@@ -171,3 +193,4 @@ module.exports = {
         }
     }
 };
+
