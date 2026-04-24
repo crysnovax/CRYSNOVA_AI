@@ -14,7 +14,7 @@ module.exports = {
         if (!pkg) {
             return reply(
                 `╭─❍ *NPM INFO*\n│\n` +
-                `│ ⚉ *Usage:* ${prefix}npminfo <package>\n│\n` +
+                `│ ⓘ *Usage:* ${prefix}npminfo <package>\n│\n` +
                 `│ ✪ *Examples:*\n` +
                 `│ ${prefix}npminfo axios\n` +
                 `│ ${prefix}npminfo react\n` +
@@ -25,7 +25,7 @@ module.exports = {
         }
 
         await sock.sendMessage(m.chat, { react: { text: '📦', key: m.key } });
-        await reply(`\`📦 Fetching: ${pkg}...\``);
+        await reply(`\`⟁⃝📦 HOLD ON...℘\``);
 
         try {
             // Try with @ prefix for scoped packages
