@@ -1,102 +1,118 @@
-/**
- * .tm command - Show time for specific region
- * Usage: .tm <region> (e.g., .tm Lagos, .tm "New York")
- */
+const axios = require('axios');
 
-const { getTimezone, getPopularRegions, getTimeData } = require('../Core/®.js');
+// Popular timezones mapping
+const TIMEZONES = {
+    'lagos': 'Africa/Lagos',
+    'london': 'Europe/London',
+    'new york': 'America/New_York',
+    'los angeles': 'America/Los_Angeles',
+    'chicago': 'America/Chicago',
+    'toronto': 'America/Toronto',
+    'tokyo': 'Asia/Tokyo',
+    'dubai': 'Asia/Dubai',
+    'paris': 'Europe/Paris',
+    'berlin': 'Europe/Berlin',
+    'mumbai': 'Asia/Kolkata',
+    'delhi': 'Asia/Kolkata',
+    'singapore': 'Asia/Singapore',
+    'sydney': 'Australia/Sydney',
+    'moscow': 'Europe/Moscow',
+    'rio': 'America/Sao_Paulo',
+    'beijing': 'Asia/Shanghai',
+    'shanghai': 'Asia/Shanghai',
+    'cairo': 'Africa/Cairo',
+    'nairobi': 'Africa/Nairobi',
+    'accra': 'Africa/Accra',
+    'abuja': 'Africa/Lagos',
+    'capetown': 'Africa/Johannesburg'
+};
+
+function getTimezone(region) {
+    const key = region.toLowerCase().trim();
+    if (TIMEZONES[key]) return TIMEZONES[key];
+    return region; // Try as raw timezone
+}
 
 module.exports = {
     name: 'tm',
-    alias: ['time', 'timezone'],
-    category: 'Utility',
-    desc: 'Show current time and date for a specific region',
-    usage: '.tm <region> (e.g., .tm Lagos, .tm "New York")',
-    
-    reactions: {
-        start: '⏰',
-        success: '✅',
-        error: '❌'
-    },
+    alias: ['time', 'timezone', 'clock'],
+    desc: 'Show current time for any region',
+    category: 'Info',
+    usage: '.tm <region>',
+    reactions: { start: '⏰', success: '📅', error: '❔' },
 
-    execute: async (sock, m, { args, reply }) => {
+    execute: async (sock, m, { args, reply, prefix }) => {
         const region = args.join(' ').trim();
         
         if (!region) {
-            const popular = getPopularRegions();
+            const popular = Object.keys(TIMEZONES).slice(0, 10).map(r => r.charAt(0).toUpperCase() + r.slice(1));
             return reply(
-                `╭─❍ *CRYSNOVA TIME* 𓉤\n` +
-                `│ ⚉ Usage: .tm <region>\n│\n` +
-                `│ Examples:\n` +
-                `│ • .tm Lagos\n` +
-                `│ • .tm London\n` +
-                `│ • .tm "New York"\n` +
-                `│ • .tm Tokyo\n` +
-                `│ • .tm Dubai\n│\n` +
-                `│ Popular: ${popular.slice(0, 10).join(', ')}\n` +
-                `╰────────────────`
+                `╭─❍ *WORLD TIME*\n│\n` +
+                `│ ⚉ *Usage:* ${prefix}tm <region>\n│\n` +
+                `│ ✪ *Popular:*\n` +
+                `│ ${popular.join(', ')}\n│\n` +
+                `│ 🌍 *Any city worldwide!*\n` +
+                `╰──────────────────`
             );
         }
 
-        await reply('_⏰ Fetching time data..._');
+        await sock.sendMessage(m.chat, { react: { text: '⏰', key: m.key } });
 
         try {
             const timezone = getTimezone(region);
             
-            if (!timezone) {
-                return reply(
-                    `╭─❍ *CRYSNOVA TIME* 𓉤\n` +
-                    `│ ⚉ Unknown region: "${region}"\n│\n` +
-                    `│ Try: Lagos, London, New York, Tokyo,\n` +
-                    `│ Dubai, Paris, Berlin, Mumbai...\n` +
-                    `╰────────────────`
-                );
-            }
+            const response = await axios.get(`https://worldtimeapi.org/api/timezone/${encodeURIComponent(timezone)}`, {
+                timeout: 10000
+            });
 
-            // Use the new getTimeData with retry and fallback
-            const { source, data } = await getTimeData(timezone);
-            console.log(`[TM] Data source: ${source}`);
-            
+            const data = response.data;
             const datetime = new Date(data.datetime);
             
-            const timeString = datetime.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
+            const timeString = datetime.toLocaleTimeString('en-US', {
+                hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: true 
+                hour12: true
             });
             
-            const dateString = datetime.toLocaleDateString('en-US', { 
+            const dateString = datetime.toLocaleDateString('en-US', {
                 weekday: 'long',
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
 
-            const dstStatus = data.dst ? '☀️ DST Active' : '🌙 Standard Time';
-            const sourceNote = source !== 'worldtimeapi' ? `\n│ 📡 Source: ${source}` : '';
+            const regionName = data.timezone.split('/').pop().replace(/_/g, ' ');
+            const gmtOffset = data.utc_offset;
 
-            await reply(
-                `╭─❍ *CRYSNOVA TIME* 𓉤\n` +
-                `│\n` +
-                `│ 📍 ${data.timezone.replace(/_/g, ' ')}\n` +
-                `│\n` +
-                `│ 🕐 ${timeString}\n` +
-                `│ 📅 ${dateString}\n` +
-                `│\n` +
-                `│ 📊 UTC ${data.utc_offset}\n` +
-                `│ 🏷️ ${data.abbreviation}\n` +
-                `│ ${dstStatus}${sourceNote}\n` +
-                `╰────────────────`
-            );
+            await sock.sendMessage(m.chat, {
+                headerText: `## 🕐 ${regionName}`,
+                contentText: '---',
+                title: '📊 Time Details',
+                table: [
+                    ['⏰ Current Time', timeString],
+                    ['📅 Date', dateString],
+                    ['🌍 Timezone', data.timezone],
+                    ['📊 UTC Offset', `UTC${gmtOffset}`],
+                    ['🏷️ Abbreviation', data.abbreviation],
+                    ['☀️ DST', data.dst ? 'Active 🎭' : 'Inactive 💤'],
+                    ['📅 Day of Year', `Day ${data.day_of_year} / Week ${data.week_number}`]
+                ],
+                footerText: '💡 SWIPE ⇆ for details • Powered by CRYSNOVA AI'
+            }, { quoted: m });
 
-        } catch (err) {
-            console.error('[TM ERROR]', err.message);
+            await sock.sendMessage(m.chat, { react: { text: '📅', key: m.key } });
+
+        } catch (error) {
+            console.error('[TM ERROR]', error.message);
+            await sock.sendMessage(m.chat, { react: { text: '🙊', key: m.key } });
+            
             reply(
-                `╭─❍ *CRYSNOVA TIME* 𓉤\n` +
-                `│ ⚉ Failed to get time\n│\n` +
-                `│ ${err.message.substring(0, 100)}\n│\n` +
-                `│ Try again in a moment.\n` +
-                `╰────────────────`
+                `╭─❍ *WORLD TIME*\n│\n` +
+                `│ ✘ *Region not found:* "${region}"\n│\n` +
+                `│ Try: Lagos, London, New York, Tokyo,\n` +
+                `│ Dubai, Paris, Berlin, Mumbai...\n` +
+                `╰──────────────────`
             );
         }
     }
