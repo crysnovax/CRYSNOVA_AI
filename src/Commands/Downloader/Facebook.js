@@ -10,60 +10,43 @@ module.exports = {
     alias: ['facebook', 'fbdown'],
     desc: 'Download Facebook video via CRYSNOVA Gateway',
     category: 'downloader',
-    usage: '.fb <Facebook URL>',
+    usage: '.fb <Facebook URL> (or reply to a message containing URL)',
     owner: false,
-    reactions: { start: '📘', success: '🔖', error: '❔' },
 
     execute: async (sock, m, { args, reply, quoted }) => {
         let url = args[0]?.trim();
 
-        // ✅ Check if replying to a message with Facebook URL
+        // Priority 1: Direct URL from args
+        // Priority 2: Extract from replied/quoted message
         if (!url || !url.includes('facebook.com')) {
             const target = m.quoted || quoted;
-            if (target && target.text) {
-                const urlMatch = target.text.match(/(https?:\/\/(?:www\.|web\.|m\.)?facebook\.com\/[^\s]+)/);
-                if (urlMatch) url = urlMatch[0];
+            if (target) {
+                const targetText = target.text || target.body || target.message?.conversation || target.message?.imageMessage?.caption || target.message?.videoMessage?.caption || target.message?.extendedTextMessage?.text || '';
+                if (targetText) {
+                    const urlMatch = targetText.match(/(https?:\/\/[^\s]+facebook\.com[^\s]*)/i);
+                    if (urlMatch) url = urlMatch[0];
+                }
             }
         }
 
         if (!url || !url.includes('facebook.com')) {
             return reply(
                 '𓄄 *Provide a valid Facebook URL!*\n\n' +
-                'Example:\n' +
-                '`.fb https://facebook.com/...`\n\n' +
-                '📱 _Or reply to a message with a Facebook link_'
+                '*Usage:*\n' +
+                '`.fb https://facebook.com/...`\n' +
+                '`.fb` (reply to message with URL)\n\n' +
+                '*Example:*\n' +
+                '`.fb https://facebook.com/watch?v=...`'
             );
         }
 
-        await sock.sendMessage(m.chat, { react: { text: '📘', key: m.key } });
-
-        // ✅ Progress message
-        const progressMsg = await sock.sendMessage(m.chat, {
-            text: `📘 *Fetching Facebook Video...*\n\n▰▱▱▱▱▱▱▱▱▱ 0%\n\n🔍 Resolving URL...`
-        });
-
-        const updateProgress = async (percent, phase) => {
-            const filled = Math.round(percent / 10);
-            const bar = '▰'.repeat(filled) + '▱'.repeat(10 - filled);
-            await sock.sendMessage(m.chat, {
-                text: `📘 *Fetching Facebook Video...*\n\n${bar} ${percent}%\n\n🔍 ${phase}`,
-                edit: progressMsg.key
-            });
-        };
-
-        await updateProgress(15, 'Connecting to gateway...');
+        await reply('_*✪ Downloading...*_');
 
         try {
-            // Call Apex gateway /download/facebookv2 endpoint
             const apiUrl = `${GATEWAY_URL}/download/facebookv2?token=${encodeURIComponent(GATEWAY_TOKEN)}&url=${encodeURIComponent(url)}`;
             const res = await axios.get(apiUrl, { timeout: 60000 });
             const data = res.data;
 
-            console.log('[FB GATEWAY RESPONSE]', JSON.stringify(data).slice(0, 500));
-
-            await updateProgress(40, 'Extracting video URL...');
-
-            // Robust extraction of video URL
             let videoUrl = null;
             let title = 'Facebook Video';
 
@@ -92,22 +75,13 @@ module.exports = {
             title = data?.result?.title || data?.title || data?.respon?.title || data?.data?.title || 'Facebook Video';
 
             if (!videoUrl) {
-                await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } });
-                await sock.sendMessage(m.chat, { text: '🏗️ Could not extract video URL', edit: progressMsg.key });
-                return;
+                return reply('_✘ Failed to extract video URL from gateway response._');
             }
-
-            await updateProgress(70, 'Downloading video...');
 
             const caption =
                 `📘 *Facebook Downloader*\n\n` +
                 `❏◦: ${title}\n` +
                 `_*CRYSNOVA Gateway*_`;
-
-            await updateProgress(90, 'Processing...');
-            await updateProgress(100, 'Done!');
-            await new Promise(r => setTimeout(r, 400));
-            await sock.sendMessage(m.chat, { delete: progressMsg.key });
 
             await sock.sendMessage(m.chat, {
                 video: { url: videoUrl },
@@ -116,17 +90,8 @@ module.exports = {
                 fileName: `${title.replace(/[^a-zA-Z0-9]/g, '_')}.mp4`
             }, { quoted: m });
 
-            await sock.sendMessage(m.chat, { react: { text: '🔖', key: m.key } });
-
         } catch (err) {
-            console.error('[FB ERROR]', err.message);
-            await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } });
-
-            let errorMsg = '🏗️ *Download Failed*\n\n';
-            if (err.code === 'ECONNABORTED') errorMsg += '⏰ Timeout\n';
-            else errorMsg += `𓆉 ${err.message}`;
-
-            await sock.sendMessage(m.chat, { text: errorMsg, edit: progressMsg.key });
+            reply(`✘ Download failed: ${err.message || 'Unknown error'}`);
         }
     }
 };
