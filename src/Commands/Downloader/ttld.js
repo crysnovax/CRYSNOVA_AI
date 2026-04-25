@@ -141,7 +141,7 @@ module.exports = {
                             video: fallbackBuffer,
                             mimetype: 'video/mp4',
                             caption: `🎵 *${title}*\n👤 ${author}\n\n_⚡ CRYSNOVA_`
-                        }, { quoted: m });
+                        }, );
 
                         await sock.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
                         return;
