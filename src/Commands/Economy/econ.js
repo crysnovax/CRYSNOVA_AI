@@ -196,7 +196,7 @@ cmds.push({
 
 // ==================== ROB (WALLET ONLY - BANK SAFE) ====================
 cmds.push({
-    name: 'rob', alias: ['steal', 'mug'], category: 'Economy',
+    name: 'rob', alias: ['extort', 'mug'], category: 'Economy',
     desc: 'Attempt to rob someone (wallet only, bank is safe)', usage: '.rob <phone>',
     reactions: { start: '😈', success: '✨', error: '❔' },
     execute: async (sock, m, { args, reply }) => {
@@ -269,7 +269,7 @@ cmds.push({
 
 // ==================== ECOROFILE ====================
 cmds.push({
-    name: 'ecoprofile', alias: ['eprofile', 'stats'], category: 'Economy',
+    name: 'ecoprofile', alias: ['eprofile', 'estats'], category: 'Economy',
     desc: 'View your full economy profile', usage: '.ecoprofile',
     execute: async (sock, m, { reply }) => {
         const phone = myPhone(m);
