@@ -25,7 +25,7 @@ const backupCmd = {
     category: 'Owner',
     ownerOnly: true,
     usage: '.backup start | number= | code= | push',
-    reactions: { start: '💾', success: '✅', error: '❔' },
+    reactions: { start: '💾', success: '🥀', error: '❔' },
 
     execute: async (sock, m, { args, reply, prefix }) => {
         const userId = m.sender;
