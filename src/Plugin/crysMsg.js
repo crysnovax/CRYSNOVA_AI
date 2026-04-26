@@ -147,9 +147,10 @@ const handleMessage = async (sock, m, store) => {
         if (!m || !m.message) return;
         if (m.key?.remoteJid === 'status@broadcast') return;
 
-        const prefix    = getVar('PREFIX', '.');
-        const autoReact = getVar('AUTO_REACT', true);
-        const cooldown  = getVar('COOLDOWN', 3);
+        const prefix       = getVar('PREFIX', '.');
+        const autoReact    = getVar('AUTO_REACT', true);
+        const privateReact = getVar('PRIVATE_REACT', true);
+        const cooldown     = getVar('COOLDOWN', 3);
 
         const config = () => require('../../settings/config');
         const cfg    = config();
@@ -213,7 +214,7 @@ const handleMessage = async (sock, m, store) => {
         const isPublicCommand = cmdName === 'appeal';
 
         if (!cfg.status.public && !isSudo && !isDual && !isPublicCommand) {
-            if (autoReact) {
+            if (privateReact) {
                 await sock.sendMessage(m.chat, { react: { text: '⚉', key: m.key } }).catch(() => {});
             }
             return;
@@ -259,4 +260,3 @@ const handleMessage = async (sock, m, store) => {
 };
 
 module.exports = { handleMessage };
-    
