@@ -11,7 +11,7 @@ module.exports = {
 
     execute: async (sock, m, { reply }) => {
         if (!m.isGroup) {
-            return reply('`⟁⃝ GROUP ONLY! ℘`');
+            return reply('`⟁⃝GROUP ONLY! ℘`');
         }
 
         try {
@@ -52,7 +52,7 @@ module.exports = {
             } catch {}
 
             // Build caption text with owner tagged
-            const captionText = `*⟁⃝  GROUP INFORMATION —͟͟͞͞𖣘*\n\n` +
+            const captionText = `*⟁⃝GROUP INFORMATION —͟͟͞͞𖣘*\n\n` +
                               `㋛ *Name:* ${groupName}\n` +
                               `㋛ *Members:* ${participants}\n` +
                               `㋛ *Owner:* @${ownerNumber || 'unknown'}\n` +
