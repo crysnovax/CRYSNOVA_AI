@@ -94,7 +94,7 @@ module.exports = {
 
         } catch (e) {
             console.error('ADD ERROR:', e);
-            reply(`❌ Error: ${e.message}`);
+            reply(`𓆉 Error: ${e.message}`);
         }
     }
 };
