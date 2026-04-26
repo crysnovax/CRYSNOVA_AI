@@ -9,8 +9,8 @@ module.exports = {
 
     execute: async (sock, m, { reply }) => {
         try {
-            
-        if (!m.isGroup) return reply('`⟁⃝GROUP ONLY!℘`')
+            if (!m.isGroup) return reply('`⟁⃝GROUP ONLY!℘`');
+
             const meta = await sock.groupMetadata(m.chat);
             const groupName = meta.subject;
 
@@ -52,4 +52,3 @@ module.exports = {
         }
     }
 };
-                
