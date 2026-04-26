@@ -18,6 +18,6 @@ module.exports = {
         db[m.chat].goodbyeEnabled = true;
         db[m.chat].goodbye = text;
         writeDB(db);
-        await reply(`—͟͟͞͞𖣘 _*Goodbye message set!*_`);
+        await reply('`Goodbye message set!`');
     }
 };
