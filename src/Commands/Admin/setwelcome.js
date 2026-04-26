@@ -18,6 +18,6 @@ module.exports = {
         db[m.chat].welcomeEnabled = true;
         db[m.chat].welcome = text;
         writeDB(db);
-        await reply(`—͟͟͞͞𖣘 _*Welcome message set!*_`);
+        await reply('`Welcome message set!`');
     }
 };
