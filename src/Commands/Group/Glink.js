@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
 
 module.exports = {
-    name: 'glink',
-    alias: ['grouplink', 'link'],
+    name: 'invite',
+    alias: ['grouplink', 'glink'],
     category: 'Group',
     admin: false,
     group: true,
