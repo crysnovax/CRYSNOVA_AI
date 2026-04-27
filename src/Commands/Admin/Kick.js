@@ -3,13 +3,12 @@ module.exports = {
     alias: ['remove'],
     desc: 'Remove a user from the group',
     category: 'group',
-    usage: '.kick @user',
-     // ⭐ Reaction config
+    usage: '.kick @user\n.kick <number>\n.kick (reply to user)',
+    // ⭐ Reaction config
     reactions: {
         start: '🤬',
         success: '😤'
     },
-    
 
     execute: async (sock, m, { args, reply }) => {
 
@@ -18,22 +17,31 @@ module.exports = {
 
         let target;
 
-        if (m.mentionedJid?.length) {
+        // MODE 1: Reply to user's message
+        const quotedSender = m.message?.extendedTextMessage?.contextInfo?.participant;
+        const isReply = !!quotedSender;
+
+        if (isReply && !args[0] && !m.mentionedJid?.length) {
+            target = quotedSender;
+        }
+        // MODE 2: @mention
+        else if (m.mentionedJid?.length) {
             target = m.mentionedJid[0];
-        } else if (args[0]) {
+        }
+        // MODE 3: Phone number
+        else if (args[0]) {
             const number = args[0].replace(/[^0-9]/g, '');
             if (number.length < 10)
                 return reply('`ⓘ INVALID FORMAT!`');
             target = number + '@s.whatsapp.net';
-        } else {
-            return reply('`𓋎 MENTION A USER!`\n_☠︎︎ .kick @user_');
+        }
+        // ERROR
+        else {
+            return reply('`𓋎 MENTION OR REPLY TO A USER!`\n_☠︎︎ .kick @user_\n_☠︎︎ .kick (reply to user)_');
         }
 
         try {
-
             await sock.groupParticipantsUpdate(m.chat, [target], 'remove');
-
-            await new Promise(r => setTimeout(r, 1500));
 
             const removedNumber = target.split('@')[0];
 
@@ -45,7 +53,6 @@ module.exports = {
             });
 
         } catch (err) {
-
             console.error('[KICK ERROR]', err?.message || err);
 
             let msg = '_*✘ Failed to remove user*_\n\n';
