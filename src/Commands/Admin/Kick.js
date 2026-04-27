@@ -45,7 +45,7 @@ module.exports = {
 
             const removedNumber = target.split('@')[0];
 
-            await reply('_*ಥ⁠‿⁠ಥ Kicked successfully*_');
+          //  await reply('_*ಥ⁠‿⁠ಥ Kicked successfully*_');
 
             await sock.sendMessage(m.chat, {
                 text: `_*—͟͟͞͞𖣘 @${removedNumber} removed from group*_`,
