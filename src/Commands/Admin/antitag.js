@@ -19,7 +19,23 @@ function getMentions(m) {
     const raw = m.message || {};
     const mentions = [];
 
-    // extendedTextMessage (most common for tagall)
+    // ── @all / Mention Everyone detection ──
+    // WhatsApp's @all uses a special flag in contextInfo, not mentionedJid
+    const ctxInfo = 
+        raw.extendedTextMessage?.contextInfo ||
+        raw.imageMessage?.contextInfo ||
+        raw.videoMessage?.contextInfo ||
+        raw.documentMessage?.contextInfo ||
+        raw.audioMessage?.contextInfo ||
+        raw.stickerMessage?.contextInfo ||
+        m.msg?.contextInfo;
+
+    // Check for mentionAll flag (used by @all / @everyone)
+    if (ctxInfo?.mentionAll) {
+        mentions.push('__ALL__');
+    }
+
+    // extendedTextMessage (most common for tagall/hidetag)
     const ext = raw.extendedTextMessage;
     if (ext?.contextInfo?.mentionedJid?.length) {
         mentions.push(...ext.contextInfo.mentionedJid);
@@ -35,6 +51,11 @@ function getMentions(m) {
     // Already serialized by smsg
     if (m.mentionedJid?.length) mentions.push(...m.mentionedJid);
     if (m.msg?.contextInfo?.mentionedJid?.length) mentions.push(...m.msg.contextInfo.mentionedJid);
+
+    // ── Direct mentions array on message object (some Baileys versions) ──
+    if (m.message?.extendedTextMessage?.mentions?.length) {
+        mentions.push(...m.message.extendedTextMessage.mentions);
+    }
 
     return [...new Set(mentions)];
 }
@@ -123,7 +144,8 @@ module.exports.handleAntiTag = async function(sock, m) {
         
         // Get ALL mentions from the message
         const mentions = getMentions(m);
-        const uniqueMentions = [...new Set(mentions)];
+        const hasAllMention = mentions.includes('__ALL__');
+        const uniqueMentions = [...new Set(mentions)].filter(m => m !== '__ALL__');
         const mentionCount = uniqueMentions.length;
 
         // Get text for hidetag detection
@@ -131,8 +153,13 @@ module.exports.handleAntiTag = async function(sock, m) {
         const invisibleCount = (text.match(/[\u200e\u200f\u200b\u2060\u061c\ufeff]/g) || []).length;
         const isHideTag = invisibleCount >= 2;
 
-        // Trigger if: hidetag OR enough mentions
-        const shouldTrigger = isHideTag || mentionCount >= minTags;
+        // ── Hidetag detection: mentions without visible @ symbols in text ──
+        // If there are mentions in contextInfo but no @numbers visible in text, it's a hidetag
+        const visibleAtTags = (text.match(/@\d+/g) || []).length;
+        const hasHiddenMentions = mentionCount > 0 && visibleAtTags === 0 && !text.includes('@all') && !text.includes('@everyone');
+
+        // Trigger if: @all mention OR hidetag (invisible chars OR hidden mentions) OR enough mentions
+        const shouldTrigger = hasAllMention || isHideTag || hasHiddenMentions || mentionCount >= minTags;
 
         if (!shouldTrigger) return;
 
@@ -150,7 +177,11 @@ module.exports.handleAntiTag = async function(sock, m) {
         if (senderNorm === botJid) return;
 
         const sender = m.sender;
-        const triggerReason = isHideTag ? 'hidetag' : `${mentionCount} tags (min: ${minTags})`;
+        let triggerReason;
+        if (hasAllMention) triggerReason = '@all mention';
+        else if (isHideTag) triggerReason = 'hidetag (invisible chars)';
+        else if (hasHiddenMentions) triggerReason = `hidetag (${mentionCount} hidden mentions)`;
+        else triggerReason = `${mentionCount} tags (min: ${minTags})`;
 
         // Delete the message
         await sock.sendMessage(group, { delete: m.key }).catch(() => {});
