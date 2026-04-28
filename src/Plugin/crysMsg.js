@@ -212,15 +212,25 @@ const handleMessage = async (sock, m, store) => {
         let groupMeta, isAdmin, isBotAdmin;
         if (m.isGroup) {
             groupMeta = await sock.groupMetadata(m.chat).catch(() => null);
-            const admins = (groupMeta?.participants || [])
-                .filter(p => p.admin)
-                .map(p => normalizeJid(p.id));
+            const adminParticipants = (groupMeta?.participants || []).filter(p => p.admin);
+            const adminJids = adminParticipants.map(p => normalizeJid(p.id));
 
-            const senderJid = normalizeJid(m.sender);
-            const botJid    = normalizeJid(sock.user?.id || '');
+            const senderJid   = normalizeJid(m.sender);
+            const senderLid   = normalizeJid(m.key?.participant || m.participant || '');
+            const botJid      = normalizeJid(sock.user?.id || '');
+            const senderPhone = senderJid.split('@')[0];
+            const botPhone    = botJid.split('@')[0];
+            const adminPhones = adminJids.map(j => j.split('@')[0]);
 
-            isAdmin    = admins.includes(senderJid);
-            isBotAdmin = isAdmin;
+            // Check by JID, LID, or phone — handles @lid vs @s.whatsapp.net mismatch
+            isAdmin =
+                adminJids.includes(senderJid) ||
+                adminJids.includes(senderLid) ||
+                adminPhones.includes(senderPhone);
+
+            isBotAdmin =
+                adminJids.includes(botJid) ||
+                adminPhones.includes(botPhone);
         }
 
         const reply = (txt) => sock.sendMessage(m.chat, { text: txt }, { quoted: m });
@@ -239,7 +249,7 @@ const handleMessage = async (sock, m, store) => {
         if (cmd.sudoOnly    && !isSudo)                  return reply(cfg.message.owner   || 'Sudo only!');
         if (cmd.groupOnly   && !m.isGroup)               return reply(cfg.message.group   || 'Group only!');
         if (cmd.privateOnly && m.isGroup)                return reply(cfg.message.private || 'Private only!');
-        if (cmd.adminOnly   && !isAdmin && !isSudo)      return reply(cfg.message.admin   || 'Admin only!');
+        if (cmd.adminOnly   && !(isAdmin && isOwner))    return reply(cfg.message.admin   || 'Admin only!');
         if (cmd.botAdmin    && !isBotAdmin)              return reply('𓉤 Make me an admin first!');
 
         // MODIFIED: Skip cooldown for public commands like appeal
@@ -275,3 +285,4 @@ const handleMessage = async (sock, m, store) => {
 };
 
 module.exports = { handleMessage };
+                                    
