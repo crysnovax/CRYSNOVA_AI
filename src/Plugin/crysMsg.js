@@ -147,7 +147,10 @@ const handleMessage = async (sock, m, store) => {
         if (!m || !m.message) return;
         if (m.key?.remoteJid === 'status@broadcast') return;
 
-        const prefix       = getVar('PREFIX', '.');
+        // ── PREFIX — supports null/empty for no-prefix mode ──
+        let prefix = getVar('PREFIX', '.');
+        if (prefix === 'null' || prefix === '') prefix = '';
+
         const autoReact    = getVar('AUTO_REACT', true);
         const privateReact = getVar('PRIVATE_REACT', true);
         const cooldown     = getVar('COOLDOWN', 3);
@@ -185,11 +188,23 @@ const handleMessage = async (sock, m, store) => {
                        (altNum && isDualUser(altJid, store));
 
         const body = m.text || '';
-        if (!body.startsWith(prefix)) return;
 
-        const cmdName = body.slice(prefix.length).trim().split(/ +/)[0].toLowerCase();
-        const args    = body.trim().split(/ +/).slice(1);
-        const text    = args.join(' ');
+        // ── PREFIX HANDLING — supports no-prefix mode ──
+        let cmdName, args, text;
+
+        if (prefix === '') {
+            // No-prefix mode — first word is the command
+            const parts = body.trim().split(/ +/);
+            cmdName = parts[0]?.toLowerCase() || '';
+            args    = parts.slice(1);
+            text    = args.join(' ');
+        } else {
+            // Normal prefix mode
+            if (!body.startsWith(prefix)) return;
+            cmdName = body.slice(prefix.length).trim().split(/ +/)[0]?.toLowerCase() || '';
+            args    = body.trim().split(/ +/).slice(1);
+            text    = args.join(' ');
+        }
 
         const cmd = getCommand(cmdName);
         if (!cmd) return;
