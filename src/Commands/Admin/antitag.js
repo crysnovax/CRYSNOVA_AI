@@ -18,11 +18,12 @@ function saveDB(data) {
 function getMentions(m) {
     const raw = m.message || {};
     const mentions = [];
+    let nonJidMentionCount = 0;
 
-    // ── @all / Mention Everyone detection ──
-    // WhatsApp's @all uses a special flag in contextInfo, not mentionedJid
+    // ── Get contextInfo from all possible message types ──
     const ctxInfo = 
         raw.extendedTextMessage?.contextInfo ||
+        raw.conversation?.contextInfo ||  // .hidetag sometimes comes as conversation
         raw.imageMessage?.contextInfo ||
         raw.videoMessage?.contextInfo ||
         raw.documentMessage?.contextInfo ||
@@ -30,34 +31,37 @@ function getMentions(m) {
         raw.stickerMessage?.contextInfo ||
         m.msg?.contextInfo;
 
-    // Check for mentionAll flag (used by @all / @everyone)
+    // ── @all / Mention Everyone detection ──
+    // WhatsApp native @all uses mentionAll flag
     if (ctxInfo?.mentionAll) {
         mentions.push('__ALL__');
     }
 
-    // extendedTextMessage (most common for tagall/hidetag)
+    // ── nonJidMentions: hidetag / @all count (THE KEY FIX!) ──
+    // Your hidetag uses extendedTextMessage with contextInfo.nonJidMentions
+    if (ctxInfo?.nonJidMentions > 0) {
+        nonJidMentionCount = ctxInfo.nonJidMentions;
+        mentions.push('__NONJID__');
+    }
+
+    // ── extendedTextMessage mentionedJid ──
     const ext = raw.extendedTextMessage;
     if (ext?.contextInfo?.mentionedJid?.length) {
         mentions.push(...ext.contextInfo.mentionedJid);
     }
 
-    // imageMessage, videoMessage, etc with caption
+    // ── imageMessage, videoMessage, etc with caption ──
     for (const type of ['imageMessage','videoMessage','documentMessage','audioMessage','stickerMessage']) {
         if (raw[type]?.contextInfo?.mentionedJid?.length) {
             mentions.push(...raw[type].contextInfo.mentionedJid);
         }
     }
 
-    // Already serialized by smsg
+    // ── Already serialized by smsg ──
     if (m.mentionedJid?.length) mentions.push(...m.mentionedJid);
     if (m.msg?.contextInfo?.mentionedJid?.length) mentions.push(...m.msg.contextInfo.mentionedJid);
 
-    // ── Direct mentions array on message object (some Baileys versions) ──
-    if (m.message?.extendedTextMessage?.mentions?.length) {
-        mentions.push(...m.message.extendedTextMessage.mentions);
-    }
-
-    return [...new Set(mentions)];
+    return { mentions: [...new Set(mentions)], nonJidMentionCount };
 }
 
 // Helper to normalize JID
@@ -85,16 +89,16 @@ module.exports = {
         if (!sub) {
             const cfg = db[group];
             return reply(
-                `🛡️ *Anti Tag Settings*\n\n` +
-                `• Status   : ${cfg.enabled ? '😤 ON' : '✘ OFF'}\n` +
-                `• Action   : ${cfg.action || 'warn'}\n` +
-                `• Min tags : ${cfg.minTags || 2} mentions to trigger\n\n` +
+                `☠︎︎ *Anti Tag Settings*\n\n` +
+                `❏• Status   : ${cfg.enabled ? '😤 ON' : '✘ OFF'}\n` +
+                `❏• Action   : ${cfg.action || 'warn'}\n` +
+                `❏• Min tags : ${cfg.minTags || 2} mentions to trigger\n\n` +
                 `_Hidetag / mass mentions always blocked when ON_\n\n` +
                 `Commands:\n` +
-                `• .antitag on\n• .antitag off\n` +
-                `• .antitag warn  → delete + warn\n` +
-                `• .antitag kick  → delete + kick\n` +
-                `• .antitag min 3 → set minimum mentions`
+                `❏• .antitag on\n• .antitag off\n` +
+                `❏• .antitag warn  → delete + warn\n` +
+                `❏• .antitag kick  → delete + kick\n` +
+                `❏• .antitag min 3 → set minimum mentions`
             );
         }
 
@@ -143,9 +147,10 @@ module.exports.handleAntiTag = async function(sock, m) {
         const action     = db[group].action  || 'warn';
         
         // Get ALL mentions from the message
-        const mentions = getMentions(m);
+        const { mentions, nonJidMentionCount } = getMentions(m);
         const hasAllMention = mentions.includes('__ALL__');
-        const uniqueMentions = [...new Set(mentions)].filter(m => m !== '__ALL__');
+        const hasNonJid = mentions.includes('__NONJID__');
+        const uniqueMentions = [...new Set(mentions)].filter(m => !m.startsWith('__'));
         const mentionCount = uniqueMentions.length;
 
         // Get text for hidetag detection
@@ -153,13 +158,8 @@ module.exports.handleAntiTag = async function(sock, m) {
         const invisibleCount = (text.match(/[\u200e\u200f\u200b\u2060\u061c\ufeff]/g) || []).length;
         const isHideTag = invisibleCount >= 2;
 
-        // ── Hidetag detection: mentions without visible @ symbols in text ──
-        // If there are mentions in contextInfo but no @numbers visible in text, it's a hidetag
-        const visibleAtTags = (text.match(/@\d+/g) || []).length;
-        const hasHiddenMentions = mentionCount > 0 && visibleAtTags === 0 && !text.includes('@all') && !text.includes('@everyone');
-
-        // Trigger if: @all mention OR hidetag (invisible chars OR hidden mentions) OR enough mentions
-        const shouldTrigger = hasAllMention || isHideTag || hasHiddenMentions || mentionCount >= minTags;
+        // Trigger if: @all mention OR nonJidMentions (hidetag/@all) OR hidetag (invisible chars) OR enough mentions
+        const shouldTrigger = hasAllMention || hasNonJid || isHideTag || mentionCount >= minTags;
 
         if (!shouldTrigger) return;
 
@@ -179,8 +179,8 @@ module.exports.handleAntiTag = async function(sock, m) {
         const sender = m.sender;
         let triggerReason;
         if (hasAllMention) triggerReason = '@all mention';
+        else if (hasNonJid) triggerReason = `hidetag (${nonJidMentionCount} non-JID mentions)`;
         else if (isHideTag) triggerReason = 'hidetag (invisible chars)';
-        else if (hasHiddenMentions) triggerReason = `hidetag (${mentionCount} hidden mentions)`;
         else triggerReason = `${mentionCount} tags (min: ${minTags})`;
 
         // Delete the message
