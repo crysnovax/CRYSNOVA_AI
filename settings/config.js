@@ -117,11 +117,28 @@ const config = {
             userConfig?.bot?.name        ||
             'ZEE BOT',
 
-        prefix:
-            process.env.PREFIX           ||
-            getVar('PREFIX')             ||
-            userConfig?.bot?.prefix      ||
-            '.',
+        // ════════════════════════════════════════════
+        // PREFIX — supports null/empty for no prefix
+        // ════════════════════════════════════════════
+        prefix: (() => {
+            const envPrefix = process.env.PREFIX;
+            // Allow explicit null/empty — means no prefix
+            if (envPrefix !== undefined) {
+                return (envPrefix === 'null' || envPrefix === '') ? '' : envPrefix;
+            }
+
+            const runtimePrefix = getVar('PREFIX');
+            if (runtimePrefix !== undefined && runtimePrefix !== null) {
+                return (runtimePrefix === 'null' || runtimePrefix === '') ? '' : runtimePrefix;
+            }
+
+            const userPrefix = userConfig?.bot?.prefix;
+            if (userPrefix !== undefined && userPrefix !== null) {
+                return (userPrefix === 'null' || userPrefix === '') ? '' : userPrefix;
+            }
+
+            return '.'; // Default
+        })(),
 
         description: 'Professional WhatsApp Bot — ZEE BOT powered by CRYSNOVA AI V2',
         author:      'https://github.com/crysnovax/CRYSNOVA_AI',
