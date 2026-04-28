@@ -4,7 +4,7 @@ module.exports = {
     name: 'invite',
     alias: ['grouplink', 'glink'],
     category: 'Group',
-    admin: false,
+    admin: true,
     group: true,
 
     execute: async (sock, m, { reply }) => {
