@@ -1,9 +1,8 @@
 const axios = require("axios");
-const config = require("../../../settings/config");
 
-// Use gateway from config
-const GATEWAY_URL = process.env.GATEWAY_URL || config.api?.gateway || 'https://api.crysnovax.link';
-const GATEWAY_TOKEN = process.env.GATEWAY_TOKEN || config.api?.gatewayToken || '';
+// Apex Gateway
+const AI_GATEWAY = 'https://appex.crysnovax.link';
+const AI_TOKEN = 'x';
 
 module.exports = {
     name: "gpt",
@@ -22,8 +21,7 @@ module.exports = {
         try {
             await sock.sendMessage(jid, { react: { text: "💫", key: m.key } });
 
-            const TRAINING_PROMPT = `
-You are Crysnova GPT Assistant.
+            const prompt = `You are Crysnova GPT Assistant.
 
 Identity Rules:
 - Reply naturally and intelligently.
@@ -33,24 +31,31 @@ Identity Rules:
 - Always behave as Crysnova AI.
 
 User Question:
-${query}
-`;
+${query}`;
 
-            // Call gateway /chat endpoint with token
-            const response = await axios.post(
-                `${GATEWAY_URL}/chat?token=${encodeURIComponent(GATEWAY_TOKEN)}`,
-                {
-                    prompt: TRAINING_PROMPT,
-                    model: 'gpt-4.5'
-                },
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    timeout: 60000
+            // Try GPT endpoints
+            let replyText = '';
+            
+            const endpoints = [
+                `${AI_GATEWAY}/ai/chatgpt?text=${encodeURIComponent(prompt)}&token=${AI_TOKEN}`,
+                `${AI_GATEWAY}/ai/gpt-3.5-turbo?text=${encodeURIComponent(prompt)}&token=${AI_TOKEN}`,
+                `${AI_GATEWAY}/ai/openai?text=${encodeURIComponent(prompt)}&token=${AI_TOKEN}`,
+                `${AI_GATEWAY}/ai/turbochat?text=${encodeURIComponent(prompt)}&token=${AI_TOKEN}`
+            ];
+
+            for (const url of endpoints) {
+                try {
+                    const response = await axios.get(url, { timeout: 45000 });
+                    const text = response.data?.result || response.data?.response || response.data?.text || '';
+                    
+                    if (text && text.length > 5 && !text.includes('older version')) {
+                        replyText = text;
+                        break;
+                    }
+                } catch (e) {
+                    continue;
                 }
-            );
-
-            const data = response.data;
-            const replyText = data?.response || data?.text || data?.message || '';
+            }
 
             if (replyText) {
                 await sock.sendMessage(jid, { text: replyText }, { quoted: m });
@@ -62,7 +67,7 @@ ${query}
 
         } catch (err) {
             console.error("GPT Plugin Error:", err.message);
-            reply("`⚠︎ GPT failed. Try again later`.");
+            reply("`⚠︎ GPT failed. Try again later.`");
         }
     }
 };
