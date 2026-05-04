@@ -642,7 +642,7 @@ try {
 
             // Anti-Link
             try {
-                const anti = require('./src/Plugin/antilink.js');
+                const anti = require('./src/Commands/Admin/antilink.js');
                 if (anti?.handleAntiLink) await anti.handleAntiLink(sock, m);
             } catch {}
 
