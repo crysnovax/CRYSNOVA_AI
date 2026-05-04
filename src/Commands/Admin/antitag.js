@@ -1,4 +1,4 @@
-here// ZEE BOT V2 — Anti Tag / Anti Mass Mention
+// ZEE BOT V2 — Anti Tag / Anti Mass Mention
 const fs   = require('fs');
 const path = require('path');
 
