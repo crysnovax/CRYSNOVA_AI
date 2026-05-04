@@ -1,4 +1,4 @@
-hereconst fs   = require('fs');
+const fs   = require('fs');
 const path = require('path');
 
 const DB_PATH = path.join(process.cwd(), 'database', 'antiword.json');
