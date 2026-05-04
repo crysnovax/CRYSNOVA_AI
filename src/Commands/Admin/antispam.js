@@ -1,11 +1,12 @@
-// ZEE BOT V2 — Anti Spam
+here// ZEE BOT V2 — Anti Spam
 const fs   = require('fs');
 const path = require('path');
 
 const DB_PATH = path.join(process.cwd(), 'database', 'antispam.json');
+const WARN_DB_PATH = path.join(process.cwd(), 'database', 'antispam_warns.json');
 
 // Spam tracking cache (in-memory, cleared on restart)
-const messageCache = new Map(); // group: { userId: { count, firstTime, lastTime, warned } }
+const messageCache = new Map(); // group: { userId: { count, firstTime, lastTime } }
 const MUTE_CACHE = new Map(); // Muted users with expiry
 
 function loadDB() {
@@ -16,6 +17,16 @@ function loadDB() {
 function saveDB(data) {
     fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+}
+
+function loadWarns() {
+    if (!fs.existsSync(WARN_DB_PATH)) return {};
+    try { return JSON.parse(fs.readFileSync(WARN_DB_PATH, 'utf8')); } catch { return {}; }
+}
+
+function saveWarns(data) {
+    fs.mkdirSync(path.dirname(WARN_DB_PATH), { recursive: true });
+    fs.writeFileSync(WARN_DB_PATH, JSON.stringify(data, null, 2));
 }
 
 // Helper to normalize JID
@@ -39,7 +50,7 @@ module.exports = {
         if (!db[group]) {
             db[group] = {
                 enabled: false,
-                action: 'warn',
+                action: 'delete',
                 maxMessages: 5,
                 timeWindow: 5000, // 5 seconds
                 muteDuration: 60000 // 1 minute
@@ -50,40 +61,61 @@ module.exports = {
 
         if (!sub) {
             const cfg = db[group];
+            let actionDisplay;
+            if (cfg.action === 'delete') actionDisplay = '🗑️ DELETE';
+            else if (cfg.action === 'warn') actionDisplay = '⚠︎ WARN (3x → KICK)';
+            else if (cfg.action === 'kick') actionDisplay = 'ಠ_ಠ KICK';
+            else if (cfg.action === 'mute') actionDisplay = '🔇 MUTE';
+            
             return reply(
                 `⚠︎ *Anti Spam Settings*\n\n` +
                 `• Status    : ${cfg.enabled ? '*ON ✓*' : '*OFF ✘*'}\n` +
-                `• Action    : ${cfg.action || 'warn'}\n` +
+                `• Action    : ${actionDisplay}\n` +
                 `• Max msgs  : ${cfg.maxMessages || 5}\n` +
                 `• Time window : ${(cfg.timeWindow || 5000) / 1000}s\n` +
                 `• Mute duration : ${(cfg.muteDuration || 60000) / 1000}s\n\n` +
                 `Commands:\n` +
-                `• .antispam on\n• .antispam off\n` +
-                `• .antispam warn\n• .antispam kick\n• .antispam mute\n` +
-                `• .antispam max <number>\n• .antispam time <seconds>\n` +
-                `• .antispam duration <seconds>`
+                `• .antispam on / off\n` +
+                `• .antispam delete → delete only\n` +
+                `• .antispam warn → delete + warn (3x = kick)\n` +
+                `• .antispam kick → delete + immediate kick\n` +
+                `• .antispam mute → delete + mute\n` +
+                `• .antispam max <number>\n` +
+                `• .antispam time <seconds>\n` +
+                `• .antispam duration <seconds>\n` +
+                `• .antispam resetwarn @user`
             );
         }
 
         if (sub === 'on') {
             db[group].enabled = true;
             saveDB(db);
-            return reply(`_*⟁⃝⚠︎ Anti Spam ON*_\n_Max ${db[group].maxMessages} msgs in ${db[group].timeWindow / 1000}s_`);
+            let actionText;
+            if (db[group].action === 'delete') actionText = '🗑️ DELETE';
+            else if (db[group].action === 'warn') actionText = '⚠︎ WARN (3x → KICK)';
+            else if (db[group].action === 'kick') actionText = 'ಠ_ಠ KICK';
+            else if (db[group].action === 'mute') actionText = '🔇 MUTE';
+            return reply(`_*⟁⃝⚠︎ Anti Spam ON*_\n_Action: ${actionText}_\n_Max ${db[group].maxMessages} msgs in ${db[group].timeWindow / 1000}s_`);
         }
         if (sub === 'off') {
             db[group].enabled = false;
             saveDB(db);
             return reply('_*✓ Anti Spam OFF*_');
         }
+        if (sub === 'delete') {
+            db[group].action = 'delete';
+            saveDB(db);
+            return reply('_*✓ Action → DELETE*_ (message deleted)');
+        }
         if (sub === 'warn') {
             db[group].action = 'warn';
             saveDB(db);
-            return reply('_*✓ Action → WARN*_');
+            return reply('_*✓ Action → WARN*_ (3 warns = auto kick)');
         }
         if (sub === 'kick') {
             db[group].action = 'kick';
             saveDB(db);
-            return reply('_*✓ Action → KICK*_');
+            return reply('_*✓ Action → KICK*_ (immediate removal)');
         }
         if (sub === 'mute') {
             db[group].action = 'mute';
@@ -111,8 +143,20 @@ module.exports = {
             saveDB(db);
             return reply(`_*✓ Mute duration → ${secs}s*_`);
         }
+        if (sub === 'resetwarn') {
+            const mentioned = m.mentionedJid?.[0];
+            if (!mentioned) return reply(`✐ Usage: .antispam resetwarn @user`);
+            const warns = loadWarns();
+            const key = `${group}_${mentioned}`;
+            if (warns[key]) {
+                delete warns[key];
+                saveWarns(warns);
+                return reply(`✓ Warnings reset for @${mentioned.split('@')[0]}`, { mentions: [mentioned] });
+            }
+            return reply(`✘ User has no warnings.`);
+        }
 
-        reply('ಠ_ಠ _*Usage: .antispam on | off | warn | kick | mute | max <n> | time <s> | duration <s>*_');
+        reply('ಠ_ಠ _*Usage: .antispam on | off | delete | warn | kick | mute | max <n> | time <s> | duration <s> | resetwarn @user*_');
     }
 };
 
@@ -141,7 +185,7 @@ module.exports.handleAntiSpam = async function(sock, m) {
         // Get group config
         const maxMessages = db[group].maxMessages || 5;
         const timeWindow = db[group].timeWindow || 5000;
-        const action = db[group].action || 'warn';
+        const action = db[group].action || 'delete';
         const muteDuration = db[group].muteDuration || 60000;
 
         // Get or create group cache
@@ -152,7 +196,7 @@ module.exports.handleAntiSpam = async function(sock, m) {
 
         // Get or create user data
         if (!groupCache.has(sender)) {
-            groupCache.set(sender, { count: 0, firstTime: now, lastTime: now, warned: false });
+            groupCache.set(sender, { count: 0, firstTime: now, lastTime: now });
         }
         const userData = groupCache.get(sender);
 
@@ -160,7 +204,6 @@ module.exports.handleAntiSpam = async function(sock, m) {
         if (now - userData.firstTime > timeWindow) {
             userData.count = 0;
             userData.firstTime = now;
-            userData.warned = false;
         }
 
         // Increment message count
@@ -181,48 +224,78 @@ module.exports.handleAntiSpam = async function(sock, m) {
                 }
             }
 
-            // Delete the spam messages (last few)
-            // Note: Can't delete all, just the current one
+            // Delete the current message
             await sock.sendMessage(group, { delete: m.key }).catch(() => {});
 
-            const senderTag = `@${sender.split('@')[0]}`;
-
-            if (action === 'warn' && !userData.warned) {
-                userData.warned = true;
+            if (action === 'delete') {
                 await sock.sendMessage(group, {
-                    text: `_*🚫 @${sender.split('@')[0]}*_ _*STOP SPAMMING!*_\n\n_${userData.count} messages in ${timeWindow / 1000}s_\n_This is a warning._`,
+                    text: `_ⓘ @${sender.split('@')[0]} *Spam detected!*_\n\n_${userData.count} messages in ${timeWindow / 1000}s_\n_Message deleted._`,
                     mentions: [sender]
-                });
-                console.log(`[ANTI SPAM] Warned: ${sender.split('@')[0]} | ${userData.count} msgs`);
+                }).catch(() => {});
+                
+                console.log(`[ANTI SPAM] Deleted: ${sender.split('@')[0]} | ${userData.count} msgs`);
             }
-
-            if (action === 'mute') {
+            else if (action === 'warn') {
+                // Load warns fresh from file
+                const warns = loadWarns();
+                const warnKey = `${group}_${sender}`;
+                
+                // Initialize or increment
+                if (!warns[warnKey]) {
+                    warns[warnKey] = { count: 0, user: sender };
+                }
+                warns[warnKey].count++;
+                
+                // Save immediately
+                saveWarns(warns);
+                
+                const warnCount = warns[warnKey].count;
+                console.log(`[ANTISPAM WARN] ${sender.split('@')[0]} now has ${warnCount}/3 warnings`);
+                
+                if (warnCount >= 3) {
+                    // Delete warns before kicking
+                    delete warns[warnKey];
+                    saveWarns(warns);
+                    
+                    await sock.sendMessage(group, {
+                        text: `_ಠ_ಠ @${sender.split('@')[0]} *KICKED*_\n_3/3 warnings - Spamming._\n\n_${userData.count} messages in ${timeWindow / 1000}s_`,
+                        mentions: [sender]
+                    }).catch(() => {});
+                    
+                    await sock.groupParticipantsUpdate(group, [sender], 'remove').catch(() => {});
+                    console.log(`[ANTI SPAM] Kicked: ${sender.split('@')[0]} | 3 warns`);
+                } else {
+                    await sock.sendMessage(group, {
+                        text: `_⚠︎ @${sender.split('@')[0]} *Warning ${warnCount}/3*_\n_STOP SPAMMING! ${3 - warnCount} more = kick!_\n\n_${userData.count} messages in ${timeWindow / 1000}s_`,
+                        mentions: [sender]
+                    }).catch(() => {});
+                    console.log(`[ANTI SPAM] Warned: ${sender.split('@')[0]} | ${warnCount}/3`);
+                }
+            }
+            else if (action === 'mute') {
                 const expiry = now + muteDuration;
                 MUTE_CACHE.set(muteKey, expiry);
                 
                 await sock.sendMessage(group, {
-                    text: `_*🔇 @${sender.split('@')[0]} has been muted for spamming!*_\n\n_${userData.count} messages in ${timeWindow / 1000}s_\n_Muted for ${muteDuration / 1000}s_`,
+                    text: `_🔇 @${sender.split('@')[0]} has been muted for spamming!_\n\n_${userData.count} messages in ${timeWindow / 1000}s_\n_Muted for ${muteDuration / 1000}s_`,
                     mentions: [sender]
-                });
+                }).catch(() => {});
                 
                 // Schedule unmute
                 setTimeout(() => {
                     MUTE_CACHE.delete(muteKey);
-                    sock.sendMessage(group, { text: `_*🔊 @${sender.split('@')[0]} has been unmuted.*_`, mentions: [sender] }).catch(() => {});
+                    sock.sendMessage(group, { text: `_🔊 @${sender.split('@')[0]} has been unmuted._`, mentions: [sender] }).catch(() => {});
                 }, muteDuration);
                 
-                userData.count = 0;
                 console.log(`[ANTI SPAM] Muted: ${sender.split('@')[0]} for ${muteDuration / 1000}s`);
             }
-
-            if (action === 'kick') {
+            else if (action === 'kick') {
                 await sock.sendMessage(group, {
-                    text: `_*👢 @${sender.split('@')[0]} was kicked for spamming!*_\n\n_${userData.count} messages in ${timeWindow / 1000}s_`,
+                    text: `_ಠ_ಠ @${sender.split('@')[0]} *KICKED for spamming!*_\n\n_${userData.count} messages in ${timeWindow / 1000}s_`,
                     mentions: [sender]
-                });
-                await sock.groupParticipantsUpdate(group, [sender], 'remove').catch(() => {});
+                }).catch(() => {});
                 
-                // Remove from cache
+                await sock.groupParticipantsUpdate(group, [sender], 'remove').catch(() => {});
                 groupCache.delete(sender);
                 console.log(`[ANTI SPAM] Kicked: ${sender.split('@')[0]}`);
             }
@@ -232,7 +305,7 @@ module.exports.handleAntiSpam = async function(sock, m) {
             userData.firstTime = now;
         }
 
-        // Clean up old entries (every 100 messages)
+        // Clean up old entries (occasionally)
         if (Math.random() < 0.01) {
             for (const [uid, data] of groupCache.entries()) {
                 if (now - data.lastTime > timeWindow * 2) {
