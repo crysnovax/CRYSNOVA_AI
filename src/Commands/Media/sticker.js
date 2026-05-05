@@ -32,9 +32,9 @@ module.exports = {
             // ================= VIDEO STICKER =================
             if (/video/.test(mime)) {
                 const duration = (quoted.msg || quoted).seconds || 0;
-                if (duration < 1 || duration > 10) {
+                if (duration < 1 || duration > 5) {
                     fs.unlinkSync(input);
-                    return reply('✘ Video must be between 1s and 10s');
+                    return reply('✘ Video must be between 1s and 5s');
                 }
 
                 // Helper to run ffmpeg with given settings
@@ -52,14 +52,9 @@ module.exports = {
                     return sizeKB;
                 };
 
-                let sizeKB = await compressVideo(12, 70, 10);
+                let sizeKB = await compressVideo(12, 70, 5);
 
                 // If first attempt too large, try lower fps and quality
-                if (sizeKB > 500) {
-                    sizeKB = await compressVideo(8, 40, 10);
-                }
-
-                // If still too large, trim to 5 seconds as a last resort
                 if (sizeKB > 500) {
                     sizeKB = await compressVideo(8, 40, 5);
                 }
@@ -90,7 +85,7 @@ module.exports = {
                 pack: 'CRYSNOVA AI',
                 author: 'crysnovax',
                 type: 'full',
-                quality: 70   // lower quality = smaller file
+                quality: 70
             });
             buffer = await sticker.toBuffer();
 
