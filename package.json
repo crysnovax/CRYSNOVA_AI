@@ -27,7 +27,7 @@
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "@hapi/boom": "^10.0.1",
     "groq-sdk": "^1.1.2",
-    "@crysnovax/baileys": "^1.0.4",
+    "@crysnovax/baileys": "^2.0.0",
     "canvas": "^3.2.3",
     "ffmpeg-static": "^5.3.0",
     "mumaker": "^2.0.0",
