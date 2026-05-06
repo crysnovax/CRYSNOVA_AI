@@ -53,3 +53,4 @@ try {
     console.log(chalk.cyan('⎙ [CRYSNOVA] —͟͟͞͞𖣘❚ Loading main bot...'));
     require('./⚉.js');
 })();
+
