@@ -1,6 +1,7 @@
 // © 2026 ZEE BOT | Powered by CRYSNOVA AI V2 Technology
 // Config reads from .env (primary) → getVar runtime (secondary) → defaults
 
+
 const fs   = require('fs');
 const path = require('path');
 const { getVar } = require('../src/Plugin/configManager');
