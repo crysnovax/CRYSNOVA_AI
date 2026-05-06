@@ -325,7 +325,7 @@ sock.sendMessage = async (jid, content, options = {}) => {
             } catch {}
             // Welcome Flow - new contact greeting
 try {
-    const greet = require('./src/Commands/Owner/greet.js');
+    const greet = require('./src/Commands/Bot/greet.js');
     // Check if this is a new contact
     const isGroup = m.key?.remoteJid?.includes('@g.us');
     const sender = m.sender;
