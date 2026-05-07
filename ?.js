@@ -145,7 +145,7 @@ sock.sendMessage = async (jid, content, options = {}) => {
     patchGroupEvents(sock);
 
     const econ = require('./src/Commands/Economy/econ.js');
-    econ.startNotifChecker(sock);
+  //  econ.startNotifChecker(sock);
 
     try {
         const autonews = require('./src/Commands/Owner/ཽ.js');
