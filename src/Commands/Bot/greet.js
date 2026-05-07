@@ -29,7 +29,7 @@ module.exports = {
     alias: [],
     category: 'Owner',
     desc: 'Auto welcome new customers with business support options',
-    usage: '.greet on | .greet test',
+    usage: '.greet on | .greet off | .greet test',
     ownerOnly: true,
 
     execute: async (sock, m, { args, reply }) => {
@@ -65,6 +65,13 @@ module.exports = {
             });
 
             return reply('_*🏷️ Business greeting sent to your DM!*_');
+        }
+
+        if (sub === 'off') {
+            greetConfig.enabled = false;
+            greetConfig.greeting = null;
+            greetConfig.faqHandler = null;
+            return reply('_*🏷️ Business Auto Welcome OFF!*_\n\n_New customers will no longer receive auto greeting._');
         }
 
         if (sub === 'on') {
@@ -127,7 +134,7 @@ https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38`
             return reply('_*🏷️ Business Auto Welcome ON!*_\n\n_New customers will now receive a professional welcome message._');
         }
 
-        return reply('💼 *.greet on* | *.greet test*');
+        return reply('💼 *.greet on* | *.greet off* | *.greet test*');
     },
 
     greetConfig,
