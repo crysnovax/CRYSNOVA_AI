@@ -6,6 +6,7 @@
  * ╚══════════════════════════════════════════════════╝
  */
 
+
 const chalk = require('chalk');
 const { setupStatusHandler } = require('./src/Plugin/statusHandler');
 const { getVar }             = require('./src/Plugin/configManager');
