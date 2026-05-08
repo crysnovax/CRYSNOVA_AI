@@ -29,7 +29,7 @@
 
 <div align="center">
   <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=40&pause=1000&color=00FFF0&center=true&width=910&height=80&lines=CRYSNOVA+AI+V2;Premium+WhatsApp+Bot;250%2B+Commands;AI+Powered+%E2%80%A2+Always+Online;Don't+Forget+to+Star+%E2%AD%90;By+crysnovax" alt="Typing SVG" />
+    <img src="https://readme-typing-svg.demolab.com?font=Ribeye&size=40&pause=1000&color=00FFF0&center=true&width=910&height=80&lines=CRYSNOVA+AI+V2;Premium+WhatsApp+Bot;400%2B+Commands;AI+Powered+%E2%80%A2+Always+Online;Don't+Forget+to+Star+%E2%AD%90;By+crysnovax" alt="Typing SVG" />
   </a>
 </div>
 
