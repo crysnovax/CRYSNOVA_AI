@@ -4,7 +4,7 @@ module.exports = {
     name: 'livematch',
     alias: ['live', 'match', 'football'],
     desc: 'Get live football match scores',
-    category: 'Sports',
+    category: 'Search',
     usage: '.livematch [team] | .livematch premier | .livematch barcelona',
     reactions: { start: '⚽', success: '✨', error: '❔' },
 
@@ -14,13 +14,46 @@ module.exports = {
             
             await sock.sendMessage(m.chat, { react: { text: '⚽', key: m.key } });
 
-            const url = `https://livematch.crysnovax.workers.dev/?team=${encodeURIComponent(teamFilter)}`;
-            const res = await axios.get(url, {
-                headers: { 'Accept': 'application/json' },
-                timeout: 15000
-            });
+            let matches = [];
+            let usingFallback = false;
 
-            const matches = res.data;
+            // Try primary API first
+            try {
+                const primaryUrl = teamFilter 
+                    ? `https://apis.prexzyvilla.site/sports/football?detail=${encodeURIComponent(teamFilter)}`
+                    : `https://apis.prexzyvilla.site/sports/football`;
+                
+                const primaryRes = await axios.get(primaryUrl, {
+                    headers: { 'Accept': 'application/json' },
+                    timeout: 10000
+                });
+
+                // Transform primary API response
+                if (primaryRes.data && primaryRes.data.data && primaryRes.data.data.matches) {
+                    matches = transformPrimaryResponse(primaryRes.data.data.matches);
+                }
+
+                if (!matches || matches.length === 0) {
+                    throw new Error('No matches from primary API');
+                }
+            } catch (primaryError) {
+                console.log('[PRIMARY API FAILED] Trying fallback...', primaryError.message);
+                
+                // Fallback to original API
+                try {
+                    const fallbackUrl = `https://livematch.crysnovax.workers.dev/?team=${encodeURIComponent(teamFilter)}`;
+                    const fallbackRes = await axios.get(fallbackUrl, {
+                        headers: { 'Accept': 'application/json' },
+                        timeout: 15000
+                    });
+
+                    matches = fallbackRes.data || [];
+                    usingFallback = true;
+                } catch (fallbackError) {
+                    console.error('[BOTH APIs FAILED]', fallbackError.message);
+                    throw new Error('Both APIs failed');
+                }
+            }
 
             if (!matches || matches.length === 0) {
                 await sock.sendMessage(m.chat, { react: { text: '💤', key: m.key } });
@@ -32,19 +65,19 @@ module.exports = {
 
             if (displayMatches.length === 1) {
                 // Single match - detailed view
-                const m = displayMatches[0];
+                const match = displayMatches[0];
                 
                 await sock.sendMessage(m.chat, {
-                    headerText: `## ⚽ ${m.team1} vs ${m.team2}`,
+                    headerText: `## ⚽ ${match.team1} vs ${match.team2}`,
                     contentText: '---',
                     title: '📊 Match Details',
                     table: [
-                        ['🏆 League', m.league || 'N/A'],
-                        ['📊 Status', m.status || 'N/A'],
-                        ['⚽ Score', m.score || '0 - 0'],
-                        ['⏱️ Time', m.time || 'N/A']
+                        ['🏆 League', match.league || 'N/A'],
+                        ['📊 Status', match.status || 'N/A'],
+                        ['⚽ Score', match.score || '0 - 0'],
+                        ['⏱️ Time', match.time || 'N/A']
                     ],
-                    footerText: '💡 Live scores • Powered by CRYSNOVA AI'
+                    footerText: `💡 Live scores${usingFallback ? ' (Fallback)' : ''} • Powered by CRYSNOVA AI`
                 }, { quoted: m });
             } else {
                 // Multiple matches - table view
@@ -68,7 +101,7 @@ module.exports = {
                     contentText: '---',
                     title: `📊 ${displayMatches.length} Match${displayMatches.length > 1 ? 'es' : ''}`,
                     table: tableData,
-                    footerText: `💡 SWIPE ⇆ • Use ${prefix}livematch <team> to search`
+                    footerText: `💡 SWIPE ⇆ • Use ${prefix}livematch <team> to search${usingFallback ? ' (Fallback)' : ''}`
                 }, { quoted: m });
             }
 
@@ -81,3 +114,36 @@ module.exports = {
         }
     }
 };
+
+// Helper function to transform primary API response
+function transformPrimaryResponse(matches) {
+    if (!Array.isArray(matches)) return [];
+    
+    return matches.map(match => {
+        // Determine match status based on state field
+        let status = 'Scheduled';
+        if (match.state === 1) status = 'Live';
+        else if (match.state === 3) status = 'Half Time';
+        else if (match.state === -1) status = 'Finished';
+        
+        // Calculate match time if live
+        let time = 'N/A';
+        if (match.state === 1 && match.startTime_t) {
+            const elapsed = Math.floor((Date.now() - match.startTime_t) / 60000);
+            time = `${elapsed}'`;
+        } else if (match.state === 3) {
+            time = 'HT';
+        } else if (match.state === -1) {
+            time = 'FT';
+        }
+
+        return {
+            team1: match.homeName || 'Unknown',
+            team2: match.awayName || 'Unknown',
+            league: match.leagueEn || 'N/A',
+            status: status,
+            score: `${match.homeScore || 0} - ${match.awayScore || 0}`,
+            time: time
+        };
+    });
+    }
