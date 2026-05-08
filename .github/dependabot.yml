@@ -11,12 +11,12 @@ updates:
     groups:
       patch-and-minor:
         patterns:
-          - "*"                  # All packages
+          - "*"                  
         update-types:
           - "patch"
-          - "minor"              # Groups small/safe updates into one PR
+          - "minor"              
     ignore:
-      - dependency-name: "*"     # Optional: ignore major updates if you prefer manual control
+      - dependency-name: "*"     
         update-types:
           - "version-update:semver-major"
     commit-message:
