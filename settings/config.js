@@ -80,7 +80,7 @@ const config = {
         process.env.THUMB_URL        ||
         getVar('THUMB_URL')          ||
         userConfig?.thumbUrl         ||
-        'https://cdn.crysnovax.link/files/1776175087921-35676c31-34d6-4fb0-97fa-41397533ca10.jpeg',
+        'https://cdn.crysnovax.link/files/1778529162616-eca99707-7b11-453a-802a-e85a9d1c2395.jpeg',
 
     // ════════════════════════════════════════════
     // BOT STATUS / MODE (ZEE BOT .env style)
