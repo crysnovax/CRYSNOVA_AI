@@ -50,13 +50,13 @@ const sfwCommands = SFW_ACTIONS.map(action => ({
             
             if (!imageUrl) return reply(`\`×͜× ${action.name} failed ×͜×\``);
             
-            let caption = `${action.emoji} *${action.desc.toUpperCase()}!*\n\n_⚡ Nekos API_`;
+            let caption = `${action.emoji} *${action.desc.toUpperCase()}!*`;
             
             if (mentioned && mentioned.length > 0) {
                 const target = mentioned[0];
                 const senderName = m.pushName || 'Someone';
                 const targetName = target.split('@')[0];
-                caption = `${action.emoji} *${senderName} ${action.endpoint}s ${targetName}!*\n\n_⚡ Nekos API_`;
+                caption = `${action.emoji} *${senderName} ${action.endpoint}s ${targetName}!*`;
             }
             
             // GIFs send as video, images as image
@@ -98,7 +98,7 @@ const nsfwCommands = NSFW_ACTIONS.map(action => ({
             
             await sock.sendMessage(m.chat, {
                 image: { url: imageUrl },
-                caption: `${action.emoji} *${action.desc.toUpperCase()}!*\n\n_⚡ Nekos API_`
+                caption: `${action.emoji} *${action.desc.toUpperCase()}!*`
             }, { quoted: m });
             
             await sock.sendMessage(m.chat, { react: { text: '🔞', key: m.key } });
@@ -125,7 +125,7 @@ const utilityCommands = [
                 const res = await axios.get(`${BASE}/fact`);
                 const fact = res.data?.fact;
                 if (!fact) return reply('`×͜× No fact found ×͜×`');
-                await sock.sendMessage(m.chat, { text: `💡 *FACT:*\n\n${fact}\n\n_⚡ Nekos API_` }, { quoted: m });
+                await sock.sendMessage(m.chat, { text: `💡 *FACT:*\n\n${fact}` }, { quoted: m });
             } catch {
                 reply('`×͜× Fact fetch failed ×͜×`');
             }
@@ -144,7 +144,7 @@ const utilityCommands = [
                 const res = await axios.get(`${BASE}/name`);
                 const name = res.data?.name;
                 if (!name) return reply('`×͜× No name generated ×͜×`');
-                await sock.sendMessage(m.chat, { text: `📛 *ANIME NAME:*\n\n✨ ${name}\n\n_⚡ Nekos API_` }, { quoted: m });
+                await sock.sendMessage(m.chat, { text: `📛 *ANIME NAME:*\n\n✨ ${name}` }, { quoted: m });
             } catch {
                 reply('`×͜× Name generation failed ×͜×`');
             }
@@ -165,7 +165,7 @@ const utilityCommands = [
                 const res = await axios.get(`${BASE}/owoify?text=${encodeURIComponent(text)}`);
                 const owo = res.data?.owo;
                 if (!owo) return reply('`×͜× OwOify failed ×͜×`');
-                await sock.sendMessage(m.chat, { text: `😸 *OwO:*\n\n${owo}\n\n_⚡ Nekos API_` }, { quoted: m });
+                await sock.sendMessage(m.chat, { text: `😸 *OwO:*\n\n${owo}` }, { quoted: m });
             } catch {
                 reply('`×͜× OwOify failed ×͜×`');
             }
@@ -184,7 +184,7 @@ const utilityCommands = [
                 const res = await axios.get(`${BASE}/why`);
                 const why = res.data?.why;
                 if (!why) return reply('`×͜× No why found ×͜×`');
-                await sock.sendMessage(m.chat, { text: `🤔 *WHY:*\n\n${why}\n\n_⚡ Nekos API_` }, { quoted: m });
+                await sock.sendMessage(m.chat, { text: `🤔 *WHY:*\n\n${why}` }, { quoted: m });
             } catch {
                 reply('`×͜× Why fetch failed ×͜×`');
             }
@@ -205,7 +205,7 @@ const utilityCommands = [
                 if (!imageUrl) return reply('`×͜× Cat fetch failed ×͜×`');
                 await sock.sendMessage(m.chat, {
                     image: { url: imageUrl },
-                    caption: '🐱 *Meow!*\n\n_⚡ Nekos API_'
+                    caption: '🐱 *Meow!*'
                 }, { quoted: m });
             } catch {
                 reply('`×͜× Cat fetch failed ×͜×`');
@@ -228,7 +228,7 @@ const utilityCommands = [
                 const answer = res.data?.response;
                 const imageUrl = res.data?.url;
                 
-                let text = `🎱 *8BALL*\n\n❔ *Q:* ${question}\n🔮 *A:* ${answer}\n\n_⚡ Nekos API_`;
+                let text = `🎱 *8BALL*\n\n❔ *Q:* ${question}\n🔮 *A:* ${answer}`;
                 
                 if (imageUrl) {
                     await sock.sendMessage(m.chat, {
@@ -258,7 +258,7 @@ const utilityCommands = [
                 const res = await axios.get(`${BASE}/spoiler?text=${encodeURIComponent(text)}`);
                 const spoiler = res.data?.owo;
                 if (!spoiler) return reply('`×͜× Spoiler failed ×͜×`');
-                await sock.sendMessage(m.chat, { text: `🙈 *SPOILER:*\n\n${spoiler}\n\n_⚡ Nekos API_` }, { quoted: m });
+                await sock.sendMessage(m.chat, { text: `🙈 *SPOILER:*\n\n${spoiler}` }, { quoted: m });
             } catch {
                 reply('`×͜× Spoiler failed ×͜×`');
             }
@@ -279,7 +279,7 @@ const utilityCommands = [
                 const res = await axios.get(`${BASE}/chat?text=${encodeURIComponent(text)}`);
                 const response = res.data?.response;
                 if (!response) return reply('`×͜× Chat failed ×͜×`');
-                await sock.sendMessage(m.chat, { text: `💬 *YOU:* ${text}\n\n🤖 *NEKOS:* ${response}\n\n_⚡ Nekos API_` }, { quoted: m });
+                await sock.sendMessage(m.chat, { text: `💬 *YOU:* ${text}\n\n🤖 *NEKOS:* ${response}` }, { quoted: m });
             } catch {
                 reply('`×͜× Chat failed ×͜×`');
             }
