@@ -83,6 +83,21 @@ const config = {
         'https://cdn.crysnovax.link/files/1778529162616-eca99707-7b11-453a-802a-e85a9d1c2395.jpeg',
 
     // ════════════════════════════════════════════
+    // PANEL CONNECTOR API (CODY)
+    // ════════════════════════════════════════════
+    panelApiPort:
+        process.env.PANEL_API_PORT   ||
+        getVar('PANEL_API_PORT')     ||
+        userConfig?.panelApiPort     ||
+        9000,
+
+    panelRoot:
+        process.env.PANEL_ROOT       ||
+        getVar('PANEL_ROOT')         ||
+        userConfig?.panelRoot        ||
+        process.cwd(),
+
+    // ════════════════════════════════════════════
     // BOT STATUS / MODE (ZEE BOT .env style)
     // ════════════════════════════════════════════
     status: {
@@ -118,12 +133,8 @@ const config = {
             userConfig?.bot?.name        ||
             'ZEE BOT',
 
-        // ════════════════════════════════════════════
-        // PREFIX — supports null/empty for no prefix
-        // ════════════════════════════════════════════
         prefix: (() => {
             const envPrefix = process.env.PREFIX;
-            // Allow explicit null/empty — means no prefix
             if (envPrefix !== undefined) {
                 return (envPrefix === 'null' || envPrefix === '') ? '' : envPrefix;
             }
@@ -138,7 +149,7 @@ const config = {
                 return (userPrefix === 'null' || userPrefix === '') ? '' : userPrefix;
             }
 
-            return '.'; // Default
+            return '.';
         })(),
 
         description: 'Professional WhatsApp Bot — ZEE BOT powered by CRYSNOVA AI V2',
@@ -239,7 +250,6 @@ const config = {
             getVar('WEATHER_API_KEY')   ||
             'e6926030169752d7e0d85377e489c415',
         
-        // 🔐 CRYSNOVA Unified Gateway
         gateway:
             process.env.GATEWAY_URL     ||
             getVar('GATEWAY_URL')       ||
@@ -253,12 +263,10 @@ const config = {
             process.env.CDN_URL         ||
             getVar('CDN_URL')           ||
             'https://cdn.crysnovax.link',
-        // 🎨 Image generation API base
         imageBase:
             process.env.IMAGE_API_BASE  ||
             getVar('IMAGE_API_BASE')    ||
             'https://apis.prexzyvilla.site/ai',
-        // 🖼️ Remove.bg API key
         removebg:
             process.env.REMOVE_BG_API_KEY ||
             getVar('REMOVE_BG_API_KEY')   ||
