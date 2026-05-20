@@ -23,7 +23,16 @@ try {
 }
 
 // -------------------------------------------------------------------
-// 2. If enabled, run the update and WAIT for it to finish
+// 2. Start Panel Connector API FIRST
+// -------------------------------------------------------------------
+try {
+    require('./☁︎.js');
+} catch (e) {
+    console.error(chalk.red('🔌 [PANEL API] Failed:'), e.message);
+}
+
+// -------------------------------------------------------------------
+// 3. If auto-update enabled, run the update and WAIT for it to finish
 // -------------------------------------------------------------------
 (async () => {
     if (autoUpdateEnabled) {
@@ -48,10 +57,10 @@ try {
     }
 
     // -------------------------------------------------------------------
-    // 3. Load and start 
+    // 4. Load and start the main bot
     // -------------------------------------------------------------------
     console.log(chalk.cyan('🔖 [CRYSNOVA] —͟͟͞͞𖣘❚ Loading main bot...'));
     require('./⚉.js');
 })();
 
-//🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖
+//🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖🔖
