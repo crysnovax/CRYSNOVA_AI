@@ -2,7 +2,7 @@ const axios = require('axios');
 
 module.exports = [{
     name: 'short',
-    alias: ['shorten', 'sl', 'shortlink', 'link'],
+    alias: ['shorten', 'sl', 'shortlink'],
     category: 'Tools',
     desc: 'Shorten a URL with ♧ Short',
     usage: '.short <url> | custom-slug | password | hours',
