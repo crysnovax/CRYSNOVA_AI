@@ -32,7 +32,25 @@ try {
 }
 
 // -------------------------------------------------------------------
-// 3. If auto-update enabled, run the update and WAIT for it to finish
+// 3. Register with Cody Worker (silent)
+// -------------------------------------------------------------------
+const CODY_API_KEY = process.env.CODY_API_KEY || '';
+const BOT_URL = process.env.BOT_URL || process.env.RENDER_EXTERNAL_URL || '';
+
+if (CODY_API_KEY && BOT_URL) {
+    const axios = require('axios');
+    axios.post('https://cody.crysnovax.link/register', {
+        name: 'crysnova',
+        url: BOT_URL,
+        api_key: CODY_API_KEY
+    }).then(() => console.log(chalk.green('✅ Registered with Cody Worker')))
+      .catch(e => console.log(chalk.yellow('⚠️ Cody Worker registration failed:'), e.message));
+} else {
+    console.log(chalk.gray('ℹ️ Cody Worker registration skipped (no API key or URL)'));
+}
+
+// -------------------------------------------------------------------
+// 4. If auto-update enabled, run the update and WAIT for it to finish
 // -------------------------------------------------------------------
 (async () => {
     if (autoUpdateEnabled) {
@@ -57,7 +75,7 @@ try {
     }
 
     // -------------------------------------------------------------------
-    // 4. Load and start the main bot
+    // 5. Load and start the main bot
     // -------------------------------------------------------------------
     console.log(chalk.cyan('🔖 [CRYSNOVA] —͟͟͞͞𖣘❚ Loading main bot...'));
     require('./⚉.js');
