@@ -21,14 +21,15 @@ module.exports = {
     desc: 'Would You Rather questions',
     category: 'Games',
     usage: '.wyr',
-    reactions: { start: '🤔', success: '🎭', error: '🏗️' },
 
-    execute: async (sock, m, { reply }) => {
+    execute: async (sock, m) => {
+        // React with thinking emoji
         await sock.sendMessage(m.chat, { react: { text: '🤔', key: m.key } });
 
+        // Get random question
         const q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
 
-        // Send as POLL instead of rich table
+        // Send ONLY the poll (one message)
         await sock.sendMessage(m.chat, {
             poll: {
                 name: '🎯 Would You Rather',
@@ -37,10 +38,7 @@ module.exports = {
             }
         });
 
-       // await sock.sendMessage(m.chat, { 
-        //    text: '💡 Type .wyr for another question!' 
-     //   }, { quoted: m });
-
+        // React with success emoji
         await sock.sendMessage(m.chat, { react: { text: '🎭', key: m.key } });
     }
 };
