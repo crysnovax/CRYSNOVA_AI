@@ -37,9 +37,9 @@ module.exports = {
             }
         });
 
-        await sock.sendMessage(m.chat, { 
-            text: '💡 Type .wyr for another question!' 
-        }, { quoted: m });
+       // await sock.sendMessage(m.chat, { 
+        //    text: '💡 Type .wyr for another question!' 
+     //   }, { quoted: m });
 
         await sock.sendMessage(m.chat, { react: { text: '🎭', key: m.key } });
     }
