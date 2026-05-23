@@ -1,3 +1,5 @@
+// File: src/Commands/Games/wyr.js
+
 const QUESTIONS = [
     { a: 'Be able to fly', b: 'Be able to read minds' },
     { a: 'Have unlimited money', b: 'Have unlimited time' },
@@ -26,16 +28,17 @@ module.exports = {
 
         const q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
 
+        // Send as POLL instead of rich table
         await sock.sendMessage(m.chat, {
-            headerText: `## 🤔 Would You Rather`,
-            contentText: '---',
-            title: '🎯 Choose One!',
-            table: [
-                ['🅰️ Option A', q.a],
-                ['🅱️ Option B', q.b],
-                ['💬 Reply', 'Type A or B!']
-            ],
-            footerText: '💡 .wyr for another question!'
+            poll: {
+                name: '🎯 Would You Rather',
+                values: [`🅰️ ${q.a}`, `🅱️ ${q.b}`],
+                selectableCount: 1
+            }
+        });
+
+        await sock.sendMessage(m.chat, { 
+            text: '💡 Type .wyr for another question!' 
         }, { quoted: m });
 
         await sock.sendMessage(m.chat, { react: { text: '🎭', key: m.key } });
