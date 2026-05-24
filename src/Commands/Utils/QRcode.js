@@ -1,6 +1,6 @@
-const QRCode  = require('qrcode');
+const QRCode = require('qrcode');
 const { createCanvas, loadImage } = require('canvas');
-const jsQR    = require('jsqr');
+const jsQR = require('jsqr');
 
 module.exports = {
     name: 'qr',
@@ -8,15 +8,36 @@ module.exports = {
     desc: 'Generate QR code from text or read QR from quoted image',
     category: 'tools',
     usage: '.qr <text>   OR   .qrread (reply to QR image)',
-    owner: true,
+    reactions: { start: '📱', success: '✓', error: '⊘' },
 
-    execute: async (sock, m, { args, reply }) => {
+    execute: async (sock, m, { args, reply, prefix }) => {
         const cmd = (m.body || '').toLowerCase().split(/\s+/)[0].trim();
+        
+        // Get the command without the dot
+        const command = cmd.replace('.', '');
 
         // ── GENERATE QR ──────────────────────────────────────────────
-        if (['.qr', '.qrcode', '.makeqr'].includes(cmd)) {
-            const text = args.join(' ').trim();
-            if (!text) return reply('Provide text!\nExample: .qr https://example.com');
+        if (['qr', 'qrcode', 'makeqr'].includes(command)) {
+            // Check if replying to a message for text
+            let text = args.join(' ').trim();
+            
+            if (!text && m.quoted) {
+                // If no args but replying to a message, get quoted message text
+                const quotedMsg = m.quoted;
+                const quotedText = quotedMsg.message?.conversation || 
+                                  quotedMsg.message?.extendedTextMessage?.text ||
+                                  quotedMsg.message?.imageMessage?.caption ||
+                                  '';
+                if (quotedText) {
+                    text = quotedText;
+                }
+            }
+            
+            if (!text) {
+                return reply(`⊘ *Provide text!*\n\nExample: ${prefix}qr https://example.com\nOr reply to a message with ${prefix}qr`);
+            }
+
+            await sock.sendMessage(m.chat, { react: { text: '📱', key: m.key } });
 
             try {
                 const buffer = await QRCode.toBuffer(text, {
@@ -26,81 +47,104 @@ module.exports = {
                     errorCorrectionLevel: 'H'
                 });
 
-                await sock.sendMessage(m.key.remoteJid, {
+                await sock.sendMessage(m.chat, {
                     image: buffer,
-                    mimetype: 'image/png'
+                    mimetype: 'image/png',
+                    caption: `📱 *QR Code Generated*\n└ 📝 *Text:* ${text.substring(0, 100)}${text.length > 100 ? '...' : ''}`
                 }, { quoted: m });
+
+                await sock.sendMessage(m.chat, { react: { text: '✓', key: m.key } });
 
             } catch (err) {
                 console.error('QR generate error:', err);
-                return reply('✘ Failed to generate QR code');
+                await sock.sendMessage(m.chat, { react: { text: '⊘', key: m.key } });
+                return reply('⊘ *Failed to generate QR code*');
             }
         }
 
         // ── READ QR ───────────────────────────────────────────────────
-        else if (['.qrread', '.readqr', '.scanqr', '.deqr'].includes(cmd)) {
+        else if (['qrread', 'readqr', 'scanqr', 'deqr'].includes(command)) {
 
-            // 1. Must be a reply
+            // Check if replying to a message
             if (!m.quoted) {
                 return reply(
-                    '✘ Reply to a QR code image!\n\n' +
-                    'How: Send a QR image → reply to it → type .qrread.  ⚉'
+                    `⊘ *Reply to a QR code image!*\n\n` +
+                    `📌 *How to use:*\n` +
+                    `1️⃣ Send or forward a QR code image\n` +
+                    `2️⃣ Reply to that image\n` +
+                    `3️⃣ Type ${prefix}qrread\n\n` +
+                    `💡 Or use ${prefix}qr to generate a QR code`
                 );
             }
 
-            // 2. Check type — serialize.js puts the type in m.quoted.mtype
-            //    It will be 'imageMessage' for images
-            const mtype = m.quoted.mtype || '';
-            if (!mtype.includes('image')) {
-                return reply('✘ Reply to an *image* (not sticker/video/document)');
+            // Get the message type from quoted message
+            const quotedMsg = m.quoted;
+            const messageContent = quotedMsg.message || {};
+            
+            // Check if it's an image message
+            const isImage = messageContent.imageMessage || 
+                           (quotedMsg.mtype && quotedMsg.mtype.includes('image'));
+            
+            if (!isImage) {
+                return reply(`⊘ *Reply to an IMAGE* (not sticker, video, or document)\n\n📌 The QR code must be in image format.`);
             }
 
-            try {
-                // ✅ THE FIX:
-                // serialize.js line 91 gives us m.quoted.download() — use it directly.
-                // DO NOT use downloadMediaMessage(quoted) — quoted is unwrapped content,
-                // not a full Baileys { key, message } object, so it will always fail.
-                const buffer = await m.quoted.download();
+            await sock.sendMessage(m.chat, { react: { text: '📱', key: m.key } });
 
-                if (!buffer || !buffer.length) {
-                    return reply('𓄄 Could not download the image. Try again.');
+            try {
+                // Download the image using the correct method
+                let buffer;
+                
+                // Try different download methods
+                if (typeof m.quoted.download === 'function') {
+                    buffer = await m.quoted.download();
+                } else if (sock.downloadMediaMessage) {
+                    buffer = await sock.downloadMediaMessage(quotedMsg);
+                } else {
+                    throw new Error('Cannot download image');
                 }
 
-                // Load into canvas and scan
-                const img    = await loadImage(buffer);
+                if (!buffer || buffer.length === 0) {
+                    throw new Error('Empty image data');
+                }
+
+                // Load image into canvas
+                const img = await loadImage(buffer);
                 const canvas = createCanvas(img.width, img.height);
-                const ctx    = canvas.getContext('2d');
+                const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, img.width, img.height);
 
+                // Scan for QR code
                 const imageData = ctx.getImageData(0, 0, img.width, img.height);
                 const code = jsQR(imageData.data, img.width, img.height, {
                     inversionAttempts: 'attemptBoth'
                 });
 
-                if (code?.data) {
-                    return reply(`✓ _*QR Decoded:*_\n\n${code.data}`);
+                if (code && code.data) {
+                    await sock.sendMessage(m.chat, { react: { text: '✓', key: m.key } });
+                    return reply(
+                        `✓ *QR Code Decoded*\n\n` +
+                        `┌ 📦 *Result:*\n` +
+                        `│ ${code.data}\n` +
+                        `└ 🔍 *Confidence:* ${Math.round(code.confidence)}%`
+                    );
                 }
 
+                await sock.sendMessage(m.chat, { react: { text: '⊘', key: m.key } });
                 return reply(
-                    '_⚉ No QR code detected_.\n\n' +
-                    '• Try a clearer / higher-quality image\n' +
-                    '• Make sure the QR fills most of the frame\n' +
-                    '• Avoid heavy compression or blur'
+                    `⊘ *No QR code detected*\n\n` +
+                    `📌 *Tips for better results:*\n` +
+                    `• Use a clearer / higher-quality image\n` +
+                    `• Make sure the QR fills most of the frame\n` +
+                    `• Avoid heavy compression or blur\n` +
+                    `• Try sending the original image`
                 );
 
             } catch (err) {
-                console.error('QR read error:', err.message || err);
-                return reply(`✘ Error reading QR:\n${err.message}`);
+                console.error('QR read error:', err);
+                await sock.sendMessage(m.chat, { react: { text: '⊘', key: m.key } });
+                return reply(`⊘ *Error reading QR code*\n\n└ ${err.message}`);
             }
-        }
-
-        // ── HELP ─────────────────────────────────────────────────────
-        else {
-            return reply(
-                '*QR Code Commands:*\n\n' +
-                '`.qr <text>` — generate QR image\n' +
-                '`.qrread` — decode QR (reply to image)'
-            );
         }
     }
 };
