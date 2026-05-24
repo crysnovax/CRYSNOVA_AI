@@ -13,24 +13,19 @@ module.exports = {
 
         if (!m.quoted) {
             await reply('⊘ *Please reply to a message to forward!*');
-            await sock.sendMessage(m.chat, { react: { text: '😑', key: m.key } });
-            return;
+            return sock.sendMessage(m.chat, { react: { text: '😑', key: m.key } });
         }
 
         if (!args[0]) {
             await reply('⊘ *Please provide target JID or invite link!*');
-            await sock.sendMessage(m.chat, { react: { text: '😑', key: m.key } });
-            return;
+            return sock.sendMessage(m.chat, { react: { text: '😑', key: m.key } });
         }
 
         let targetJid = args[0];
 
         try {
             if (targetJid.includes('chat.whatsapp.com')) {
-                const inviteCode = targetJid
-                    .split('chat.whatsapp.com/')[1]
-                    .split('?')[0];
-
+                const inviteCode = targetJid.split('chat.whatsapp.com/')[1].split('?')[0];
                 const groupInfo = await sock.groupGetInviteInfo(inviteCode);
                 targetJid = groupInfo.id;
             }
@@ -46,14 +41,11 @@ module.exports = {
 
         } catch (e) {
             await sock.sendMessage(m.chat, { react: { text: '🙈', key: m.key } });
-            return reply(`⊘ *Invalid link or invite expired*`);
+            return reply('⊘ *Invalid link or invite expired*');
         }
 
         const q = m.quoted;
 
-        // =============================
-        // TEXT EXTRACTION (SAFE)
-        // =============================
         const text =
             q.text ||
             q.caption ||
@@ -61,77 +53,81 @@ module.exports = {
             q.conversation ||
             '';
 
-        // =============================
-        // FIXED MEDIA DOWNLOAD (NO EMPTY KEY ERROR)
-        // =============================
         let media = null;
 
         try {
             media = await sock.downloadMediaMessage(q);
-        } catch (e) {
+        } catch {
             media = null;
         }
 
-        // =============================
+       
+        const contextInfo = {
+            forwardingScore: 1,
+            isForwarded: true
+        };
+
         // TEXT FORWARD
-        // =============================
-        if (text) {
+        if (text && !media) {
             await sock.sendMessage(targetJid, {
-                text: `_*📨 Forwarded*_\n\n${text}`
+                text,
+                contextInfo
             });
 
-            await sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
-            return;
+            return sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
         }
 
-        // =============================
-        // MEDIA FORWARD
-        // =============================
-        if (!media) {
-            await sock.sendMessage(m.chat, { react: { text: '🙈', key: m.key } });
-            return reply('⊘ Cannot read quoted message.');
-        }
-
+        // IMAGE
         try {
-            await sock.sendMessage(targetJid, {
-                image: media,
-                caption: `_*📨 Forwarded*_\n\n${q.caption || ''}`
-            });
+            if (q.mtype === 'imageMessage') {
+                await sock.sendMessage(targetJid, {
+                    image: media,
+                    caption: q.caption || '',
+                    contextInfo
+                });
 
-            await sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
-            return;
+                return sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
+            }
         } catch {}
 
+        // VIDEO
         try {
-            await sock.sendMessage(targetJid, {
-                video: media,
-                caption: `_*📨 Forwarded*_\n\n${q.caption || ''}`
-            });
+            if (q.mtype === 'videoMessage') {
+                await sock.sendMessage(targetJid, {
+                    video: media,
+                    caption: q.caption || '',
+                    contextInfo
+                });
 
-            await sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
-            return;
+                return sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
+            }
         } catch {}
 
+        // AUDIO
         try {
-            await sock.sendMessage(targetJid, {
-                audio: media,
-                ptt: q.ptt || false
-            });
+            if (q.mtype === 'audioMessage') {
+                await sock.sendMessage(targetJid, {
+                    audio: media,
+                    ptt: q.ptt || false,
+                    contextInfo
+                });
 
-            await sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
-            return;
+                return sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
+            }
         } catch {}
 
+        // STICKER
         try {
-            await sock.sendMessage(targetJid, {
-                sticker: media
-            });
+            if (q.mtype === 'stickerMessage') {
+                await sock.sendMessage(targetJid, {
+                    sticker: media,
+                    contextInfo
+                });
 
-            await sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
-            return;
+                return sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
+            }
         } catch {}
 
-        await sock.sendMessage(m.chat, { react: { text: '🙈', key: m.key } });
         return reply('⊘ Unsupported message type.');
     }
 };
