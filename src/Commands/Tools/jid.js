@@ -9,7 +9,7 @@ module.exports = {
             if (!jid) {
                 return reply('Jid not found!');
             }
-            reply(`The JID of this chat is: ${jid}`);
+            reply(`${jid}`);
         } catch (error) {
             console.error(error);
             reply('An error occurred while retrieving the JID.');
