@@ -41,7 +41,7 @@ module.exports = {
 
         try {
             await sock.sendMessage(m.chat, {
-                text: `♧*${buttonText}*\n\n_Opens in WhatsApp browser_`,
+                text: `♧ *${buttonText}*\n\n_*ⓘ secured link*_`,
                 nativeFlow: [{
                     text: buttonText,
                     url: url,
