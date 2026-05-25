@@ -11,10 +11,15 @@ module.exports = {
 
             const cmd = m.body.toLowerCase().split(/\s+/)[0].slice(1)
 
-            let link = args[0] || (m.quoted && m.quoted.text)
+            let link = args[0] || (m.quoted && (m.quoted.body || m.quoted.text)) || ''
 
             if (!link)
                 return reply('*_✘ Add a link*_')
+
+            // Auto-prepend https:// if no protocol present
+            if (!/^https?:\/\//i.test(link)) {
+                link = 'https://' + link
+            }
 
             const urlRegex = /(https?:\/\/[^\s]+)/g
             const foundLinks = link.match(urlRegex)
@@ -23,8 +28,8 @@ module.exports = {
             if (!targetUrl)
                 return reply('_*𓄄 Invalid url*_')
 
-            await sock.sendMessage(m.chat,{
-                react:{ text:"📸", key:m.key }
+            await sock.sendMessage(m.chat, {
+                react: { text: "📸", key: m.key }
             })
 
             let device = "desktop"
@@ -36,7 +41,7 @@ module.exports = {
 
             const api = `https://api-rebix.zone.id/api/ssweb?url=${encodeURIComponent(targetUrl)}&device=${device}`
 
-            const res = await axios.get(api,{ responseType:'arraybuffer' })
+            const res = await axios.get(api, { responseType: 'arraybuffer' })
 
             const buffer = Buffer.from(res.data)
 
@@ -48,7 +53,7 @@ module.exports = {
 
         } catch (err) {
             console.log(err.message)
-            reply('*✘ ERROR: FAILED TO SCREENSHOT *')
+            reply('_*✘ error*_')
         }
     }
-}
+                }
