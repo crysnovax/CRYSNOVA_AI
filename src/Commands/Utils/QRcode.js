@@ -50,14 +50,14 @@ module.exports = {
                 await sock.sendMessage(m.chat, {
                     image: buffer,
                     mimetype: 'image/png',
-                    caption: `📱 *QR Code Generated*\n└ 📝 *Text:* ${text.substring(0, 100)}${text.length > 100 ? '...' : ''}`
+                 //  caption: `📱 *QR Code Generated*\n└ 𓆣≽ *Text:* ${text.substring(0, 100)}${text.length > 100 ? '...' : ''}`
                 }, { quoted: m });
 
-                await sock.sendMessage(m.chat, { react: { text: '✓', key: m.key } });
+                await sock.sendMessage(m.chat, { react: { text: '🪀', key: m.key } });
 
             } catch (err) {
                 console.error('QR generate error:', err);
-                await sock.sendMessage(m.chat, { react: { text: '⊘', key: m.key } });
+                await sock.sendMessage(m.chat, { react: { text: '📡', key: m.key } });
                 return reply('⊘ *Failed to generate QR code*');
             }
         }
@@ -69,11 +69,11 @@ module.exports = {
             if (!m.quoted) {
                 return reply(
                     `⊘ *Reply to a QR code image!*\n\n` +
-                    `📌 *How to use:*\n` +
-                    `1️⃣ Send or forward a QR code image\n` +
-                    `2️⃣ Reply to that image\n` +
-                    `3️⃣ Type ${prefix}qrread\n\n` +
-                    `💡 Or use ${prefix}qr to generate a QR code`
+                    `� *How to use:*\n` +
+                    `➊ Send or forward a QR code image\n` +
+                    `➋ Reply to that image\n` +
+                    `➌ Type ${prefix}qrread\n\n` +
+                    `ⓘ Or use ${prefix}qr to generate a QR code`
                 );
             }
 
@@ -86,7 +86,7 @@ module.exports = {
                            (quotedMsg.mtype && quotedMsg.mtype.includes('image'));
             
             if (!isImage) {
-                return reply(`⊘ *Reply to an IMAGE* (not sticker, video, or document)\n\n📌 The QR code must be in image format.`);
+                return reply(`_*⊘ Reply to an IMAGE*_`);
             }
 
             await sock.sendMessage(m.chat, { react: { text: '📱', key: m.key } });
@@ -121,19 +121,18 @@ module.exports = {
                 });
 
                 if (code && code.data) {
-                    await sock.sendMessage(m.chat, { react: { text: '✓', key: m.key } });
-                    return reply(
-                        `✓ *QR Code Decoded*\n\n` +
-                        `┌ 📦 *Result:*\n` +
-                        `│ ${code.data}\n` +
-                        `└ 🔍 *Confidence:* ${Math.round(code.confidence)}%`
+                    await sock.sendMessage(m.chat, { react: { text: '🪀', key: m.key } });
+
+                    return reply( 
+                        `${code.data}`
+                        
                     );
                 }
 
-                await sock.sendMessage(m.chat, { react: { text: '⊘', key: m.key } });
+                await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } });
                 return reply(
                     `⊘ *No QR code detected*\n\n` +
-                    `📌 *Tips for better results:*\n` +
+                    `۞ *Tips for better results:*\n` +
                     `• Use a clearer / higher-quality image\n` +
                     `• Make sure the QR fills most of the frame\n` +
                     `• Avoid heavy compression or blur\n` +
@@ -142,7 +141,7 @@ module.exports = {
 
             } catch (err) {
                 console.error('QR read error:', err);
-                await sock.sendMessage(m.chat, { react: { text: '⊘', key: m.key } });
+                await sock.sendMessage(m.chat, { react: { text: '📡', key: m.key } });
                 return reply(`⊘ *Error reading QR code*\n\n└ ${err.message}`);
             }
         }
