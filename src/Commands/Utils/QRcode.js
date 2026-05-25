@@ -11,9 +11,7 @@ module.exports = {
     owner: true,
 
     execute: async (sock, m, { args, reply }) => {
-        // Extract command name without prefix, lowercased
         const rawCmd = (m.body || '').trim().toLowerCase().split(/\s+/)[0];
-        // Strip any leading prefix characters (., !, /, etc.)
         const cmd = rawCmd.replace(/^[^a-z0-9]+/, '');
 
         const generateCmds = ['qr', 'qrcode', 'makeqr'];
@@ -21,8 +19,17 @@ module.exports = {
 
         // ── GENERATE QR ──────────────────────────────────────────────
         if (generateCmds.includes(cmd)) {
-            const text = args.join(' ').trim();
-            if (!text) return reply('Provide text!\nExample: .qr https://example.com');
+            let text = args.join(' ').trim();
+
+            // If no args but replying to a text message, use that text
+            if (!text && m.quoted) {
+                const qtype = m.quoted.mtype || '';
+                if (qtype === 'conversation' || qtype === 'extendedTextMessage') {
+                    text = m.quoted.body || m.quoted.text || '';
+                }
+            }
+
+            if (!text) return reply('Provide text or reply to a message!\nExample: .qr https://example.com');
 
             try {
                 const buffer = await QRCode.toBuffer(text, {
@@ -34,7 +41,8 @@ module.exports = {
 
                 await sock.sendMessage(m.key.remoteJid, {
                     image: buffer,
-                    mimetype: 'image/png'
+                    mimetype: 'image/png',
+                  //  caption: `🔗 QR generated for:\n${text.length > 100 ? text.slice(0, 100) + '…' : text}`
                 }, { quoted: m });
 
             } catch (err) {
@@ -96,8 +104,9 @@ module.exports = {
         else {
             return reply(
                 '*QR Code Commands:*\n\n' +
-                '`.qr <text>` — generate QR image\n' +
-                '`.qrread` — decode QR (reply to image)'
+                '`.qr <text>` — generate QR from text\n' +
+                '`.qr` _(reply to a message)_ — generate QR from that message\n' +
+                '`.qrread` _(reply to a QR image)_ — decode QR'
             );
         }
     }
