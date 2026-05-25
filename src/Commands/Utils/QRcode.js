@@ -8,7 +8,7 @@ module.exports = {
     desc: 'Generate QR code from text or read QR from quoted image',
     category: 'tools',
     usage: '.qr <text>   OR   .qrread (reply to QR image)',
-    reactions: { start: '📱', success: '✓', error: '⊘' },
+    reactions: { start: '📱', success: '🪀', error: '📡' },
 
     execute: async (sock, m, { args, reply, prefix }) => {
         const cmd = (m.body || '').toLowerCase().split(/\s+/)[0].trim();
