@@ -7,8 +7,16 @@ module.exports = {
     reactions: { start: '🌐', success: '🥏', error: '❔' },
 
     execute: async (sock, m, { args, reply, prefix }) => {
-        const fullText = args.join(' ').trim();
-        
+        let fullText = args.join(' ').trim();
+
+        // If no args but replying to a text message, use that text
+        if (!fullText && m.quoted) {
+            const qtype = m.quoted.mtype || '';
+            if (qtype === 'conversation' || qtype === 'extendedTextMessage') {
+                fullText = m.quoted.body || m.quoted.text || '';
+            }
+        }
+
         if (!fullText) {
             return reply(
                 `╭─❍ *WEBSITE BUTTON*\n│\n` +
@@ -23,9 +31,8 @@ module.exports = {
 
         const parts = fullText.split('|').map(p => p.trim());
         let url = parts[0] || '';
-        const buttonText = parts[1] || '🌐 Open Link';
+        const buttonText = parts[1] || '☁︎ Open Link';
 
-        // Validate URL
         if (!url.startsWith('http')) {
             url = 'https://' + url;
         }
@@ -34,11 +41,11 @@ module.exports = {
 
         try {
             await sock.sendMessage(m.chat, {
-                text: `🌐 *${buttonText}*\n\n_Opens in WhatsApp browser_`,
+                text: `♧*${buttonText}*\n\n_Opens in WhatsApp browser_`,
                 nativeFlow: [{
                     text: buttonText,
                     url: url,
-                    useWebview: true  // Opens in WhatsApp's in-app browser
+                    useWebview: true
                 }]
             }, { quoted: m });
 
@@ -47,8 +54,7 @@ module.exports = {
         } catch (error) {
             console.error('[URL ERROR]', error.message);
             await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } });
-            
-            reply(`🌐 *Link:* ${url}`);
+            reply(`☁︎  *Link:* ${url}`);
         }
     }
 };
