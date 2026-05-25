@@ -35,7 +35,7 @@ module.exports = {
                     }]
                 }, { quoted: m });
 
-                await sock.sendMessage(m.chat, { react: { text: '✓', key: m.key } });
+                await sock.sendMessage(m.chat, { react: { text: '💬', key: m.key } });
                 return;
             }
 
@@ -49,7 +49,7 @@ module.exports = {
             
             // Basic validation - should start with country code
             if (number.length < 10 || number.length > 15) {
-                await sock.sendMessage(m.chat, { react: { text: '⊘', key: m.key } });
+                await sock.sendMessage(m.chat, { react: { text: '💬', key: m.key } });
                 return reply(`⊘ *Invalid phone number!*\n\nUse international format without +\n📝 *Example:* ${prefix}jid 2348077134210`);
             }
 
