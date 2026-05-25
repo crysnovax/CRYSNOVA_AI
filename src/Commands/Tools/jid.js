@@ -4,7 +4,7 @@ module.exports = {
     desc: 'Get JID of current chat or convert a phone number to JID',
     category: 'Tools',
     usage: '.jid OR .jid 2348077134210',
-    reactions: { start: '📱', success: '✓', error: '⊘' },
+    reactions: { start: '📱', success: '💬', error: '📡' },
 
     execute: async (sock, m, { args, reply, prefix }) => {
         await sock.sendMessage(m.chat, { react: { text: '📱', key: m.key } });
@@ -57,18 +57,18 @@ module.exports = {
             source = `Number: ${number}`;
 
             await sock.sendMessage(m.chat, {
-                text: `*𓆣 NUMBER TO JID*\n\n╭─❍ *Conversion*\n│\n│ ⚉ *Number:* ${number}\n│ ⚉ *JID:* \`${jid}\`\n│\n│ ✪ *From:* ${source}\n│\n│ _👇 Tap the button to copy_\n╰──────────────────`,
+                text: `*𓆣 NUMBER TO JID*\n\n╭─❍ *Conversion*\n│\n│ ⚉ *Number:* ${number}\n│ ۞ *JID:* \`${jid}\`\n│\n│ ✪ *From:* ${source}\n│\n│ _👇 Tap the button to copy_\n╰──────────────────`,
                 nativeFlow: [{
                     text: '📋 Copy JID',
                     copy: jid
                 }]
             }, { quoted: m });
 
-            await sock.sendMessage(m.chat, { react: { text: '✓', key: m.key } });
+            await sock.sendMessage(m.chat, { react: { text: '✨', key: m.key } });
 
         } catch (error) {
             console.error('[JID ERROR]', error);
-            await sock.sendMessage(m.chat, { react: { text: '⊘', key: m.key } });
+            await sock.sendMessage(m.chat, { react: { text: '🙈', key: m.key } });
             reply('⊘ *An error occurred while retrieving the JID.*');
         }
     }
