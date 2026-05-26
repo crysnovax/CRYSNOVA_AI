@@ -5,6 +5,9 @@ module.exports = {
     category: 'Tools',
     usage: '.quoted (reply to a message that quotes another)',
     reactions: { start: '📝', success: '💬', error: '📡' },
+    adminOnly: true,      // Only admins can use in groups
+ownerOnly: true,      // Only bot owner can use (overrides adminOnly)
+groupOnly: false,     // Can be used in private chats too
 
     execute: async (sock, m, { reply, store }) => {
         await sock.sendMessage(m.chat, { react: { text: '📝', key: m.key } });
