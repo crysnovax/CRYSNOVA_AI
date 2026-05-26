@@ -6,8 +6,8 @@ module.exports = {
     usage: '.quoted (reply to a message that quotes another)',
     reactions: { start: '📝', success: '💬', error: '📡' },
     adminOnly: true,      
-ownerOnly: true,      
-groupOnly: false,     
+    ownerOnly: true,      
+    groupOnly: false,     
 
     execute: async (sock, m, { reply, store }) => {
         await sock.sendMessage(m.chat, { react: { text: '📝', key: m.key } });
