@@ -270,7 +270,7 @@ sock.sendMessage = async (jid, content, options = {}) => {
 });
 
 // TEMP DEBUG
-console.log('[STORE SET]', mek.key.remoteJid + ':' + mek.key.id, 'Size:', customStore.messages.size);
+//console.log('[STORE SET]', mek.key.remoteJid + ':' + mek.key.id, 'Size:', customStore.messages.size);
 
             try {
                 const antidelete = require('./src/Commands/Tools/antidelete.js');
