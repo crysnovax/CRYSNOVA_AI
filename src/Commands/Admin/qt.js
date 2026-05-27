@@ -49,20 +49,7 @@ module.exports = {
             const innerType = getContentType(innerQuoted);
             const innerMsg = innerQuoted[innerType] || innerQuoted;
 
-            // Text message
-            const innerText =
-                innerQuoted.conversation ||
-                innerMsg.text ||
-                innerMsg.caption ||
-                innerMsg.conversation || '';
-
-            if (innerText) {
-                await sock.sendMessage(m.chat, { text: innerText }, { quoted: m });
-                await sock.sendMessage(m.chat, { react: { text: '💬', key: m.key } });
-                return;
-            }
-
-            // Media messages
+            // Media types map
             const mediaTypes = {
                 imageMessage:    'image',
                 videoMessage:    'video',
@@ -73,11 +60,23 @@ module.exports = {
 
             const mediaKey = Object.keys(mediaTypes).find(k => innerQuoted[k]);
 
+            // Pure text only (no media)
+            const innerText =
+                innerQuoted.conversation ||
+                innerMsg.text ||
+                innerMsg.conversation || '';
+
+            if (innerText && !mediaKey) {
+                await sock.sendMessage(m.chat, { text: innerText }, { quoted: m });
+                await sock.sendMessage(m.chat, { react: { text: '💬', key: m.key } });
+                return;
+            }
+
+            // Media (with or without caption)
             if (mediaKey) {
                 const mediaMsg = innerQuoted[mediaKey];
                 const mediaType = mediaTypes[mediaKey];
 
-                // Download the media
                 const stream = await downloadContentFromMessage(mediaMsg, mediaType);
                 let buffer = Buffer.alloc(0);
                 for await (const chunk of stream) {
@@ -85,17 +84,18 @@ module.exports = {
                 }
 
                 const sendOptions = { quoted: m };
+                const caption = mediaMsg.caption || '';
 
                 if (mediaKey === 'imageMessage') {
                     await sock.sendMessage(m.chat, {
                         image: buffer,
-                        caption: mediaMsg.caption || ''
+                        caption
                     }, sendOptions);
 
                 } else if (mediaKey === 'videoMessage') {
                     await sock.sendMessage(m.chat, {
                         video: buffer,
-                        caption: mediaMsg.caption || '',
+                        caption,
                         gifPlayback: mediaMsg.gifPlayback || false
                     }, sendOptions);
 
@@ -110,7 +110,8 @@ module.exports = {
                     await sock.sendMessage(m.chat, {
                         document: buffer,
                         mimetype: mediaMsg.mimetype || 'application/octet-stream',
-                        fileName: mediaMsg.fileName || 'file'
+                        fileName: mediaMsg.fileName || 'file',
+                        caption
                     }, sendOptions);
 
                 } else if (mediaKey === 'stickerMessage') {
