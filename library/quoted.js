@@ -1,34 +1,37 @@
+// Stores last deleted message per chat
+const deletedMessages = new Map();
 
-// © 2026 CRYSNOVA. All Rights Reserved.
-// respect the work, don’t just copy-paste.
+const onDelete = async (sock, updates, customStore) => {
+    for (const update of updates) {
+        try {
+            if (!update.key?.remoteJid || !update.key?.id) continue;
 
-const fs = require('fs')
+            // Check if this is a delete (message revoked)
+            if (!update.update?.message || update.update.message === null) {
+                const storeKey = update.key.remoteJid + ':' + update.key.id;
+                const stored = customStore?.messages?.get(storeKey);
+                if (!stored?.message) continue;
 
-const fquoted = {
-    channel: {
-        key: {
-            fromMe: false,
-            participant: "0@s.whatsapp.net",
-            remoteJid: "2348077528901@s.whatsapp.net"
-        },
-        message: {
-            newsletterAdminInviteMessage: {
-                newsletterJid: "0@newsletter",
-                newsletterName: " X ",
-                caption: "CRYSNOVA BOT",
-                inviteExpiration: "0"
+                // Save as last deleted for this chat
+                deletedMessages.set(update.key.remoteJid, {
+                    message: stored.message,
+                    timestamp: Date.now()
+                });
             }
+        } catch (err) {
+            console.error('[QUOTED DELETE]', err.message);
         }
     }
 };
 
-module.exports = { fquoted };
+const getLastDeleted = (jid) => deletedMessages.get(jid) || null;
 
-let file = require.resolve(__filename)
-require('fs').watchFile(file, () => {
-  require('fs').unwatchFile(file)
-  console.log('\x1b[0;32m'+__filename+' \x1b[1;32mupdated!\x1b[0m')
-  delete require.cache[file]
-  require(file)
-})
+const cleanUp = () => {
+    const now = Date.now();
+    const TTL = 48 * 60 * 60 * 1000;
+    for (const [jid, data] of deletedMessages.entries()) {
+        if (now - data.timestamp > TTL) deletedMessages.delete(jid);
+    }
+};
 
+module.exports = { onDelete, getLastDeleted, cleanUp };
