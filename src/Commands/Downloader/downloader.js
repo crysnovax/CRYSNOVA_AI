@@ -4,143 +4,113 @@ const mime = require('mime-types');
 module.exports = {
     name: 'd',
     alias: ['download', 'dl'],
-    desc: 'Download & send media from direct URL (or reply to a URL)',
+    desc: 'Download & send media from direct URL',
     category: 'Downloader',
-    usage: '.d <URL> or reply to a message with a URL',
-    reactions: { start: '📥', success: '💾', error: '❔' },
+    usage: '.d <URL>',
+    reactions: { start: '📥', success: '🔖', error: '❔' },
 
-    execute: async (sock, m, { args, reply, prefix, quoted }) => {
-        let url = args[0]?.trim();
+    execute: async (sock, m, { args, reply, prefix }) => {
+        let rawText = args.join(' ').trim();
 
-        // Check if replying to a message with URL
-        if (!url || !url.startsWith('http')) {
-            const target = m.quoted || quoted;
-            if (target && target.text) {
-                const urlMatch = target.text.match(/(https?:\/\/[^\s]+)/);
-                if (urlMatch) url = urlMatch[0];
-            }
+        if (!rawText) {
+            rawText = m.quoted?.body || m.quoted?.text || '';
         }
 
-        if (!url || !url.startsWith('http')) {
-            return reply(
-                `╭─❍ *DIRECT DOWNLOADER*\n│\n` +
-                `│ ⚉ *Usage:* ${prefix}d <URL>\n│\n` +
-                `│ ✪ *Or reply to a message with URL*\n│\n` +
-                `│ ${prefix}d https://files.catbox.moe/video.mp4\n│\n` +
-                `│ 📥 *Downloads from direct links*\n` +
-                `╰──────────────────`
-            );
+        const urlMatches = rawText.match(/(https?:\/\/[^\s]+)/g) || [];
+
+        if (!urlMatches.length && args[0]) {
+            urlMatches.push('https://' + args[0].trim());
+        }
+
+        if (!urlMatches.length) {
+            return reply(`⊘ *Usage:* ${prefix}d <URL>`);
         }
 
         await sock.sendMessage(m.chat, { react: { text: '📥', key: m.key } });
 
-        // ONE message for everything
-        const progressMsg = await sock.sendMessage(m.chat, {
-            text: `📥 *Downloading...*\n\n▰▱▱▱▱▱▱▱▱▱ 0%\n\n📡 Connecting...`
-        });
+        for (const rawUrl of urlMatches) {
+            const url = rawUrl.replace(/[)>\].,;!?]+$/, '');
 
-        const updateProgress = async (percent, phase) => {
-            const filled = Math.round(percent / 10);
-            const bar = '▰'.repeat(filled) + '▱'.repeat(10 - filled);
-            await sock.sendMessage(m.chat, {
-                text: `📥 *Downloading...*\n\n${bar} ${percent}%\n\n📡 ${phase}`,
-                edit: progressMsg.key
-            });
-        };
-
-        try {
-            await updateProgress(5, 'Connecting to server...');
-
-            let contentType = '';
             try {
-                const headRes = await axios.head(url, {
-                    timeout: 15000,
-                    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
-                });
-                contentType = headRes.headers['content-type'] || '';
-            } catch (e) {}
-
-            await updateProgress(15, 'Starting download...');
-
-            const response = await axios.get(url, {
-                responseType: 'arraybuffer',
-                timeout: 120000,
-                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
-                onDownloadProgress: (progressEvent) => {
-                    if (progressEvent.total) {
-                        const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-                        updateProgress(percent, `${formatSize(progressEvent.loaded)} / ${formatSize(progressEvent.total)}`);
-                    }
-                }
-            });
-
-            await updateProgress(85, 'Processing...');
-
-            const buffer = Buffer.from(response.data);
-            if (buffer.length < 100) {
+                await downloadAndSend(sock, m, url);
+            } catch (err) {
+                console.error('[D ERROR]', err.message || err);
                 await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } });
-                await sock.sendMessage(m.chat, { text: `𓆉 File too small`, edit: progressMsg.key });
-                return;
             }
-
-            contentType = contentType || response.headers['content-type'] || '';
-            let ext = mime.extension(contentType) || url.split('.').pop()?.split('?')[0]?.toLowerCase() || 'bin';
-            const fileName = `CRYSNOVA_${Date.now()}.${ext}`;
-
-            let sendKey = 'document';
-            let caption = '';
-
-            if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
-                sendKey = 'image';
-                caption = `🖼️ ${formatSize(buffer.length)} • ${ext.toUpperCase()}`;
-            } else if (['mp4', 'mov', 'avi', 'mkv', 'webm', 'flv'].includes(ext)) {
-                sendKey = 'video';
-                caption = `🎬 ${formatSize(buffer.length)} • ${ext.toUpperCase()}`;
-            } else if (['mp3', 'm4a', 'ogg', 'wav', 'flac', 'aac'].includes(ext)) {
-                sendKey = 'audio';
-                caption = `🎵 ${formatSize(buffer.length)} • ${ext.toUpperCase()}`;
-            } else {
-                sendKey = 'document';
-                caption = `📄 ${fileName} • ${formatSize(buffer.length)}`;
-            }
-
-            // ✅ Final progress update — 100% complete
-            await updateProgress(100, `Done! ${formatSize(buffer.length)} • ${ext.toUpperCase()}`);
-            
-            // Short pause so user sees 100%
-            await new Promise(r => setTimeout(r, 500));
-
-            // Delete the progress message
-            await sock.sendMessage(m.chat, { delete: progressMsg.key });
-
-            // Send the actual file
-            await sock.sendMessage(m.chat, {
-                [sendKey]: buffer,
-                mimetype: contentType || 'application/octet-stream',
-                ...(sendKey === 'document' ? { fileName } : {}),
-                ...(sendKey === 'audio' ? { ptt: false } : {}),
-                caption: caption
-            }, { quoted: m });
-
-            await sock.sendMessage(m.chat, { react: { text: '🔖', key: m.key } });
-
-        } catch (err) {
-            console.error('[D ERROR]', err.message || err);
-            await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } });
-
-            let errorMsg = `🏗️ *Failed*\n\n`;
-            if (err.response?.status === 404) errorMsg += '📡 Link not found\n';
-            else if (err.code === 'ECONNABORTED') errorMsg += '⏰ Timeout\n';
-            else errorMsg += `⚠︎ ${err.message}`;
-
-            await sock.sendMessage(m.chat, { text: errorMsg, edit: progressMsg.key });
         }
     }
 };
 
-function formatSize(bytes) {
-    if (!bytes || bytes === 0) return '0 B';
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+async function downloadAndSend(sock, m, url) {
+    let response;
+    let retries = 1;
+    
+    while (retries >= 0) {
+        try {
+            response = await axios.get(url, {
+                responseType: 'arraybuffer',
+                timeout: 120000,
+                maxRedirects: 5,
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+            });
+            break;
+        } catch (err) {
+            if (retries === 0) throw err;
+            retries--;
+            await new Promise(r => setTimeout(r, 2000));
+        }
+    }
+
+    const buffer = Buffer.from(response.data);
+
+    if (buffer.length < 100) {
+        throw new Error('File too small or empty');
+    }
+
+    const detectedExt = detectByMagicBytes(buffer);
+    const contentType = response.headers['content-type'] || '';
+    let ext = detectedExt || mime.extension(contentType.split(';')[0].trim()) || url.split('?')[0].split('.').pop()?.toLowerCase() || 'bin';
+    
+    const cleanName = url.split('?')[0].split('/').pop() || `file_${Date.now()}.${ext}`;
+    const fileName = cleanName.includes('.') ? cleanName : `${cleanName}.${ext}`;
+
+    const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+    const videoExts = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'flv'];
+    const audioExts = ['mp3', 'm4a', 'ogg', 'wav', 'flac', 'aac', 'opus'];
+
+    let sendKey;
+    if (imageExts.includes(ext)) {
+        sendKey = (ext === 'webp' && isAnimatedWebp(buffer)) ? 'sticker' : 'image';
+    } else if (videoExts.includes(ext)) sendKey = 'video';
+    else if (audioExts.includes(ext)) sendKey = 'audio';
+    else sendKey = 'document';
+
+    await sock.sendMessage(m.chat, {
+        [sendKey]: buffer,
+        mimetype: contentType.split(';')[0].trim() || 'application/octet-stream',
+        ...(sendKey === 'document' ? { fileName } : {}),
+        ...(sendKey === 'audio' ? { ptt: false } : {})
+    }, { quoted: m });
+}
+
+function detectByMagicBytes(buffer) {
+    const hex = buffer.slice(0, 12).toString('hex');
+
+    if (hex.startsWith('ffd8ff')) return 'jpg';
+    if (hex.startsWith('89504e47')) return 'png';
+    if (hex.startsWith('47494638')) return 'gif';
+    if (hex.startsWith('52494646') && hex.slice(16, 24) === '57454250') return 'webp';
+    if (hex.startsWith('00000018') || hex.startsWith('00000020') || hex.slice(8, 16) === '66747970') return 'mp4';
+    if (hex.startsWith('1a45dfa3')) return 'mkv';
+    if (hex.startsWith('fff') || hex.startsWith('494433')) return 'mp3';
+    if (hex.startsWith('4f676753')) return 'ogg';
+    if (hex.startsWith('664c6143')) return 'flac';
+    if (hex.startsWith('25504446')) return 'pdf';
+    if (hex.startsWith('504b0304')) return 'zip';
+
+    return null;
+}
+
+function isAnimatedWebp(buffer) {
+    return buffer.indexOf(Buffer.from('414e494d', 'hex')) !== -1;
 }
