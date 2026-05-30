@@ -1,6 +1,6 @@
 /**
  * ╔══════════════════════════════════════╗
- * ║   .repo — CODY Creator Panel         ║
+ * ║   .repo — C2582 Creator Panel         ║
  * ║   Powered by CRYSNOVA AI             ║
  * ╚══════════════════════════════════════╝
  */
