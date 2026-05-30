@@ -10,7 +10,7 @@ module.exports = {
     alias: ['github', 'source', 'cody'],
     desc: 'Show CODY creator panel & repositories',
     category: 'Info',
-    reactions: { start: '💠', success: '✨' },
+    reactions: { start: '💠', success: '📑' },
     
     execute: async (sock, m, { reply }) => {
         const REPO_IMG = 'https://cdn.crysnovax.link/files/1778706048639-829fb448-0553-4aed-99fd-a190721dee05.jpeg';
