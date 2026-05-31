@@ -71,7 +71,7 @@ module.exports = {
             db[group].enabled = true;
             saveDB(db);
             let actionText;
-            if (db[group].action === 'delete') actionText = '🗑️ DELETE';
+            if (db[group].action === 'delete') actionText = ' ꙰⊕ DELETE';
             else if (db[group].action === 'warn') actionText = '⚠︎ WARN (3x → KICK)';
             else if (db[group].action === 'kick') actionText = 'ಠ_ಠ KICK';
             return reply(`_*✓ Anti Status Mention*_ *ON*\nAction: *${actionText}*`);
