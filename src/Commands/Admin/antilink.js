@@ -67,7 +67,7 @@ module.exports = {
     reactions: { start: '🖇️', success: '🚫' },
 
     execute: async (sock, m, { args, reply }) => {
-        if (!m.isGroup) return reply('⚉ Group only');
+        if (!m.isGroup) return reply('`⚉ Group only`');
 
         const db = loadDB();
         const group = m.chat;
@@ -81,7 +81,7 @@ module.exports = {
             const permit = cfg.permit.length ? cfg.permit.map(u => `❏ ${u}`).join('\n') : '❏ none';
 
             let actionDisplay;
-            if (cfg.action === 'delete') actionDisplay = '🗑️ DELETE';
+            if (cfg.action === 'delete') actionDisplay = ' ꙰⊕ DELETE';
             else if (cfg.action === 'warn') actionDisplay = '⚠︎ WARN (3x → KICK)';
             else if (cfg.action === 'kick') actionDisplay = 'ಠ_ಠ KICK';
 
@@ -107,7 +107,7 @@ module.exports = {
             cfg.enabled = true;
             saveDB(db);
             let actionText;
-            if (cfg.action === 'delete') actionText = '🗑️ DELETE';
+            if (cfg.action === 'delete') actionText = ' ꙰⊕ DELETE';
             else if (cfg.action === 'warn') actionText = '⚠︎ WARN (3x → KICK)';
             else if (cfg.action === 'kick') actionText = 'ಠ_ಠ KICK';
             return reply(`亗 *AntiLink Enabled*\nAction: ${actionText}`);
@@ -120,7 +120,7 @@ module.exports = {
         if (sub === 'delete') {
             cfg.action = 'delete';
             saveDB(db);
-            return reply(`🗑️ Action → *DELETE* (message deleted)`);
+            return reply(` ꙰⊕ Action → *DELETE* (message deleted)`);
         }
         if (sub === 'warn') {
             cfg.action = 'warn';
@@ -147,7 +147,7 @@ module.exports = {
             if (idx === -1) return reply('`✘ Link not found in allowlist.`');
             cfg.whitelist.splice(idx, 1);
             saveDB(db);
-            return reply(`🗑️ Removed from allowlist:\n❏ ${url}`);
+            return reply(` ꙰ Removed from allowlist:\n❏ ${url}`);
         }
         if (sub === 'permit') {
             const url = args[1]?.trim();
@@ -164,7 +164,7 @@ module.exports = {
             if (idx === -1) return reply('`✘ Prefix not found in permit list.`');
             const removed = cfg.permit.splice(idx, 1);
             saveDB(db);
-            return reply(`🗑️ Removed from permit:\n❏ ${removed[0]}`);
+            return reply(` ꙰ Removed from permit:\n❏ ${removed[0]}`);
         }
         if (sub === 'allowlist') {
             if (!cfg.whitelist.length) return reply(`❏ No allowed links.`);
