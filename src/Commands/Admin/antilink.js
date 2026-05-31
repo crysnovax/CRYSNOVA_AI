@@ -26,10 +26,11 @@ function saveWarns(data) {
 
 function ensureGroupConfig(db, group) {
     if (!db[group]) {
-        db[group] = { enabled: false, action: 'delete', whitelist: [], permit: [] };
+        db[group] = { enabled: false, action: 'delete', whitelist: [], permit: [], domains: [] };
     } else {
         if (!db[group].hasOwnProperty('whitelist')) db[group].whitelist = [];
         if (!db[group].hasOwnProperty('permit')) db[group].permit = [];
+        if (!db[group].hasOwnProperty('domains')) db[group].domains = [];
         if (!db[group].hasOwnProperty('action')) db[group].action = 'delete';
         if (!db[group].hasOwnProperty('enabled')) db[group].enabled = false;
     }
@@ -45,6 +46,17 @@ function extractUrls(text) {
     return matches || [];
 }
 
+function extractDomains(urls) {
+    const domains = [];
+    for (const url of urls) {
+        try {
+            const domain = url.replace(/^https?:\/\//i, '').replace(/\/.*$/, '').toLowerCase();
+            domains.push(domain);
+        } catch (e) {}
+    }
+    return domains;
+}
+
 function isUrlAllowed(urls, whitelist) {
     if (!whitelist || !whitelist.length) return false;
     return urls.some(url => whitelist.some(allowed => url === allowed));
@@ -57,10 +69,18 @@ function isPermitted(urls, permitList) {
     ));
 }
 
+function isDomainAllowed(urls, domainList) {
+    if (!domainList || !domainList.length) return false;
+    const domains = extractDomains(urls);
+    return domains.some(domain => domainList.some(allowedDomain => 
+        domain === allowedDomain.toLowerCase() || domain.endsWith('.' + allowedDomain.toLowerCase())
+    ));
+}
+
 module.exports = {
     name: 'antilink',
     alias: ['al'],
-    desc: 'Block links, with allow (exact URL), permit (URL prefix), delete/warn/kick actions',
+    desc: 'Block links, with allow (exact URL), permit (URL prefix), domain whitelist, delete/warn/kick actions',
     category: 'Admin',
     groupOnly: true,
     adminOnly: true,
@@ -79,6 +99,7 @@ module.exports = {
         if (!sub) {
             const whitelist = cfg.whitelist.length ? cfg.whitelist.map(u => `❏ ${u}`).join('\n') : '❏ none';
             const permit = cfg.permit.length ? cfg.permit.map(u => `❏ ${u}`).join('\n') : '❏ none';
+            const domains = cfg.domains.length ? cfg.domains.map(d => `❏ ${d}`).join('\n') : '❏ none';
 
             let actionDisplay;
             if (cfg.action === 'delete') actionDisplay = ' ꙰⊕ DELETE';
@@ -91,15 +112,19 @@ module.exports = {
                 `• Action : ${actionDisplay}\n\n` +
                 `*Allowed (exact link)*:\n${whitelist}\n\n` +
                 `*Permit (link starts with)*:\n${permit}\n\n` +
+                `*Domains (whitelisted)*:\n${domains}\n\n` +
                 `Commands:\n` +
                 `• .antilink on / off\n` +
                 `• .antilink delete / warn / kick\n` +
+                `• .antilink add <domain>\n` +
+                `• .antilink remove <domain>\n` +
                 `• .antilink allow <full_link>\n` +
                 `• .antilink disallow <full_link>\n` +
                 `• .antilink permit <url_prefix>\n` +
                 `• .antilink unpermit <url_prefix>\n` +
-                `• .antilink allowlist / permitlist\n` +
-                `• .antilink resetwarn @user`
+                `• .antilink allowlist / permitlist / domainlist\n` +
+                `• .antilink resetwarn @user\n` +
+                `• .antilink clear`
             );
         }
 
@@ -132,6 +157,45 @@ module.exports = {
             saveDB(db);
             return reply(`ಠ_ಠ Action → *KICK* (immediate removal)`);
         }
+
+        // ── NEW: ADD DOMAIN ──────────────────────────────────────────────
+        if (sub === 'add') {
+            const domain = args[1]?.trim().toLowerCase();
+            if (!domain) return reply(`✐ Usage: .antilink add <domain>\nExample: .antilink add github.com`);
+            
+            // Remove http://, https://, www., and trailing slashes
+            let cleanDomain = domain.replace(/^https?:\/\//i, '').replace(/^www\./, '').replace(/\/$/, '');
+            
+            if (cfg.domains.includes(cleanDomain)) return reply('`✘ Domain already whitelisted.`');
+            cfg.domains.push(cleanDomain);
+            saveDB(db);
+            return reply(`✓ Domain whitelisted:\n❏ ${cleanDomain}\n\n_Any link containing this domain will be allowed._`);
+        }
+
+        // ── NEW: REMOVE DOMAIN ───────────────────────────────────────────
+        if (sub === 'remove') {
+            const domain = args[1]?.trim().toLowerCase();
+            if (!domain) return reply('`✐ Usage: .antilink remove <domain>`');
+            
+            let cleanDomain = domain.replace(/^https?:\/\//i, '').replace(/^www\./, '').replace(/\/$/, '');
+            const idx = cfg.domains.indexOf(cleanDomain);
+            if (idx === -1) return reply('`✘ Domain not found in whitelist.`');
+            cfg.domains.splice(idx, 1);
+            saveDB(db);
+            return reply(` ꙰ Removed domain from whitelist:\n❏ ${cleanDomain}`);
+        }
+
+        // ── NEW: CLEAR ALL SETTINGS ──────────────────────────────────────
+        if (sub === 'clear') {
+            cfg.enabled = false;
+            cfg.action = 'delete';
+            cfg.whitelist = [];
+            cfg.permit = [];
+            cfg.domains = [];
+            saveDB(db);
+            return reply(`۞ *AntiLink Settings Cleared*\n\n• Status: OFF\n• Action: DELETE\n• All whitelists, permits, and domains removed.`);
+        }
+
         if (sub === 'allow') {
             const url = args[1]?.trim();
             if (!url || !url.startsWith('http')) return reply(`✐ Usage: .antilink allow <full_link>\nExample: .antilink allow https://youtube.com/watch?v=abc123`);
@@ -178,6 +242,12 @@ module.exports = {
             text += cfg.permit.map(u => `❏ ${u}`).join('\n');
             return reply(text);
         }
+        if (sub === 'domainlist') {
+            if (!cfg.domains.length) return reply(`❏ No whitelisted domains.`);
+            let text = `✓ *Whitelisted Domains*:\n`;
+            text += cfg.domains.map(d => `❏ ${d}`).join('\n');
+            return reply(text);
+        }
         if (sub === 'resetwarn') {
             const mentioned = m.mentionedJid?.[0];
             if (!mentioned) return reply('`✐ Usage: .antilink resetwarn @user`');
@@ -191,7 +261,7 @@ module.exports = {
             return reply('`✘ User has no warnings.`');
         }
 
-        return reply(`𒆜 Usage:\n.antilink on/off\n.antilink delete/warn/kick\n.antilink allow <full_link>\n.antilink disallow <full_link>\n.antilink permit <url_prefix>\n.antilink unpermit <url_prefix>\n.antilink allowlist/permitlist\n.antilink resetwarn @user`);
+        return reply(`𒆜 Usage:\n.antilink on/off\n.antilink delete/warn/kick\n.antilink add <domain>\n.antilink remove <domain>\n.antilink allow <full_link>\n.antilink disallow <full_link>\n.antilink permit <url_prefix>\n.antilink unpermit <url_prefix>\n.antilink allowlist/permitlist/domainlist\n.antilink resetwarn @user\n.antilink clear`);
     }
 };
 
@@ -216,7 +286,7 @@ module.exports.handleAntiLink = async function(sock, m) {
             m.body,
             msg.conversation,
             msg.extendedTextMessage?.text,
-            msg.extendedTextMessage?.matchedText,  // ← URL embedded in rich-text messages
+            msg.extendedTextMessage?.matchedText,
             msg.imageMessage?.caption,
             msg.videoMessage?.caption,
             msg.documentMessage?.caption,
@@ -235,6 +305,9 @@ module.exports.handleAntiLink = async function(sock, m) {
 
         // Check permit list (URL starts with prefix)
         if (cfg.permit && cfg.permit.length && isPermitted(urls, cfg.permit)) return;
+
+        // ── NEW: Check domain whitelist ──
+        if (cfg.domains && cfg.domains.length && isDomainAllowed(urls, cfg.domains)) return;
 
         const meta = await sock.groupMetadata(group).catch(() => null);
         if (!meta) return;
@@ -270,7 +343,6 @@ module.exports.handleAntiLink = async function(sock, m) {
             saveWarns(warns);
 
             const warnCount = warns[warnKey].count;
-        //    console.log(`[ANTILINK WARN] ${sender.split('@')[0]} now has ${warnCount}/3 warnings`);
 
             if (warnCount >= 3) {
                 delete warns[warnKey];
@@ -298,7 +370,6 @@ module.exports.handleAntiLink = async function(sock, m) {
             await sock.groupParticipantsUpdate(group, [sender], 'remove').catch(() => {});
         }
 
-    //    console.log(`[ANTILINK] ${action} → ${sender.split('@')[0]} | urls: ${urls.join(', ')}`);
     } catch (err) {
         console.error('[ANTILINK ERROR]', err.message);
     }
