@@ -50,7 +50,7 @@ module.exports = {
         if (!sub) {
             const cfg = db[group];
             let actionDisplay;
-            if (cfg.action === 'delete') actionDisplay = '🗑️ DELETE';
+            if (cfg.action === 'delete') actionDisplay = ' ꙰⊕ DELETE';
             else if (cfg.action === 'warn') actionDisplay = '⚠︎ WARN (3x → KICK)';
             else if (cfg.action === 'kick') actionDisplay = 'ಠ_ಠ KICK';
             
