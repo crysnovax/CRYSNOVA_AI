@@ -11,49 +11,50 @@ module.exports = {
 
             const cmd = m.body.toLowerCase().split(/\s+/)[0].slice(1)
 
-            let link = args[0] || (m.quoted && (m.quoted.body || m.quoted.text)) || ''
+            // Collect all text sources
+            const sources = [
+                args.join(' '),
+                m.quoted?.body || '',
+                m.quoted?.text || '',
+                m.quoted?.caption || ''
+            ].join(' ').trim()
 
-            if (!link)
-                return reply('*_✘ Add a link*_')
+            if (!sources.trim()) return reply('*_✘ Add a link*_')
 
-            // Auto-prepend https:// if no protocol present
-            if (!/^https?:\/\//i.test(link)) {
-                link = 'https://' + link
+            // Extract ALL urls
+            const urlRegex = /(https?:\/\/[^\s]+|[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[^\s]*)/g
+            const rawMatches = sources.match(urlRegex) || []
+
+            // Normalize — prepend https:// to bare domains
+            const urls = [...new Set(
+                rawMatches.map(u => !/^https?:\/\//i.test(u) ? 'https://' + u : u)
+            )]
+
+            if (!urls.length) return reply('_*𓄄 No valid urls found*_')
+
+            await sock.sendMessage(m.chat, { react: { text: '📸', key: m.key } })
+
+            let device = 'desktop'
+            if (cmd === 'wssp' || cmd === 'wssmobile') device = 'phone'
+            if (cmd === 'wsstab')  device = 'tablet'
+            if (cmd === 'wssfull') device = 'full'
+
+            // Screenshot each url
+            for (const targetUrl of urls) {
+                try {
+                    const api = `https://api-rebix.zone.id/api/ssweb?url=${encodeURIComponent(targetUrl)}&device=${device}`
+                    const res = await axios.get(api, { responseType: 'arraybuffer' })
+                    const buffer = Buffer.from(res.data)
+
+                    await sock.sendMessage(m.chat, { image: buffer }, { quoted: m })
+                } catch (err) {
+                    await reply(`_*𓄄 Failed for:*_ ${targetUrl}`)
+                }
             }
-
-            const urlRegex = /(https?:\/\/[^\s]+)/g
-            const foundLinks = link.match(urlRegex)
-            const targetUrl = foundLinks ? foundLinks[0] : null
-
-            if (!targetUrl)
-                return reply('_*𓄄 Invalid url*_')
-
-            await sock.sendMessage(m.chat, {
-                react: { text: "📸", key: m.key }
-            })
-
-            let device = "desktop"
-
-            if (cmd === "wssp" || cmd === "wssmobile") device = "phone"
-            if (cmd === "wsstab") device = "tablet"
-            if (cmd === "wssfull") device = "full"
-            if (cmd === "wss") device = "desktop"
-
-            const api = `https://api-rebix.zone.id/api/ssweb?url=${encodeURIComponent(targetUrl)}&device=${device}`
-
-            const res = await axios.get(api, { responseType: 'arraybuffer' })
-
-            const buffer = Buffer.from(res.data)
-
-            await sock.sendMessage(
-                m.chat,
-                { image: buffer },
-                { quoted: m }
-            )
 
         } catch (err) {
             console.log(err.message)
             reply('_*✘ error*_')
         }
     }
-                }
+}
