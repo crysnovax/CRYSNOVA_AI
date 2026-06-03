@@ -4,7 +4,7 @@ module.exports = {
     desc: 'Mention all group members',
     category: 'Admin',
     groupOnly: true,
-    adminOnly: true,
+    adminOnly: false,
      // ⭐ Reaction config
     reactions: {
         start: '💬',
