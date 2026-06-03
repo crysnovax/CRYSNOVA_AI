@@ -1,12 +1,12 @@
 /**
  * CRYSNOVA AI V2 — Auto Status Handler
- * Auto like + Auto Save
+ * Auto view + Auto like + Auto Save
  */
-const { getVar } = require('./configManager');
 const chalk      = require('chalk');
 const fs         = require('fs');
 const path       = require('path');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+const { downloadContentFromMessage } = require('@crysnovax/baileys');
+const { getVar }  = require('./configManager');
 
 const seen = new Set();
 
@@ -66,6 +66,54 @@ async function autoSaveStatus(sock, msg) {
     }
 }
 
+// ── MARK AS VIEWED ────────────────────────────────────────────────
+async function markStatusViewed(sock, msg) {
+    try {
+        const reactJid = msg.key.remoteJidAlt || msg.key.participant;
+
+        await sock.sendReceipt(
+            'status@broadcast',
+            reactJid,
+            [msg.key.id],
+            'read'
+        );
+
+        const poster = msg.key.participant || '';
+        console.log(chalk.cyan(`[STATUS] Viewed: ${poster.split('@')[0]}`));
+        return true;
+    } catch (err) {
+        console.log(chalk.red(`[STATUS] View failed: ${err.message}`));
+        return false;
+    }
+}
+
+// ── SEND LIKE ─────────────────────────────────────────────────────
+async function sendStatusReaction(sock, msg) {
+    try {
+        const reactJid = msg.key.remoteJidAlt || msg.key.participant;
+
+        await sock.sendMessage(
+            'status@broadcast',
+            {
+                react: {
+                    text: '💚',
+                    key:  msg.key
+                }
+            },
+            {
+                statusJidList: [reactJid]
+            }
+        );
+
+        const poster = msg.key.participant || '';
+        console.log(chalk.magenta(`[STATUS] Liked: ${poster.split('@')[0]}`));
+        return true;
+    } catch (err) {
+        console.log(chalk.red(`[STATUS] Like failed: ${err.message}`));
+        return false;
+    }
+}
+
 const setupStatusHandler = (sock) => {
 
     sock.ev.on('messages.upsert', async ({ messages }) => {
@@ -79,38 +127,30 @@ const setupStatusHandler = (sock) => {
                 if (msgId) seen.add(msgId);
 
                 const posterJid = msg.key.participant;
-                const posterNum = (posterJid || '').split('@')[0];
-                const reactJid  = msg.key.remoteJidAlt || posterJid;
+                if (!posterJid) continue;
 
-                const autoLike  = getVar('AUTO_STATUS_LIKE', true);
+                // Read fresh from runtime every time
+                const autoView = getVar('AUTO_STATUS_VIEW', true);
+                const autoLike = getVar('AUTO_STATUS_LIKE', true);
+
+                // ── Auto View ─────────────────────────────────
+                if (autoView) {
+                    await markStatusViewed(sock, msg);
+                }
 
                 // ── Auto Like ─────────────────────────────────
-                if (autoLike && reactJid) {
-                    await new Promise(r => setTimeout(r, 600 + Math.random() * 1200));
-
-                    await sock.sendMessage(
-                        'status@broadcast',
-                        {
-                            react: {
-                                text: '💚',
-                                key:  msg.key
-                            }
-                        },
-                        {
-                            statusJidList: [reactJid]
-                        }
-                    ).catch((err) => {
-                        console.log(chalk.red(`[STATUS] Like failed: ${err.message}`));
-                    });
-
-                    console.log(chalk.magenta(`[STATUS] Liked: ${reactJid.split('@')[0]}`));
+                if (autoLike) {
+                    await new Promise(r => setTimeout(r, 1000));
+                    await sendStatusReaction(sock, msg);
                 }
 
                 // ── Auto Save ─────────────────────────────────
                 await autoSaveStatus(sock, msg);
 
-            } catch {
-                // Always silent
+            } catch (err) {
+                if (err.message && !err.message.includes('timeout')) {
+                    console.log(chalk.red('[STATUS ERROR]'), err.message);
+                }
             }
         }
     });
