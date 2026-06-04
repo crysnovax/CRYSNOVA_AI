@@ -26,7 +26,7 @@ module.exports = {
                 });
                 const timeTaken = Date.now() - startTime;
                 const output = (result || 'No output').slice(0, 4000);
-                return reply(`*☢︎* _(${timeTaken}ms)_\n\`\`\`\n${output}\n\`\`\``);
+                return reply(`*�* _(${timeTaken}ms)_\n\`\`\`\n${output}\n\`\`\``);
             } catch (err) {
                 const timeTaken = Date.now() - startTime;
                 const errOutput = (err.stdout || err.stderr || err.message).slice(0, 4000);
@@ -97,10 +97,8 @@ module.exports = {
 
             let wrappedCode;
             if (isMultiLine || hasDeclaration) {
-                // Multi-line or declaration — run as-is, no auto return
                 wrappedCode = `(async () => { ${text} })()`;
             } else {
-                // Single expression — auto return
                 wrappedCode = `(async () => { return ${text} })()`;
             }
 
@@ -112,24 +110,74 @@ module.exports = {
 
             const timeTaken = Date.now() - startTime;
 
+            // ── SMART FILTER: ONLY filter obvious WhatsApp send responses ──
+            function isWhatsAppSendResponse(result) {
+                if (!result) return false;
+                
+                // Check if it's a reaction message response
+                if (result.message?.reactionMessage) return true;
+                
+                // Check if it's a sendMessage response with key but no meaningful data
+                if (result.key && result.messageTimestamp && !result.conversation && !result.text) {
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            // ── CHECK IF USER WANTS RAW OUTPUT (by adding .raw to the command) ──
+            const wantsRaw = text.includes('.raw') || text.includes('//raw');
+            
             // Build output
             let output = '';
             if (consoleOutput) output += consoleOutput.trimEnd();
-
-            if (result !== undefined) {
-                const resultStr = typeof result === 'object'
-                    ? util.inspect(result, { depth: 3, colors: false })
-                    : String(result);
+            
+            // Handle result
+            const isSendResponse = !wantsRaw && isWhatsAppSendResponse(result);
+            
+            if (isSendResponse) {
+                // Filter out WhatsApp send responses - just react silently
+            //    await sock.sendMessage(m.chat, { react: { text: '🍁', key: m.key } }).catch(() => {});
+                // Don't show any output
+                if (!consoleOutput) return;
+            } else if (result !== undefined) {
+                // Show result normally (including m.quoted, m.isGroup, etc.)
+                let resultStr;
+                
+                if (Buffer.isBuffer(result)) {
+                    resultStr = `<Buffer ${result.length} bytes>`;
+                } else if (typeof result === 'function') {
+                    resultStr = `[Function: ${result.name || 'anonymous'}]`;
+                } else if (typeof result === 'object') {
+                    // Always show objects properly - this includes m.quoted, m.chat, etc.
+                    resultStr = util.inspect(result, { 
+                        depth: wantsRaw ? 5 : 3, 
+                        colors: false, 
+                        maxArrayLength: wantsRaw ? 50 : 20,
+                        breakLength: wantsRaw ? 80 : 60
+                    });
+                    
+                    // Truncate only if extremely long
+                    if (resultStr.length > 8000) {
+                        resultStr = resultStr.slice(0, 8000) + '\n... (truncated)';
+                    }
+                } else {
+                    resultStr = String(result);
+                }
+                
                 if (output) output += '\n' + resultStr;
                 else output = resultStr;
             }
-
-            // Only reply if there's actual output
+            
+            // Send response if there's output
             if (output && output.trim() && output.trim() !== 'undefined') {
-                reply(`*�* _(${timeTaken}ms)_\n\`\`\`\n${output.slice(0, 4000)}\n\`\`\``);
-            } else if (!consoleOutput && result === undefined) {
-                // Completely silent — no output at all
-                await sock.sendMessage(m.chat, { react: { text: '🐾', key: m.key } }).catch(() => {});
+                const finalOutput = output.slice(0, 4000);
+                await reply(`*✆ Result* _(${timeTaken}ms)_\n\`\`\`\n${finalOutput}\n\`\`\``);
+            } else if (!consoleOutput && (result === undefined || isSendResponse)) {
+                // Silent operation
+                if (!isSendResponse) {
+                    await sock.sendMessage(m.chat, { react: { text: '🐾', key: m.key } }).catch(() => {});
+                }
             }
 
         } catch (err) {
@@ -145,4 +193,3 @@ module.exports = {
         }
     }
 };
-                
