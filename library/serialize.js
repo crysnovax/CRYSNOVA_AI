@@ -130,6 +130,164 @@ const smsg = async (sock, m, store) => {
     m.copyNForward = (jid = m.chat, forceForward = false, options = {}) => 
         sock.copyNForward(jid, m, forceForward, options)
 
+    // ── ADDED: react method ──────────────────────────────────────────
+    m.react = async (emoji) => {
+        return await sock.sendMessage(m.chat, { react: { text: emoji, key: m.key } });
+    };
+
+    // ── ADDED: send method (simple text send) ─────────────────────────
+    m.send = async (content, options = {}) => {
+        if (typeof content === 'string') {
+            return await sock.sendMessage(m.chat, { text: content }, { quoted: m, ...options });
+        }
+        return await sock.sendMessage(m.chat, content, { quoted: m, ...options });
+    };
+
+    // ── ADDED: sendErr method for error messages ──────────────────────
+    m.sendErr = async (error) => {
+        return await m.send(`✘ *Error:*\n\`\`\`${error?.message || error}\`\`\``);
+    };
+
+    // ── ADDED: isAdmin check ──────────────────────────────────────────
+    m.isAdmin = false;
+    m.isBotAdmin = false;
+    
+    if (m.isGroup) {
+        try {
+            const groupMetadata = await sock.groupMetadata(m.chat);
+            const participants = groupMetadata.participants;
+            
+            const senderJid = m.sender;
+            const botJid = sock.user.id;
+            
+            m.isAdmin = participants.some(p => 
+                (p.id === senderJid || p.id.split('@')[0] === senderJid.split('@')[0]) && 
+                (p.admin === 'admin' || p.admin === 'superadmin')
+            );
+            
+            m.isBotAdmin = participants.some(p => 
+                (p.id === botJid || p.id.split('@')[0] === botJid.split('@')[0]) && 
+                (p.admin === 'admin' || p.admin === 'superadmin')
+            );
+        } catch (err) {
+            console.error('[ADMIN CHECK ERROR]', err.message);
+        }
+    }
+
+    // ── ADDED: pin method (pin/unpin message) ─────────────────────────
+    m.pin = async (time = 86400) => {
+        return await sock.sendMessage(m.chat, {
+            pin: m.key,
+            time: time,
+            type: 1
+        });
+    };
+
+    m.unpin = async () => {
+        return await sock.sendMessage(m.chat, {
+            pin: m.key,
+            type: 0
+        });
+    };
+
+    // ── ADDED: forward method ─────────────────────────────────────────
+    m.forward = async (jid, options = {}) => {
+        return await sock.copyNForward(jid, m, options);
+    };
+
+    // ── ADDED: delete method ──────────────────────────────────────────
+    m.delete = async () => {
+        return await sock.sendMessage(m.chat, { delete: m.key });
+    };
+
+    // ── ADDED: edit method (edit text message) ────────────────────────
+    m.edit = async (newText) => {
+        return await sock.sendMessage(m.chat, {
+            text: newText,
+            edit: m.key
+        });
+    };
+
+    // ── ADDED: btnText method for interactive buttons ─────────────────
+    m.btnText = async (title, buttonsObj, btnLabel = '⚉ Select') => {
+        const rows = Object.entries(buttonsObj).map(([id, label]) => ({
+            header: '',
+            title: label,
+            description: '',
+            id
+        }));
+
+        try {
+            return await sock.sendMessage(m.chat, {
+                text: title,
+                footer: 'Powered by CRYSNOVA AI',
+                buttons: [{
+                    text: btnLabel,
+                    sections: [{ title: '⚉ Options', rows }]
+                }]
+            }, { quoted: m });
+        } catch (err) {
+            const lines = Object.entries(buttonsObj)
+                .map(([cmd, label]) => `◦ ${label}  ›  \`${cmd}\``)
+                .join('\n');
+            return await m.send(`*${title}*\n\n${lines}`);
+        }
+    };
+
+    // ── ADDED: sendImage method ───────────────────────────────────────
+    m.sendImage = async (image, caption = '', options = {}) => {
+        return await sock.sendMessage(m.chat, {
+            image: typeof image === 'string' ? { url: image } : image,
+            caption: caption
+        }, { quoted: m, ...options });
+    };
+
+    // ── ADDED: sendVideo method ───────────────────────────────────────
+    m.sendVideo = async (video, caption = '', options = {}) => {
+        return await sock.sendMessage(m.chat, {
+            video: typeof video === 'string' ? { url: video } : video,
+            caption: caption
+        }, { quoted: m, ...options });
+    };
+
+    // ── ADDED: sendAudio method ───────────────────────────────────────
+    m.sendAudio = async (audio, ptt = false, options = {}) => {
+        return await sock.sendMessage(m.chat, {
+            audio: typeof audio === 'string' ? { url: audio } : audio,
+            ptt: ptt
+        }, { quoted: m, ...options });
+    };
+
+    // ── ADDED: sendSticker method ─────────────────────────────────────
+    m.sendSticker = async (sticker, options = {}) => {
+        return await sock.sendMessage(m.chat, {
+            sticker: typeof sticker === 'string' ? { url: sticker } : sticker
+        }, { quoted: m, ...options });
+    };
+
+    // ── ADDED: sendDocument method ────────────────────────────────────
+    m.sendDocument = async (document, fileName, caption = '', options = {}) => {
+        return await sock.sendMessage(m.chat, {
+            document: typeof document === 'string' ? { url: document } : document,
+            fileName: fileName,
+            caption: caption
+        }, { quoted: m, ...options });
+    };
+
+    // ── ADDED: sendButton method (simple buttons) ─────────────────────
+    m.sendButton = async (text, buttons, footer = '⚉ Select an option') => {
+        const buttonArray = buttons.map(btn => ({
+            text: btn.text,
+            buttonId: btn.id
+        }));
+        
+        return await sock.sendMessage(m.chat, {
+            text: text,
+            footer: footer,
+            buttons: buttonArray
+        }, { quoted: m });
+    };
+
     return m
 }
 
