@@ -12,12 +12,13 @@ module.exports = {
     groupOnly: true,
     adminOnly: true,
     execute: async (sock, m, { text, reply }) => {
-        if (!text) return reply('✐ Usage: _.setwelcome Your welcome text here_\n_Use @user for member name_');
+        const content = text || m.quoted?.body || m.quoted?.text || '';
+        if (!content) return reply('✐ Usage: _.setwelcome Your welcome text here_\n_Use @user for member name_');
         const db = readDB();
         if (!db[m.chat]) db[m.chat] = {};
         db[m.chat].welcomeEnabled = true;
-        db[m.chat].welcome = text;
+        db[m.chat].welcome = content;
         writeDB(db);
-        await reply('`Welcome message set!`');
+        await reply('`Welcome message set!`', { quoted: m });
     }
 };
