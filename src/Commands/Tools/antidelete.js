@@ -114,20 +114,20 @@ async function buildCaption(sock, msgObj, chatJid, isGroup) {
 async function sendDeletedMsg(sock, targetJid, msgObj, chatJid, isGroup) {
     const message = msgObj?.message;
     if (!message) {
-        console.log('[ANTIDELETE] No message content to forward');
+       // console.log('[ANTIDELETE] No message content to forward');
         return;
     }
 
     const msgType = resolveType(message);
     if (!msgType) {
-        console.log('[ANTIDELETE] Unknown message type');
+   //     console.log('[ANTIDELETE] Unknown message type');
         return;
     }
 
     const { header, footer, sender } = await buildCaption(sock, msgObj, chatJid, isGroup);
     
     if (!sender) {
-        console.log('[ANTIDELETE] Could not determine sender, skipping');
+//        console.log('[ANTIDELETE] Could not determine sender, skipping');
         return;
     }
 
@@ -361,7 +361,7 @@ module.exports = {
 
             for (const update of updates) {
                 if (!update || !update.key) {
-                    console.log('[ANTIDELETE] Skipping invalid update (no key)');
+              //      console.log('[ANTIDELETE] Skipping invalid update (no key)');
                     continue;
                 }
 
@@ -372,13 +372,13 @@ module.exports = {
                                   update.update?.status === 0;
 
                 if (!isDeleted) {
-                    console.log('[ANTIDELETE] Update is not a deletion, skipping');
+           //         console.log('[ANTIDELETE] Update is not a deletion, skipping');
                     continue;
                 }
 
                 const remoteJid = update.key.remoteJid;
                 if (!remoteJid) {
-                    console.log('[ANTIDELETE] Skipping update with no remoteJid');
+          //          console.log('[ANTIDELETE] Skipping update with no remoteJid');
                     continue;
                 }
 
@@ -424,7 +424,7 @@ module.exports = {
                 }
 
                 if (!msgObj) {
-                    console.log('[ANTIDELETE] Could not find deleted message anywhere');
+        //            console.log('[ANTIDELETE] Could not find deleted message anywhere');
                     continue;
                 }
 
@@ -435,7 +435,7 @@ module.exports = {
 
                 const botId = sock.user?.id?.split(':')[0] + '@s.whatsapp.net';
                 if (!botId) {
-                    console.log('[ANTIDELETE] Could not get bot ID');
+        //            console.log('[ANTIDELETE] Could not get bot ID');
                     continue;
                 }
 
@@ -462,10 +462,10 @@ module.exports = {
                 if (!sender && update?.key?.remoteJid) sender = update.key.remoteJid;
 
                 const senderNum = sender ? sender.split('@')[0] : 'unknown';
-                console.log(
-                    '[ANTIDELETE] ' + senderNum + ' in ' + 
-                    (isGroup ? 'Group' : 'DM') + ' → ' + mode
-                );
+        //        console.log(
+               //     '[ANTIDELETE] ' + senderNum + ' in ' + 
+               //     (isGroup ? 'Group' : 'DM') + ' → ' + mode
+             //   );
             }
         } catch (err) {
             console.error('[ANTIDELETE ERROR]', err);
@@ -473,3 +473,4 @@ module.exports = {
     }
 };
 
+                
