@@ -33,7 +33,7 @@ const sendCatalog = async (sock, m, products, nextPageCursor, label, limit) => {
                 ? { url: imageUrl }
                 : { url: 'https://via.placeholder.com/400x400/10b981/FFFFFF?text=No+Image' },
             caption: [
-                `*${p.name || 'Unnamed Product'}*`,
+                `*${p.name || '� Unnamed Product'}*`,
                 `💰 ${price}`,
                 p.description ? `📝 ${p.description}` : null,
                 `📦 ${p.availability || 'in stock'}`,
@@ -41,10 +41,10 @@ const sendCatalog = async (sock, m, products, nextPageCursor, label, limit) => {
             ].filter(Boolean).join('\n'),
             footer: `⚉ ${BOT_NAME} Business`,
             nativeFlow: [{
-                text: '🛒 View Product',
+                text: '🛒 ⊹ View Product',
                 url: productUrl
             }, {
-                text: '💬 Inquire',
+                text: '� Inquire ✆',
                 copy: `Hi! I'm interested in: ${p.name} (ID: ${p.id})`
             }]
         };
@@ -63,11 +63,11 @@ const sendCatalog = async (sock, m, products, nextPageCursor, label, limit) => {
     }
 };
 
-const USAGE = `🛒 *CATALOG USAGE*
+const USAGE = `🛒 *CATALOG USAGE �*
 
-⚉ *.catalog* — show this guide
-⚉ *.catalog me* — browse my own catalog
-⚉ *.catalog here* — browse this contact's catalog (falls back to mine if they have none)
+☁︎  *.catalog* — show this guide
+⌬ • *.catalog me* — browse my own catalog
+⌬ • *.catalog here* — browse this contact's catalog (falls back to mine if they have none)
 
 _Works in DMs only_`;
 
