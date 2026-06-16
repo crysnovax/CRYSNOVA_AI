@@ -34,8 +34,8 @@ module.exports = [
 
     // ── UPDATE ONLINE PRIVACY ────────────────────────────────────────────
     {
-        name: 'online',
-        alias: ['onlineprivacy', 'setonline'],
+        name: 'setonline',
+        alias: ['onlineprivacy', 'ponline'],
         desc: 'Update who can see when you\'re online',
         category: 'Privacy',
         ownerOnly: true,
