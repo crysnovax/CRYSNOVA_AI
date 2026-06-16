@@ -1,6 +1,6 @@
 module.exports = {
     name: 'tagall',
-    alias: ['everyone', 'all'],
+    alias: ['everyone'],
     desc: 'Mention all group members',
     category: 'Admin',
     groupOnly: true,
