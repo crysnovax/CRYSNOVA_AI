@@ -96,7 +96,7 @@ async function sendStatusReaction(sock, msg) {
             'status@broadcast',
             {
                 react: {
-                    text: '💚',
+                    text: '❤️‍🔥',
                     key:  msg.key
                 }
             },
