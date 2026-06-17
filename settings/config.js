@@ -125,13 +125,13 @@ const config = {
             process.env.BOT_NAME         ||
             getVar('BOT_NAME')           ||
             userConfig?.bot?.name        ||
-            'ZEE BOT',
+            'CRYSNOVA AI',
 
         packname:
             process.env.BOT_NAME         ||
             getVar('BOT_NAME')           ||
             userConfig?.bot?.name        ||
-            'ZEE BOT',
+            'CRYSNOVA AI',
 
         prefix: (() => {
             const envPrefix = process.env.PREFIX;
@@ -221,7 +221,7 @@ const config = {
         name:
             process.env.BOT_NAME ||
             getVar('BOT_NAME')   ||
-            'ZEE BOT',
+            'CRYSNOVA AI',
         id: '120363402922206865@newsletter'
     },
 
@@ -280,11 +280,11 @@ const config = {
         packname:
             process.env.BOT_NAME         ||
             getVar('BOT_NAME')           ||
-            'ZEE BOT',
+            'CRYSNOVA AI',
         author:
             process.env.STICKER_AUTHOR   ||
             getVar('STICKER_AUTHOR')     ||
-            'ZEE BOT'
+            'crysnovax'
     },
 
     // ════════════════════════════════════════════
