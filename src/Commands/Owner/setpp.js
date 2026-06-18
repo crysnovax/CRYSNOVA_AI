@@ -1,4 +1,4 @@
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys')
+const { downloadContentFromMessage } = require('@crysnovax/baileys')
 
 module.exports = {
     name: "setpp",
@@ -38,14 +38,21 @@ module.exports = {
                 "image"
             )
 
-            let buffer = Buffer.from([])
+            const chunks = []
+            for await (const chunk of stream) chunks.push(chunk)
+            const buffer = Buffer.concat(chunks)
 
-            for await (const chunk of stream) {
-                buffer = Buffer.concat([buffer, chunk])
-            }
+            // ── Determine Mode ───────────────────────
+            // hd = full-size no crop | standard = 720×720 crop
+            const args = m.text?.trim().split(/\s+/) || []
+            const isHD = args.includes("hd") || args.includes("--hd")
 
             // ── Update Profile Picture ───────────────
-            await sock.updateProfilePicture(sock.user.id, buffer)
+            await sock.updateProfilePicture(
+                sock.user.id,
+                buffer,
+                isHD ? { hd: true } : undefined
+            )
 
             await sock.sendMessage(m.chat, {
                 react: { text: "✨", key: m.key }
@@ -53,8 +60,9 @@ module.exports = {
 
             reply(
 `╭─❍ *PROFILE UPDATED*
-│ ( ͡❛ ₃ ͡❛) Bot profile picture
+│ ( ͡❛ ₃ ͡❛) Bot profile picture
 │   changed successfully
+│ 📐 Mode: ${isHD ? "HD (full-size)" : "Standard (720×720)"}
 ╰─ 𓄄`
             )
 
