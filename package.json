@@ -19,7 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
-    "@crysnovax/baileys": "^2.6.2",
+    "@crysnovax/baileys": "^2.6.3",
     "@crysnovax/baileys-stable": "^1.0.0",
     "@distube/ytdl-core": "^4.16.12",
     "@faker-js/faker": "^10.3.0",
