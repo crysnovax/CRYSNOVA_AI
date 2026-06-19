@@ -1,7 +1,3 @@
-/* I'm still working on this for now it's just a sent text i haven't
- * updated my baileys [ @crysnovax/baileys ^v 2.5.0 ] 
- * to support repost tag... until then please bear with me
- */
 module.exports = {
     name: 'repost',
     alias: ['resend'],
@@ -32,95 +28,97 @@ module.exports = {
                 const code = target.split('chat.whatsapp.com/')[1].split('?')[0];
                 const info = await sock.groupGetInviteInfo(code);
                 target = info.id;
-
                 if (!target) return reply('⊘ Could not resolve group JID.');
-            //    await reply(`🔗 Group detected: ${info.subject}`);
             }
-
             // WA.ME
             else if (target.includes('wa.me/')) {
                 const num = target.split('wa.me/')[1].split('?')[0];
                 target = `${num}@s.whatsapp.net`;
             }
-
             // RAW NUMBER
             else if (!target.includes('@')) {
                 target = `${target}@s.whatsapp.net`;
             }
-
         } catch (e) {
             return reply('⊘ Invalid link or expired invite.');
         }
 
         const q = m.quoted;
+        const mtype = q.mtype || '';
 
-        const text =
-            q.text ||
-            q.caption ||
-            q.body ||
-            q.conversation ||
-            '';
+        const text = q.text || q.caption || q.body || q.conversation || '';
 
+        // ── Download media if needed ────────────────────────────
         let media = null;
+        const hasMedia = /image|video|audio|sticker|document/.test(mtype);
 
-        try {
-            media = await sock.downloadMediaMessage(q);
-        } catch (e) {
-            media = null;
-        }
-
-        // TEXT ONLY
-        if (text && !media) {
-            await sock.sendMessage(target, {
-                text: `${text}`
-            });
-
-      //      return reply('🔁 Reposted as text');
-        }
-
-        // MEDIA SEND
-        if (media) {
+        if (hasMedia) {
             try {
-                if (q.mtype === 'imageMessage') {
-                    await sock.sendMessage(target, {
-                        image: media,
-                        caption: `${q.caption || ''}`
-                    });
-                }
-
-                else if (q.mtype === 'videoMessage') {
-                    await sock.sendMessage(target, {
-                        video: media,
-                        caption: `${q.caption || ''}`
-                    });
-                }
-
-                else if (q.mtype === 'audioMessage') {
-                    await sock.sendMessage(target, {
-                        audio: media,
-                        ptt: q.ptt || false
-                    });
-                }
-
-                else if (q.mtype === 'stickerMessage') {
-                    await sock.sendMessage(target, {
-                        sticker: media
-                    });
-                }
-
-                else {
-                    await sock.sendMessage(target, {
-                        document: media,
-                        fileName: 'repost-file'
-                    });
-                }
-
-     //           return reply('🔁 Reposted successfully');
+                media = await sock.downloadMediaMessage(q);
             } catch (e) {
-                return reply('⊘ Failed to repost media.');
+                return reply('⊘ Failed to download media.');
+            }
+
+            if (!media || !media.length) {
+                return reply('⊘ Media download returned empty buffer.');
             }
         }
 
-        return reply('⊘ Unsupported message type.');
+        // ── Send ────────────────────────────────────────────────
+        try {
+            if (mtype === 'imageMessage') {
+                await sock.sendMessage(target, {
+                    image: media,
+                    caption: q.caption || ''
+                });
+            //    return reply('🔁 Reposted image');
+            }
+
+            if (mtype === 'videoMessage') {
+                await sock.sendMessage(target, {
+                    video: media,
+                    caption: q.caption || ''
+                });
+            //    return reply('🔁 Reposted video');
+            }
+
+            if (mtype === 'audioMessage') {
+                await sock.sendMessage(target, {
+                    audio: media,
+                    ptt: q.ptt || false
+                });
+        //        return reply('🔁 Reposted audio');
+            }
+
+            if (mtype === 'stickerMessage') {
+                // Auto-upgrade stickers to premium 💎
+                await sock.sendMessage(target, {
+                    sticker: media,
+                    premium: 1
+                });
+     //           return reply('🔁 Reposted sticker 💎');
+            }
+
+            if (mtype === 'documentMessage') {
+                await sock.sendMessage(target, {
+                    document: media,
+                    mimetype: q.mimetype || 'application/octet-stream',
+                    fileName: q.fileName || 'repost-file'
+                });
+              //  return reply('🔁 Reposted document');
+            }
+
+            // TEXT ONLY
+            if (text) {
+                await sock.sendMessage(target, { text });
+              //  return reply('🔁 Reposted text');
+            }
+
+          //  return reply('⊘ Unsupported message type.');
+
+        } catch (e) {
+            console.error('REPOST ERROR:', e);
+            return reply(`⊘ Failed to repost: ${e.message}`);
+        }
     }
 };
