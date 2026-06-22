@@ -12,8 +12,8 @@ module.exports = {
         const quoted = m.quoted || m;
         const mime = quoted.mimetype || '';
 
-        if (!/image|video/.test(mime)) {
-            return reply('⚉ Reply to an image or video');
+        if (!/image|video|webp/.test(mime)) {
+            return reply('⚉ Reply to an image, video or sticker');
         }
 
         try {
@@ -29,29 +29,17 @@ module.exports = {
 
             fs.writeFileSync(input, media);
 
+            // ================= STICKER (webp) =================
+            if (/webp/.test(mime)) {
+                // Already a webp — just pass through as-is
+                fs.copyFileSync(input, output);
+            }
             // ================= VIDEO STICKER =================
-            if (/video/.test(mime)) {
-                const duration = (quoted.msg || quoted).seconds || 0;
-                if (duration < 1 || duration > 5) {
-                    fs.unlinkSync(input);
-                    return reply('✘ Video must be between 1s and 5s');
-                }
-
-                const compressVideo = async (fps, quality) => {
-                    const cmd = `ffmpeg -y -i "${input}" -t 5 -vf "fps=${fps},scale=512:512:force_original_aspect_ratio=increase,crop=512:512:(iw-ow)/2:(ih-oh)/2,format=yuva420p" -c:v libwebp -lossless 0 -q:v ${quality} -loop 0 -an -preset default -compression_level 6 "${output}"`;
-                    await new Promise((resolve, reject) => {
-                        exec(cmd, (err) => err ? reject(err) : resolve());
-                    });
-                    return fs.statSync(output).size / 1024;
-                };
-
-                let sizeKB = await compressVideo(12, 70);
-                if (sizeKB > 500) sizeKB = await compressVideo(8, 40);
-                if (sizeKB > 500) {
-                    fs.unlinkSync(input);
-                    fs.unlinkSync(output);
-                    return reply('✘ Video too complex to fit WhatsApp sticker limit. Try a shorter/simpler clip.');
-                }
+            else if (/video/.test(mime)) {
+                const cmd = `ffmpeg -y -i "${input}" -vf "fps=15,scale=512:512:force_original_aspect_ratio=increase,crop=512:512:(iw-ow)/2:(ih-oh)/2,format=yuva420p" -c:v libwebp -lossless 0 -q:v 70 -loop 0 -an -preset default -compression_level 6 "${output}"`;
+                await new Promise((resolve, reject) => {
+                    exec(cmd, (err) => err ? reject(err) : resolve());
+                });
             }
             // ================= IMAGE STICKER =================
             else {
@@ -89,4 +77,3 @@ module.exports = {
         }
     }
 };
-
