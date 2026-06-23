@@ -32,13 +32,13 @@ module.exports = {
             // ================= VIDEO STICKER =================
             if (/video/.test(mime)) {
                 const duration = (quoted.msg || quoted).seconds || 0;
-                if (duration < 1 || duration > 5) {
-                    fs.unlinkSync(input);
-                    return reply('✘ Video must be between 1s and 5s');
-                }
+                
+                // Remove the 5-second limit check
+                // Just use the actual duration
+                const durationSec = Math.min(duration || 5, 10);
 
                 // Helper to run ffmpeg with given settings
-                const compressVideo = async (fps, quality, durationSec, attempt = 1) => {
+                const compressVideo = async (fps, quality, durationSec) => {
                     const cmd = `ffmpeg -y -i "${input}" -t ${durationSec} -vf "fps=${fps},scale=512:512:force_original_aspect_ratio=increase,crop=512:512:(iw-ow)/2:(ih-oh)/2,format=yuva420p" -c:v libwebp -lossless 0 -q:v ${quality} -loop 0 -an -preset default -compression_level 6 "${output}"`;
                     
                     await new Promise((resolve, reject) => {
@@ -52,11 +52,16 @@ module.exports = {
                     return sizeKB;
                 };
 
-                let sizeKB = await compressVideo(12, 70, 5);
+                let sizeKB = await compressVideo(12, 70, durationSec);
 
-                // If first attempt too large, try lower fps and quality
+                // If too large, try lower fps and quality
                 if (sizeKB > 500) {
-                    sizeKB = await compressVideo(8, 40, 5);
+                    sizeKB = await compressVideo(8, 40, durationSec);
+                }
+
+                // If still too large, try even lower
+                if (sizeKB > 500) {
+                    sizeKB = await compressVideo(6, 30, durationSec);
                 }
 
                 // Final check – if still too large, abort
