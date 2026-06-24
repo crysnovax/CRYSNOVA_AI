@@ -1,5 +1,4 @@
-const fetch = require('node-fetch')
-const { prepareWAMessageMedia, generateMessageIDV2, extractImageThumb } = require('@crysnovax/baileys')
+const { prepareWAMessageMedia, generateMessageIDV2 } = require('@crysnovax/baileys')
 
 module.exports = {
     name: 'invite',
@@ -25,42 +24,33 @@ module.exports = {
 
             const inviteLink = `https://chat.whatsapp.com/${inviteCode}?mode=gi_t`
 
-            // ── Get group photo, generate small jpegThumbnail ──
-            let photoBuffer = null
-            let smallThumb = null
+            // ── Get group photo URL ───────────────────
+            let photoUrl = null
             try {
-                const pp = await sock.profilePictureUrl(m.chat, 'image')
-                photoBuffer = await fetch(pp).then(r => r.buffer())
-                // WA's extendedTextMessage jpegThumbnail field has an undocumented
-                // size ceiling around ~7KB before the client fails to render it
-                // (shows blank/black). 296px @ quality 50 sits safely under that
-                // while staying as sharp as reliably possible.
-                const { buffer } = await extractImageThumb(photoBuffer, 296)
-                smallThumb = buffer
-            } catch (err) {
-                console.error('THUMB GENERATION ERROR:', err)
-            }
+                photoUrl = await sock.profilePictureUrl(m.chat, 'image')
+            } catch {}
 
-            // ── Upload photo through real media pipeline
-            // to get proper highQualityThumbnail fields ──
-            let img = null
-            if (photoBuffer) {
+            // ── Upload via mediaTypeOverride:'thumbnail-link' ──
+            // Pass URL directly — Baileys' own HTTP layer fetches it
+            // with proper headers, avoiding quality degradation from
+            // manual fetch(). jpegThumbnail comes from the upload result
+            // itself — no manual extractImageThumb needed.
+            let hq = null
+            let smallThumb = null
+            if (photoUrl) {
                 try {
                     const prepared = await prepareWAMessageMedia(
-                        { image: photoBuffer },
-                        { upload: sock.waUploadToServer }
+                        { image: { url: photoUrl } },
+                        { upload: sock.waUploadToServer, mediaTypeOverride: 'thumbnail-link' }
                     )
-                    img = prepared.imageMessage
+                    hq = prepared.imageMessage
+                    smallThumb = hq?.jpegThumbnail ? Buffer.from(hq.jpegThumbnail) : null
                 } catch (err) {
                     console.error('HQ THUMB UPLOAD ERROR:', err)
                 }
             }
 
-            // ── Build the actual proto.Message manually ───────
-            // generateWAMessage() does NOT recognize a raw
-            // extendedTextMessage key in content, so it silently
-            // mishandles it. We bypass it entirely and relay
-            // a correctly-shaped Message object ourselves.
+            // ── Build proto and relay directly ────────
             const message = {
                 extendedTextMessage: {
                     text: inviteLink,
@@ -70,22 +60,21 @@ module.exports = {
                     description: `${meta.participants.length} members · WhatsApp Group Invite`,
                     previewType: 5, // IMAGE
                     jpegThumbnail: smallThumb || undefined,
-                    ...(img
+                    ...(hq
                         ? {
-                            thumbnailDirectPath: img.directPath,
-                            mediaKey: img.mediaKey,
-                            mediaKeyTimestamp: img.mediaKeyTimestamp,
-                            thumbnailWidth: img.width,
-                            thumbnailHeight: img.height,
-                            thumbnailSha256: img.fileSha256,
-                            thumbnailEncSha256: img.fileEncSha256
+                            thumbnailDirectPath: hq.directPath,
+                            mediaKey: hq.mediaKey,
+                            mediaKeyTimestamp: hq.mediaKeyTimestamp,
+                            thumbnailWidth: hq.width,
+                            thumbnailHeight: hq.height,
+                            thumbnailSha256: hq.fileSha256,
+                            thumbnailEncSha256: hq.fileEncSha256
                         }
                         : {})
                 }
             }
 
             const messageId = generateMessageIDV2(sock.user.id)
-
             await sock.relayMessage(m.chat, message, { messageId })
 
         } catch (e) {
@@ -94,4 +83,3 @@ module.exports = {
         }
     }
 }
-
