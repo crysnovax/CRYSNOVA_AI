@@ -1,6 +1,6 @@
 module.exports = {
-    name: 'repost',
-    alias: ['resend'],
+    name: 'resend',
+    alias: ['repost'],
     desc: 'Repost a replied message',
     category: 'Tools',
 
