@@ -14,9 +14,9 @@ module.exports = {
             return reply(
                 '⊘ Provide target chat!\n\n' +
                 'Examples:\n' +
-                '• .repost 2348xxxx@s.whatsapp.net\n' +
-                '• .repost https://chat.whatsapp.com/xxxxx\n' +
-                '• .repost https://wa.me/2348xxxx'
+                '• .resend 2348xxxx@s.whatsapp.net\n' +
+                '• .resend https://chat.whatsapp.com/xxxxx\n' +
+                '• .resend https://wa.me/2348xxxx'
             );
         }
 
