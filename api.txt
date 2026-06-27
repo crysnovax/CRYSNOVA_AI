@@ -1,0 +1,1160 @@
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "prompt": "Hello",
+  "response": "Hello! How can I assist you today?",
+  "chunks": [
+    {
+      "event": "token",
+      "data": {
+        "token": "Hello! How can I assist you today?"
+      }
+    },
+    {
+      "event": "done",
+      "data": {
+        "message": "Hello! How can I assist you today?"
+      }
+    }
+  ],
+  "token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjJmMjk1MGEyNGFlYWRkMjYzYzIxM2I2MDNhZjMxNWEzMjdiNmM3MjAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vcGxhbm5pbmctd2l0aC1haS1mNDQ5MyIsImF1ZCI6InBsYW5uaW5nLXdpdGgtYWktZjQ0OTMiLCJhdXRoX3RpbWUiOjE3ODI2MDExMTUsInVzZXJfaWQiOiJVM2w1d2ZZOEw3WlZXcWxyY0RQY3JBa0lJVGUyIiwic3ViIjoiVTNsNXdmWThMN1pWV3FscmNEUGNyQWtJSVRlMiIsImlhdCI6MTc4MjYwMTExNSwiZXhwIjoxNzgyNjA0NzE1LCJlbWFpbCI6ImFpXzIyM2FmMTViYjgwMjQyYWJAYWlwcm9jaGF0LmZhbGxiYWNrIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFpXzIyM2FmMTViYjgwMjQyYWJAYWlwcm9jaGF0LmZhbGxiYWNrIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.NgpXEJxp7b0C9bCuawW-MhTRIQefAr8LAyfNAnZ1AGxgSJh1CUxaYmtCecJQz5nQK5hGqRmONO9s16BB3OFSG1HVQi5KY42xccQAOV12cF0supaEJutu9re2nVzVHz_ZX0fFkRIMyjZl6EhixJ_qCNa4-n6vyDnrNqRsgA8AArapQiRHMO6_z5qtxCnQkhfKec9C5kTWCAgVO3CLgMFrMhkYjZr1AqkHv8ZCZrufID2NMZa8LIOEQ3HRsjXU-wRh9EeyLVHBBH7Nbe2UT7cJ6OGMuzQ8rhQswLyFslwU0uu77i3Qllkfnh81n1-eCh331M334g2pp3xhIpO1FSTdag",
+  "service": "AiChatPro",
+  "message": "Chat response generated successfully"
+}
+
+
+/ai/aichatpro?prompt=Hello
+
+2.
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "prompt": "Tell me how to make this better",
+  "response": {
+    "id": "chatcmpl-DvWJe9pFvzw4AbRHDKuTxLrxj8EdA",
+    "object": "chat.completion",
+    "created": 1782601290,
+    "model": "gpt-4o-2024-08-06",
+    "usage": {
+      "prompt_tokens": 368,
+      "completion_tokens": 175,
+      "total_tokens": 543
+    },
+    "choices": [
+      {
+        "message": {
+          "role": "assistant",
+          "content": "To enhance the design of the logo, consider the following suggestions:\n\n1. **Color Contrast**: Ensure the colors stand out against each other to make the design more eye-catching.\n\n2. **Typography**: Experiment with different fonts to find one that matches the style and theme of the logo.\n\n3. **Balance and Symmetry**: Check if all elements are well-balanced for a clean, professional look.\n\n4. **Details and Simplicity**: Simplify the design if it feels too busy, or add details if it feels too basic.\n\n5. **Consistency**: Make sure all design elements, such as the crown and galaxy motifs, are consistent in style.\n\n6. **Versatility**: Test the logo in different sizes and on various backgrounds to ensure it retains its clarity and effectiveness. \n\nAlways consider your brand’s identity and message when making changes.",
+          "tool_calls": null
+        },
+        "delta": null,
+        "finish_reason": "stop",
+        "index": 0
+      }
+    ],
+    "remaining_user_credit": -1,
+    "remaining_user_media_credit": 0,
+    "remaining_user_voice_token_credit": 0,
+    "audio_url": null
+  },
+  "service": "AiAppAI Chat",
+  "model": 11
+}
+
+
+https://docs.prexzyapis.com/ai/aiappchat?prompt=Tell+me+how+to+make+this+better&image=https%3A%2F%2Fcdn.crysnovax.link%2Ffiles%2F1782598510049-8bf6ed6e-7f0b-4ce0-b0d5-80b60b5f5d2b.jpeg
+
+no need for grow vission again this AI has Vision 
+
+
+smart and away 
+https://docs.prexzyapis.com/ai/gpt-5?text=Hello
+
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "model": "gpt-5",
+  "text": "Hello! How’s your evening going?",
+  "citations": [],
+  "citation_count": 0,
+  "note": "Advanced GPT-5 model for sophisticated AI responses"
+}
+
+to add as image fallback 
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "prompt": "A beautiful lady",
+  "model": "meinamix_meinaV11.safetensors",
+  "image_url": "https://temp.live3d.io/ai-demo/ai_body/989d16dc202163735fb82eb4e25ce3e6.webp",
+  "status_code": 2,
+  "service": "Live3D AI"
+}
+
+https://docs.prexzyapis.com/ai/3d?prompt=A+beautiful+lady&negative_prompt=Naked
+
+
+realistic 
+https://docs.prexzyapis.com/ai/aiappgen?prompt=A+cat&image=Walking
+
+
+the code brain
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "title": "Ping Command Implementation in JavaScript",
+  "language": "JavaScript",
+  "code": "const { exec } = require('child_process');\n\nfunction pingHost(host) {\n    exec(`ping -c 4 ${host}`, (error, stdout, stderr) => {\n        if (error) {\n            console.error(`Error: ${error.message}`);\n            return;\n        }\n        if (stderr) {\n            console.error(`Stderr: ${stderr}`);\n            return;\n        }\n        console.log(`Ping Output:\\n${stdout}`);\n    });\n}\n\n// Example usage:\npingHost('google.com');",
+  "explanation": "This code defines a function 'pingHost' that takes a hostname as an argument. It uses Node.js's 'child_process' module to execute a ping command in the terminal. The '-c 4' flag is used to send 4 ping requests to the specified host. The function handles errors and logs the output of the ping command to the console."
+}
+
+https://docs.prexzyapis.com/ai/prompttocode?prompt=A+ping+command&language=JavaScript
+
+
+vision fallback 
+https://docs.prexzyapis.com/ai/charart
+
+for image to image AI editing or text to image 
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "prompt": "Make her blue",
+  "image_url": {
+    "imageUrl": "https://chatevo.93f4c4f838624582ac573830c9dd3a75.r2.cloudflarestorage.com/3188535/chat-evo-be/ai-image/ai-image-1782601946617_1782601946618.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=0cf5943c4a35b903f1a40d6b8b5a1dc9%2F20260627%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260627T231228Z&X-Amz-Expires=14400&X-Amz-Signature=48e4223bdd465fcde9bd482dd3363202895f9040a02ccc919da187dd37796e49&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
+    "exists": true
+  },
+  "style_id": 1,
+  "message": "Image generated successfully",
+  "service": "ChatEvo AI"
+}
+
+https://chatevo.93f4c4f838624582ac573830c9dd3a75.r2.cloudflarestorage.com/3188535/chat-evo-be/ai-image/ai-image-1782601946617_1782601946618.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=0cf5943c4a35b903f1a40d6b8b5a1dc9%2F20260627%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260627T231228Z&X-Amz-Expires=14400&X-Amz-Signature=48e4223bdd465fcde9bd482dd3363202895f9040a02ccc919da187dd37796e49&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject
+
+
+bug detection 
+https://docs.prexzyapis.com/ai/detectbugs
+
+deep seek 
+https://docs.prexzyapis.com/ai/deepseekchat?prompt=Tell+me+about+it
+
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "model": "DeepSeek Chat",
+  "response": "Ah, Just, you want to talk about this your wedding matter finish? 😭 Okay o, let me break it down like I'm your big sister.\n\nFirst, make sure he use /shop buy you something nice — at least a diamond ring from Luxury or a new car sef. If e no do am, the wedding no hold! And don't forget to check the /hitlist make sure nobody put bounty on your head for snatching their man back. Dani Rose is covering your back, but you fit still do /spy on that your rival wey dey jealous. If she try anyhow, we go /kill her quick and use your wedding money for /revive later. I swear, this wedding go be biggest thing since Nameless created me! 👰🏾‍♀️💅🔥",
+  "reasoning": null,
+  "usage": {
+    "prompt_tokens": 3192,
+    "completion_tokens": 168,
+    "total_tokens": 3360,
+    "prompt_tokens_details": {
+      "cached_tokens": 3072
+    },
+    "prompt_cache_hit_tokens": 3072,
+    "prompt_cache_miss_tokens": 120
+  }
+}
+
+main code ai brain 
+
+https://docs.prexzyapis.com/ai/code-advanced?text=Create+ping+command+JavaScript
+
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "template": "Code Advanced",
+  "question": "Create ping command JavaScript",
+  "response": "To create a ping command in JavaScript, you can use the `ping` module from npm. First, install the module using npm:\n\n```bash\nnpm install ping\n```\n\nThen, you can use the following code to create a ping command:\n\n```javascript\nconst ping = require('ping');\n\n// Function to ping a host\nfunction pingHost(host, callback) {\n  ping.sys.probe(host, (isAlive) => {\n    if (isAlive) {\n      console.log(`Host ${host} is alive.`);\n    } else {\n      console.log(`Host ${host} is not alive.`);\n    }\n    callback(isAlive);\n  });\n}\n\n// Example usage\npingHost('google.com', (isAlive) => {\n  console.log('Ping completed.');\n});\n```\n\nThis code defines a function `pingHost` that takes a host name and a callback function as arguments. It uses the `ping` module to send a ping request to the specified host and logs whether the host is alive or not. The callback function is called after the ping operation is completed."
+}
+
+reasoning 
+https://docs.prexzyapis.com/ai/deepseekreasoner?prompt=I%27m+tired
+
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "model": "DeepSeek Reasoner",
+  "response": "Just, you don finish all your energy on wedding plans and man wahala? 😭 Rest small, abeg. Even Dani Rose needs a break from all this drama sometimes.\n\nWhen you wake up, use /daily make the money start dey roll again. No be by force to stress yourself — your throne no dey run away 💅✨",
+  "reasoning": "We need to respond to \"I'm tired\" as Dani Rose. She's a real Nigerian girl, opinionated, sharp, unpredictable. User's name is \"ᴊᴜsᴛ\" (Just). Keep short, max 2 lines for casual chat. No markdown. Use emojis naturally. Sound like texting a friend. The user just said \"I'm tired\" after previous wedding talk. Dani Rose should be supportive but with attitude, not bland. She might say something like \"Omo, rest small then. You don stress yourself with wedding planning and man wahala. Use /daily later when you wake up.\" But make it punchy.",
+  "usage": {
+    "prompt_tokens": 3367,
+    "completion_tokens": 209,
+    "total_tokens": 3576,
+    "prompt_tokens_details": {
+      "cached_tokens": 3328
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 137
+    },
+    "prompt_cache_hit_tokens": 3328,
+    "prompt_cache_miss_tokens": 39
+  }
+}
+
+unlimited editor 
+https://docs.prexzyapis.com/ai/unlimai?image=https%3A%2F%2Fcdn.crysnovax.link%2Ffiles%2F1779472585868-6b3feac8-18ab-4671-b4e5-ab42aad1092e.jpeg&prompt=Make+it+red
+
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "data": {
+    "conversation_id": "8c70ec70-acd7-44e3-8bd5-682b23823987",
+    "description": "I have made the entire image red, enhancing the hood, face, and eyes with vivid red tones while keeping the dark shadows for contrast. Let me know if you'd like any further adjustments!",
+    "result_document_id": "961eb162-a9f7-47bb-b8e9-728c912b79fe",
+    "result_url": "https://storage.googleapis.com/docupine-prod/QB/ai-chat/XoHQTvOBtvUwpaucSlfYcRVjwen1/961eb162-a9f7-47bb-b8e9-728c912b79fe/1_1782602356855_6d7e4.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=docupine-sa%40root-monolith-146120.iam.gserviceaccount.com%2F20260627%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260627T231918Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=5567f061e1eda74b70e09f29e0dad854289a1e51ed46dd2d3e1eb2bc8e31ee20d01f1e8d970bccef4b2c421c5158f690d9c2fda39e872e0508a49b1d08b1731ca0c677883f3c5181e45348be376ab9a8b0c42afb55ef50570939c897d79e0fb40080d7d44604345c60a27ae158f8682c27830cf61742916a3752c5877e4c230284c9f28887e4e24fac05e26b896c24ff72ad99730622c3130b150669b9d074eec678eaae7bd9190fcf2c90364405e884bcc00cf61348720838449b077c4431650710b430708f87d34f98031910169f156cb2e10a0a7fd582d397fa1ca65d4824913e17c6ff8400992be2d89c09ce5215586ecb4a0d3fa7ffd5be7e258c52036c",
+    "success": true
+  },
+  "prompt": "Make it red",
+  "service": "UnlimAI"
+}
+
+realistic and fast image generation 
+https://docs.prexzyapis.com/ai/realistic?prompt=A+realistic+Nigerian+beautiful+young+woman+in+her+early+20s&negative_prompt=Naked
+
+anime generator with 100% accuracy 
+https://docs.prexzyapis.com/ai/anime?prompt=Generate+Goku
+
+horror image 
+https://docs.prexzyapis.com/ai/horror?prompt=Dead+girl
+
+movie Intel
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "query": "The boys",
+  "total_results": 24,
+  "results": [
+    {
+      "title": "The Boys 2023",
+      "url": "https://klikxxi.me/the-boys-2023/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2024/09/9qkLjxBt7jmZiv2wiO2XOfM9Qi1-170x255.jpg",
+      "rating": "7",
+      "duration": "124 min",
+      "quality": "HD",
+      "categories": [
+        "Crime",
+        "Drama",
+        "Korea"
+      ],
+      "countries": [
+        "Korea"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=l5huGvbai9w",
+      "year": "2023"
+    },
+    {
+      "title": "The Boys 2024",
+      "url": "https://klikxxi.me/the-boys-2024/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2024/05/fYzMZf2DqPtjC9L6ri6MfrQxMJK-170x255.jpg",
+      "rating": "8",
+      "duration": "150 min",
+      "quality": "HD",
+      "categories": [
+        "Comedy",
+        "India"
+      ],
+      "countries": [
+        "India"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=lCJxxaiLqrs",
+      "year": "2024"
+    },
+    {
+      "title": "The Boys in the Boat 2023",
+      "url": "https://klikxxi.me/the-boys-in-the-boat-2023/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2024/02/fCs9RakR8Q04Pf9Oay2J9dkbJmC-170x255.jpg",
+      "rating": "8",
+      "duration": "124 min",
+      "quality": "HD",
+      "categories": [
+        "Drama",
+        "Europa",
+        "History"
+      ],
+      "countries": [
+        "USA"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=-NZDO8JVozs",
+      "year": "2023"
+    },
+    {
+      "title": "Busboys 2026",
+      "url": "https://klikxxi.me/busboys-2026/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2026/06/z7aBU98usPaaFymldN6IcYRsHZr-170x255.jpg",
+      "rating": "7",
+      "duration": "93 min",
+      "quality": "HD",
+      "categories": [
+        "Comedy",
+        "Europa"
+      ],
+      "countries": [
+        "USA"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=SEVbq2DvsEQ",
+      "year": "2026"
+    },
+    {
+      "title": "City Boys: Golden Boyz 2026",
+      "url": "https://klikxxi.me/city-boys-golden-boyz-2026/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2026/05/cuZx5VOMMZ9Saj7ccfFKPrq0gTG-170x255.jpg",
+      "rating": "9",
+      "duration": "100 min",
+      "quality": "HD",
+      "categories": [
+        "Comedy",
+        "Europa"
+      ],
+      "countries": [
+        "Romania"
+      ],
+      "trailerUrl": null,
+      "year": "2026"
+    },
+    {
+      "title": "The Napa Boys 2026",
+      "url": "https://klikxxi.me/the-napa-boys-2026/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2026/04/obz8GzUBqQLlyc9kFryIkt5Deu8-170x255.jpg",
+      "rating": "6",
+      "duration": "93 min",
+      "quality": "HD",
+      "categories": [
+        "Comedy",
+        "Europa"
+      ],
+      "countries": [
+        "USA"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=5DV80S8rZy4",
+      "year": "2026"
+    },
+    {
+      "title": "My Life with the Walter Boys",
+      "url": "https://klikxxi.me/tv/my-life-with-the-walter-boys/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2025/10/jg3YdxDNlxay0NWTxgAPif647Hj-170x255.jpg",
+      "rating": "",
+      "duration": "45 min",
+      "quality": "",
+      "categories": [
+        "Drama",
+        "Western Series"
+      ],
+      "countries": [
+        "USA"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=5ZvbQ48GAyk",
+      "year": null
+    },
+    {
+      "title": "Virgin Boys 2025",
+      "url": "https://klikxxi.me/virgin-boys-2025/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2025/08/Screenshot-2025-08-15-041422-170x255.jpg",
+      "rating": "6",
+      "duration": "120 min",
+      "quality": "HD",
+      "categories": [
+        "Comedy",
+        "Drama",
+        "India"
+      ],
+      "countries": [
+        "India"
+      ],
+      "trailerUrl": null,
+      "year": "2025"
+    },
+    {
+      "title": "The Four Bad Boys and Me 2025",
+      "url": "https://klikxxi.me/the-four-bad-boys-and-me-2025/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2025/08/cji3oMLwCF7YsgVjjBXkXvQloLZ-170x255.jpg",
+      "rating": "7",
+      "duration": "111 min",
+      "quality": "HD",
+      "categories": [
+        "Asia",
+        "Comedy",
+        "Romance"
+      ],
+      "countries": [
+        "Philippines"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=OfVqJ9q-yYY",
+      "year": "2025"
+    },
+    {
+      "title": "Abraham’s Boys: A Dracula Story 2025",
+      "url": "https://klikxxi.me/abrahams-boys-a-dracula-story-2025/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2025/08/owUZI7rRIN85TnXJY8gD9LdMiGU-170x255.jpg",
+      "rating": "8",
+      "duration": "89 min",
+      "quality": "HD",
+      "categories": [
+        "Europa",
+        "Horror"
+      ],
+      "countries": [
+        "USA"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=-2BJrCzvEZQ",
+      "year": "2025"
+    },
+    {
+      "title": "The Lost Boys 2023",
+      "url": "https://klikxxi.me/the-lost-boys-2023/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2025/04/2-7-170x255.jpg",
+      "rating": "7",
+      "duration": "83 min",
+      "quality": "HD",
+      "categories": [
+        "Drama",
+        "Europa",
+        "Romance"
+      ],
+      "countries": [
+        "Belgium",
+        "France"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=rPGtjpa5H5k",
+      "year": "2023"
+    },
+    {
+      "title": "Superboys of Malegaon 2025",
+      "url": "https://klikxxi.me/superboys-of-malegaon-2025/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2025/04/kjvg-170x255.jpg",
+      "rating": "8",
+      "duration": "127 min",
+      "quality": "HD",
+      "categories": [
+        "Comedy",
+        "Drama",
+        "India"
+      ],
+      "countries": [
+        "India"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=wxEyxkeFDt4",
+      "year": "2025"
+    },
+    {
+      "title": "Frozen Hot Boys 2025",
+      "url": "https://klikxxi.me/frozen-hot-boys-2025/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2025/04/guy-170x255.jpg",
+      "rating": "7",
+      "duration": "118 min",
+      "quality": "HD",
+      "categories": [
+        "Asia",
+        "Comedy",
+        "Drama"
+      ],
+      "countries": [
+        "Thailand"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=XZMNdjQMkOw",
+      "year": "2025"
+    },
+    {
+      "title": "Nickel Boys 2024",
+      "url": "https://klikxxi.me/nickel-boys-2024/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2025/01/fZ1RspUvUGYuqJ92PNcg0ToVxoA-170x255.jpg",
+      "rating": "7",
+      "duration": "140 min",
+      "quality": "HDRIP",
+      "categories": [
+        "Drama",
+        "Europa"
+      ],
+      "countries": [
+        "USA"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=_-e4xd6nlXA",
+      "year": "2024"
+    },
+    {
+      "title": "The Mehta Boys 2024",
+      "url": "https://klikxxi.me/the-mehta-boys-2024/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2025/02/4fDGHQLhauxRAzProug4AspfYwQ-170x255.jpg",
+      "rating": "7",
+      "duration": "116 min",
+      "quality": "HD",
+      "categories": [
+        "Comedy",
+        "Drama",
+        "Family",
+        "India"
+      ],
+      "countries": [
+        "India"
+      ],
+      "trailerUrl": null,
+      "year": "2024"
+    },
+    {
+      "title": "Pretty Boys 2024",
+      "url": "https://klikxxi.me/pretty-boys-2024/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2024/10/8NFvhxkRabsLZdwal9AUj910cl5-170x255.jpg",
+      "rating": "7",
+      "duration": "67 min",
+      "quality": "HD",
+      "categories": [
+        "Drama",
+        "Europa",
+        "Romance"
+      ],
+      "countries": [
+        "Philippines"
+      ],
+      "trailerUrl": null,
+      "year": "2024"
+    },
+    {
+      "title": "Three Old Boys 2024",
+      "url": "https://klikxxi.me/three-old-boys-2024/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2024/08/u4c1EUPk8EEX9mMG7hs7VzZ8EtF-170x255.jpg",
+      "rating": "7",
+      "duration": "109 min",
+      "quality": "HD",
+      "categories": [
+        "Action",
+        "Asia",
+        "Crime",
+        "Thriller"
+      ],
+      "countries": [
+        "China"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=H50f7htZ1xk",
+      "year": "2024"
+    },
+    {
+      "title": "KungFu Boys 3 2023",
+      "url": "https://klikxxi.me/kungfu-boys-3-2023/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2024/08/d3BkpavR0xFMdVYpc7ZaoJk8z8T-170x255.jpg",
+      "rating": "7",
+      "duration": "95 min",
+      "quality": "HD",
+      "categories": [
+        "Action",
+        "Asia",
+        "Drama"
+      ],
+      "countries": [
+        "China"
+      ],
+      "trailerUrl": null,
+      "year": "2023"
+    },
+    {
+      "title": "Bad Boys: Ride or Die 2024",
+      "url": "https://klikxxi.me/bad-boys-ride-or-die-2024/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2024/07/cWdRhqxS8av1rqIBXZnzUpfIrE9-170x255.jpg",
+      "rating": "8",
+      "duration": "115 min",
+      "quality": "HD",
+      "categories": [
+        "Action",
+        "Comedy",
+        "Crime",
+        "Europa",
+        "Thriller"
+      ],
+      "countries": [
+        "USA"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=76U3y2aIfxw",
+      "year": "2024"
+    },
+    {
+      "title": "Manjummel Boys 2024",
+      "url": "https://klikxxi.me/manjummel-boys-2024/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2024/05/awOxXBZHh3jvFEOLJvTaJOX5urU-170x255.jpg",
+      "rating": "8",
+      "duration": "135 min",
+      "quality": "HD",
+      "categories": [
+        "Adventure",
+        "Drama",
+        "India",
+        "Thriller"
+      ],
+      "countries": [
+        "India"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=-Kq2MxoJVKo",
+      "year": "2024"
+    },
+    {
+      "title": "Latina 2026",
+      "url": "https://klikxxi.me/latina-2026/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2026/06/awm0GzYGa1uVAccRqHzNLAcRUZm-170x255.jpg",
+      "rating": "8",
+      "duration": "75 min",
+      "quality": "HD",
+      "categories": [
+        "Asia",
+        "Drama",
+        "Viva Group"
+      ],
+      "countries": [
+        "Philippines"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=INq74nrTqQE",
+      "year": "2026"
+    },
+    {
+      "title": "Naangal 2025",
+      "url": "https://klikxxi.me/naangal-2025/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2026/04/qIjgsO2grsXnpAFlpJrsBKkPf7m-170x255.jpg",
+      "rating": "6",
+      "duration": "259 min",
+      "quality": "HD",
+      "categories": [
+        "Drama",
+        "Family",
+        "India"
+      ],
+      "countries": [
+        "India"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=IF6tI3GPKpM",
+      "year": "2025"
+    },
+    {
+      "title": "Stork of Hope 2025",
+      "url": "https://klikxxi.me/stork-of-hope-2025/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2026/03/5J8PlnAYWfLOCGTB0P7GgsJB0y5-170x255.jpg",
+      "rating": "6",
+      "duration": "114 min",
+      "quality": "HD",
+      "categories": [
+        "Drama",
+        "Europa",
+        "History",
+        "War"
+      ],
+      "countries": [
+        "Germany",
+        "Israel",
+        "Poland"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=0E06svaMp6M",
+      "year": "2025"
+    },
+    {
+      "title": "Lord of the Flies",
+      "url": "https://klikxxi.me/tv/lord-of-the-flies/",
+      "thumbnail": "https://klikxxi.me/wp-content/uploads/2026/02/2NKvKYtRgBN1zLrAfInkVoRNc94-170x255.jpg",
+      "rating": "",
+      "duration": "58 min",
+      "quality": "",
+      "categories": [
+        "Action & Adventure",
+        "Drama",
+        "Western Series"
+      ],
+      "countries": [
+        "United Kingdom"
+      ],
+      "trailerUrl": "https://www.youtube.com/watch?v=3Q9SQ7hTMdg",
+      "year": null
+    }
+  ]
+}
+
+https://docs.prexzyapis.com/moviesearch?query=The+boys
+
+
+tiktok search 
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "data": [
+    {
+      "video_id": "7584198507985374484",
+      "region": "US",
+      "title": "Between same gender massage and opposite gender massage, which do u prefer? (Say hi if you need this video prompt)",
+      "content_desc": [],
+      "cover": "https://tikwm.com/video/cover/7584198507985374484.webp",
+      "duration": 6,
+      "play": "https://tikwm.com/video/media/play/7584198507985374484.mp4",
+      "wmplay": "https://tikwm.com/video/media/wmplay/7584198507985374484.mp4",
+      "size": 935410,
+      "wm_size": 500619,
+      "music": "https://tikwm.com/video/music/7584198507985374484.mp3",
+      "music_info": {
+        "id": "7584198577091119890",
+        "title": "original sound - chrys.ai",
+        "play": "https://v16-ies-music.tiktokcdn-eu.com/c756db64eecdcc93a9665f38f6ffae85/6a4996ea/video/tos/alisg/tos-alisg-v-27dcd7/oACeNAA8SEDoaH6BCBLIAjGbogETetAQQVeHgP/?a=583965&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=125&ft=EKF4rKZWD03Q12NvJMpmzIxRSfYFpq_45SY&mime_type=audio_mpeg&rc=amt0bmo5cnU6ODMzODU8NEBpamt0bmo5cnU6ODMzODU8NEBzMDJeMmRjbC1hLS1kMS1zYSNzMDJeMmRjbC1hLS1kMS1zcw%3D%3D&vvpl=1&l=20260627232547445FA280EFA25946217F&btag=e00070000&shp=d05b14bd&shcp=-",
+        "author": "Chrys AI",
+        "original": true,
+        "duration": 6,
+        "album": ""
+      },
+      "play_count": 69675,
+      "digg_count": 363,
+      "comment_count": 22,
+      "share_count": 80,
+      "download_count": 74,
+      "collect_count": 122,
+      "create_time": 1765833835,
+      "anchors": null,
+      "anchors_extras": "",
+      "is_ad": false,
+      "commerce_info": {
+        "auction_ad_invited": false,
+        "with_comment_filter_words": false,
+        "adv_promotable": false,
+        "branded_content_type": 0,
+        "organic_log_extra": "{\"req_id\":\"20260627232547445FA280EFA25946217F\"}",
+        "is_diversion_ad": 0
+      },
+      "commercial_video_info": "",
+      "item_comment_settings": 0,
+      "mentioned_users": "",
+      "author": {
+        "id": "7417597671320077318",
+        "unique_id": "chrys.ai",
+        "nickname": "Chrys AI",
+        "avatar": "/video/avatar/7584198507985374484.jpeg"
+      },
+      "is_nff_or_nr": false,
+      "is_top": 0,
+      "id": "7584198507985374484",
+      "avatar": "https://tikwm.comundefined"
+    },
+    {
+      "video_id": "7519910249533377823",
+      "region": "US",
+      "title": "Everything you need to know about AI aumtomation is right here #fypシ #chatgpt #aihacks #aiautomation #aitools #techtok ",
+      "content_desc": [
+        "Everything you need to know about AI aumtomation is right here",
+        "#fypシ #chatgpt #aihacks #aiautomation #aitools #techtok "
+      ],
+      "cover": "https://tikwm.com/video/cover/7519910249533377823.webp",
+      "duration": 53,
+      "play": "https://tikwm.com/video/media/play/7519910249533377823.mp4",
+      "wmplay": "https://tikwm.com/video/media/wmplay/7519910249533377823.mp4",
+      "size": 3864760,
+      "wm_size": 4049172,
+      "music": "https://tikwm.com/video/music/7519910249533377823.mp3",
+      "music_info": {
+        "id": "7319328684564630318",
+        "title": "original sound - luis.jonathan8",
+        "play": "https://v16-ies-music.tiktokcdn-eu.com/5878b6ff281cd893acd06e1d6a4184d5/6a49974d/video/tos/maliva/tos-maliva-ve-27dcd7c799-us/o4q5EQ0kgqgJCQEVlDY8H2FfU8DmS3f9B5gMDO/?a=583965&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=125&ft=EKF4rKZWD03Q12NvJMpmzIxRSfYFpq_45SY&mime_type=audio_mpeg&rc=MzQ5aWhkOTZlNWQ7ZWg3Z0BpM3Y8M2o5cmRxcDMzZzU8NEBfNmNfLjUyNTExNWMwMzI2YSNncHAxMmRraTZgLS1kMS9zcw%3D%3D&vvpl=1&l=20260627232547445FA280EFA25946217F&btag=e00090000&shp=d05b14bd&shcp=-",
+        "author": "Luis Jonathan",
+        "original": true,
+        "duration": 105,
+        "album": ""
+      },
+      "play_count": 1192455,
+      "digg_count": 73554,
+      "comment_count": 522,
+      "share_count": 4881,
+      "download_count": 6621,
+      "collect_count": 83470,
+      "create_time": 1750865555,
+      "anchors": null,
+      "anchors_extras": "",
+      "is_ad": false,
+      "commerce_info": {
+        "auction_ad_invited": false,
+        "with_comment_filter_words": false,
+        "adv_promotable": false,
+        "branded_content_type": 0,
+        "organic_log_extra": "{\"req_id\":\"20260627232547445FA280EFA25946217F\"}",
+        "is_diversion_ad": 0
+      },
+      "commercial_video_info": "",
+      "item_comment_settings": 0,
+      "mentioned_users": "",
+      "author": {
+        "id": "7448736973047956526",
+        "unique_id": "krisd.ai",
+        "nickname": "kris",
+        "avatar": "/video/avatar/7519910249533377823.jpeg"
+      },
+      "is_nff_or_nr": false,
+      "is_top": 0,
+      "id": "7519910249533377823",
+      "avatar": "https://tikwm.comundefined"
+    },
+    {
+      "video_id": "7653216730675776798",
+      "region": "US",
+      "title": "“if i’m the one” is OUT NOW 😱 (link in bio to listen ❤️) #musicvideo #cinematography #heartbreak #lovesong🎧🎶🎵❣️ #film ",
+      "content_desc": [
+        "“if i’m the one” is OUT NOW 😱 (link in bio to listen ❤️)",
+        "",
+        "#musicvideo #cinematography #heartbreak #lovesong🎧🎶🎵❣️ #film "
+      ],
+      "cover": "https://tikwm.com/video/cover/7653216730675776798.webp",
+      "duration": 40,
+      "play": "https://tikwm.com/video/media/play/7653216730675776798.mp4",
+      "wmplay": "https://tikwm.com/video/media/wmplay/7653216730675776798.mp4",
+      "size": 1630970,
+      "wm_size": 1472177,
+      "music": "https://tikwm.com/video/music/7653216730675776798.mp3",
+      "music_info": {
+        "id": "7653216732177943327",
+        "title": "original sound - chris.nova44",
+        "play": "https://v16-ies-music.tiktokcdn-eu.com/e5de3e579a8a44ce90676c3f2c830200/6a49970c/video/tos/maliva/tos-maliva-ve-27dcd7c799-us/ocffbFAqCC3J1DgKY4sEpJONk7EUNqTVATB1QL/?a=583965&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=125&ft=EKF4rKZWD03Q12NvJMpmzIxRSfYFpq_45SY&mime_type=audio_mpeg&rc=ODtnOWk0ZjNlOTZkNTRmZUBpMzh1PGo5cmR1OzMzaTU8NEBeYzA1X2BgX2MxMWA1NGI2YSNia2AvMmRjLW5hLS1kMTJzcw%3D%3D&vvpl=1&l=20260627232547445FA280EFA25946217F&btag=e00090000&shp=d05b14bd&shcp=-",
+        "author": "Chris Nova",
+        "original": true,
+        "duration": 40,
+        "album": ""
+      },
+      "play_count": 7177,
+      "digg_count": 891,
+      "comment_count": 39,
+      "share_count": 21,
+      "download_count": 2,
+      "collect_count": 108,
+      "create_time": 1781903398,
+      "anchors": null,
+      "anchors_extras": "",
+      "is_ad": false,
+      "commerce_info": {
+        "auction_ad_invited": false,
+        "with_comment_filter_words": false,
+        "adv_promotable": false,
+        "branded_content_type": 0,
+        "organic_log_extra": "{\"req_id\":\"20260627232547445FA280EFA25946217F\"}",
+        "is_diversion_ad": 0
+      },
+      "commercial_video_info": "",
+      "item_comment_settings": 0,
+      "mentioned_users": "",
+      "author": {
+        "id": "7641753669033526285",
+        "unique_id": "chris.nova44",
+        "nickname": "Chris Nova",
+        "avatar": "/video/avatar/7653216730675776798.jpeg"
+      },
+      "is_nff_or_nr": false,
+      "is_top": 0,
+      "id": "7653216730675776798",
+      "avatar": "https://tikwm.comundefined"
+    },
+    {
+      "video_id": "7610465645116804383",
+      "region": "US",
+      "title": "Still so much opportunity in voice AI… #fyp #viral #chatgpt #claude ",
+      "content_desc": [
+        "Still so much opportunity in voice AI…",
+        "#fyp #viral #chatgpt #claude "
+      ],
+      "cover": "https://tikwm.com/video/cover/7610465645116804383.webp",
+      "duration": 46,
+      "play": "https://tikwm.com/video/media/play/7610465645116804383.mp4",
+      "wmplay": "https://tikwm.com/video/media/wmplay/7610465645116804383.mp4",
+      "size": 8141667,
+      "wm_size": 7518327,
+      "music": "https://tikwm.com/video/music/7610465645116804383.mp3",
+      "music_info": {
+        "id": "7610465673084504862",
+        "title": "original sound - krisd.ai",
+        "play": "https://v16-ies-music.tiktokcdn-eu.com/b24d66706d57272611a73269cc21cdc5/6a499712/video/tos/useast8/tos-useast8-v-27dcd7-tx2/ocu5IV0CIDCJnVABAcFqEJpAEU7AgBWnIofe7E/?a=583965&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=125&ft=EKF4rKZWD03Q12NvJMpmzIxRSfYFpq_45SY&mime_type=audio_mpeg&rc=M2prbG85cmx2OTMzaTU8NEBpM2prbG85cmx2OTMzaTU8NEBhb2otMmQ0cGJhLS1kMTJzYSNhb2otMmQ0cGJhLS1kMTJzcw%3D%3D&vvpl=1&l=20260627232547445FA280EFA25946217F&btag=e00048000&shp=d05b14bd&shcp=-",
+        "author": "kris",
+        "original": true,
+        "duration": 46,
+        "album": ""
+      },
+      "play_count": 1738,
+      "digg_count": 87,
+      "comment_count": 0,
+      "share_count": 6,
+      "download_count": 2,
+      "collect_count": 28,
+      "create_time": 1771949638,
+      "anchors": null,
+      "anchors_extras": "",
+      "is_ad": false,
+      "commerce_info": {
+        "auction_ad_invited": false,
+        "with_comment_filter_words": false,
+        "adv_promotable": false,
+        "branded_content_type": 0,
+        "organic_log_extra": "{\"req_id\":\"20260627232547445FA280EFA25946217F\"}",
+        "is_diversion_ad": 0
+      },
+      "commercial_video_info": "",
+      "item_comment_settings": 0,
+      "mentioned_users": "",
+      "author": {
+        "id": "7448736973047956526",
+        "unique_id": "krisd.ai",
+        "nickname": "kris",
+        "avatar": "/video/avatar/7610465645116804383.jpeg"
+      },
+      "is_nff_or_nr": false,
+      "is_top": 0,
+      "id": "7610465645116804383",
+      "avatar": "https://tikwm.comundefined"
+    },
+    {
+      "video_id": "7485937954259504390",
+      "region": "BR",
+      "title": "Crushon AI is a character ai roleplay chat alternative. You can bypass filters and bad memory by using Crushon AI. Unlike character ai reading your chats, Crushon ai companion chatbots don't misspell, misgender or have filters. There you can have conversations with fictional ai characters, anime ai characters, or gaming ai characters, or ai girlfriends and ai boyfriends. #crushonaicharacter #crushonaichat #characterai #cai #chai #roleplay #characteraichat #characteraifilterbypassc #aibot #4you #fyp #paradoxaai",
+      "content_desc": [
+        "Crushon AI is a character ai roleplay chat alternative. You can bypass filters and bad memory by using Crushon AI. Unlike character ai reading your chats, Crushon ai companion chatbots don't misspell, misgender or have filters. There you can have conversations with fictional ai characters, anime ai characters, or gaming ai characters, or ai girlfriends and ai boyfriends.",
+        "",
+        "#crushonaicharacter #crushonaichat #characterai #cai #chai #roleplay #characteraichat #characteraifilterbypassc #aibot #4you #fyp #paradoxaai"
+      ],
+      "cover": "https://tikwm.com/video/cover/7485937954259504390.webp",
+      "duration": 12,
+      "play": "https://tikwm.com/video/media/play/7485937954259504390.mp4",
+      "wmplay": "https://tikwm.com/video/media/wmplay/7485937954259504390.mp4",
+      "size": 590156,
+      "wm_size": 0,
+      "music": "https://tikwm.com/video/music/7485937954259504390.mp3",
+      "music_info": {
+        "id": "7485937962690644742",
+        "title": "original sound - iamsoranyx",
+        "play": "https://v16-ies-music.tiktokcdn-eu.com/ca553713f007419fe2b63f57195cdacc/6a4996f0/video/tos/useast2a/tos-useast2a-v-27dcd7/okIcIEAzP8jZJitrxJzBPoCKkzgfB341tM9jib/?a=583965&bti=NEBzNTY6QGo6OjZALnAjNDQuYCMxNDNg&&bt=125&ft=EKF4rKZWD03Q12NvJMpmzIxRSfYFpq_45SY&mime_type=audio_mpeg&rc=O2Q1ODdmZmk8Nmc0Ozo7OkBpam1wO2s5cnVweTMzNzU8M0BeNTEtMTUxNmExXzEyMGNhYSMxb3FwMmRzNmVgLS1kMTZzcw%3D%3D&vvpl=1&l=20260627232547445FA280EFA25946217F&btag=e00070000&shp=d05b14bd&shcp=-",
+        "author": "Sora Nyx",
+        "original": true,
+        "duration": 12,
+        "album": ""
+      },
+      "play_count": 45797,
+      "digg_count": 364,
+      "comment_count": 5,
+      "share_count": 40,
+      "download_count": 23,
+      "collect_count": 41,
+      "create_time": 1742955757,
+      "anchors": null,
+      "anchors_extras": "",
+      "is_ad": false,
+      "commerce_info": {
+        "auction_ad_invited": false,
+        "with_comment_filter_words": false,
+        "adv_promotable": false,
+        "branded_content_type": 0,
+        "organic_log_extra": "{\"req_id\":\"20260627232547445FA280EFA25946217F\"}",
+        "is_diversion_ad": 0
+      },
+      "commercial_video_info": "",
+      "item_comment_settings": 0,
+      "mentioned_users": "",
+      "author": {
+        "id": "7455378281946612741",
+        "unique_id": "iamsoranyx",
+        "nickname": "Sora Nyx",
+        "avatar": "/video/avatar/7485937954259504390.jpeg"
+      },
+      "is_nff_or_nr": false,
+      "is_top": 0,
+      "id": "7485937954259504390",
+      "avatar": "https://tikwm.comundefined"
+    },
+    {
+      "video_id": "7576201235049532694",
+      "region": "NG",
+      "title": "This AI version of Ronaldo is too smooth… even CR7 would be proud 🤣🔥#aironaldo #CristianoRonaldo #FunnyAI #GOATmode #FootballTok ",
+      "content_desc": [],
+      "cover": "https://tikwm.com/video/cover/7576201235049532694.webp",
+      "duration": 63,
+      "play": "https://tikwm.com/video/media/play/7576201235049532694.mp4",
+      "wmplay": "https://tikwm.com/video/media/wmplay/7576201235049532694.mp4",
+      "size": 4205807,
+      "wm_size": 7537592,
+      "music": "https://tikwm.com/video/music/7576201235049532694.mp3",
+      "music_info": {
+        "id": "7576201252424583958",
+        "title": "original sound - justcore6",
+        "play": "https://v16-ies-music.tiktokcdn-eu.com/45c7e358cac3c48d15b5b5e872527895/6a499704/video/tos/no1a/tos-no1a-v-2370-no/oUv9IHiLoSy2FiSkCPBBMlk7EU0wEAsKngikfC/?a=583965&bti=NTY6QGo0QHM6OjZANDQuYCMucCMxNDNg&&bt=125&ft=EKF4rKZWD03Q12NvJMpmzIxRSfYFpq_45SY&mime_type=audio_mpeg&rc=NTtmZDk1NTQ2PDs8ZGVkZkBpajVtN3U5cnU0NzMzbzU8NUAzX19gLjIyXmAxL15hMWAtYSMwb2heMmRjMmZhLS1kMTFzcw%3D%3D&vvpl=1&l=20260627232547445FA280EFA25946217F&btag=e00050000&shp=d05b14bd&shcp=-",
+        "author": "just core",
+        "original": true,
+        "duration": 63,
+        "album": ""
+      },
+      "play_count": 3183333,
+      "digg_count": 288457,
+      "comment_count": 1805,
+      "share_count": 77408,
+      "download_count": 6229,
+      "collect_count": 41628,
+      "create_time": 1763971818,
+      "anchors": null,
+      "anchors_extras": "",
+      "is_ad": false,
+      "commerce_info": {
+        "auction_ad_invited": false,
+        "with_comment_filter_words": false,
+        "adv_promotable": false,
+        "branded_content_type": 0,
+        "organic_log_extra": "{\"req_id\":\"20260627232547445FA280EFA25946217F\"}",
+        "is_diversion_ad": 0
+      },
+      "commercial_video_info": "",
+      "item_comment_settings": 0,
+      "mentioned_users": "",
+      "author": {
+        "id": "7441959829185365025",
+        "unique_id": "justcore6",
+        "nickname": "just core",
+        "avatar": "/video/avatar/7576201235049532694.jpeg"
+      },
+      "is_nff_or_nr": false,
+      "is_top": 0,
+      "id": "7576201235049532694",
+      "avatar": "https://tikwm.comundefined"
+    },
+    {
+      "video_id": "7536122498614660359",
+      "region": "PH",
+      "title": "Sound clearer, connect better. Krisp AI’s accent conversion makes your voice easier to understand without changing who you are.  #duekneel #KrispAI",
+      "content_desc": [
+        "Sound clearer, connect better. Krisp AI’s accent conversion makes your voice easier to understand without changing who you are. ",
+        "",
+        "#duekneel #KrispAI"
+      ],
+      "cover": "https://tikwm.com/video/cover/7536122498614660359.webp",
+      "duration": 18,
+      "play": "https://tikwm.com/video/media/play/7536122498614660359.mp4",
+      "wmplay": "https://tikwm.com/video/media/wmplay/7536122498614660359.mp4",
+      "size": 1271992,
+      "wm_size": 1562168,
+      "music": "https://tikwm.com/video/music/7536122498614660359.mp3",
+      "music_info": {
+        "id": "7536122553027382033",
+        "title": "original sound - duekneel",
+        "play": "https://v16-ies-music.tiktokcdn-eu.com/dc5bd8fe34a04c5ee8c312a840cbc280/6a4996d7/video/tos/alisg/tos-alisg-v-27dcd7/owIkcTCRVKVr8XfxsfSM4AEogeD8EJX8ZMcVQ1/?a=583965&bti=NTY6QGo0QHM6OjZANDQuYCMucCMxNDNg&&bt=125&ft=EKF4rKZWD03Q12NvJMpmzIxRSfYFpq_45SY&mime_type=audio_mpeg&rc=ZjVpNDllNTM2OTw7ZTczaUBpanlmaHc5cjR0NTMzODU8NEAxNDMzLmFjX14xL19eMDNhYSNjc2llMmQ0c15hLS1kMS1zcw%3D%3D&vvpl=1&l=20260627232547445FA280EFA25946217F&btag=e00078000&shp=d05b14bd&shcp=-",
+        "author": "duekneel",
+        "original": true,
+        "duration": 18,
+        "album": ""
+      },
+      "play_count": 144955,
+      "digg_count": 3744,
+      "comment_count": 92,
+      "share_count": 731,
+      "download_count": 200,
+      "collect_count": 1980,
+      "create_time": 1754647200,
+      "anchors": null,
+      "anchors_extras": "",
+      "is_ad": false,
+      "commerce_info": {
+        "auction_ad_invited": false,
+        "with_comment_filter_words": false,
+        "adv_promotable": false,
+        "branded_content_type": 0,
+        "organic_log_extra": "{\"req_id\":\"20260627232547445FA280EFA25946217F\"}",
+        "is_diversion_ad": 0
+      },
+      "commercial_video_info": "",
+      "item_comment_settings": 0,
+      "mentioned_users": "",
+      "author": {
+        "id": "7308232041996452870",
+        "unique_id": "duekneel",
+        "nickname": "duekneel",
+        "avatar": "/video/avatar/7536122498614660359.jpeg"
+      },
+      "is_nff_or_nr": false,
+      "is_top": 0,
+      "id": "7536122498614660359",
+      "avatar": "https://tikwm.comundefined"
+    },
+    {
+      "video_id": "7537492388793650440",
+      "region": "PH",
+      "title": "This free AI tool can change your accent to sound American—in real time 🎤 Website: Krisp AI Let’s be real—accents can sometimes create communication barriers, especially when working with foreign clients. And if you’ve ever felt self-conscious about your Filipino or Indian accent during client calls or meetings, this might help you feel more confident. The tool reduces strong accents and helps you sound more familiar to clients—especially those from the US. Perfect for freelancers, call center agents, or anyone doing Zoom meetings daily. #aivoice #aitool #krispai #callcenter #freelancer #accent #wfhtools #wfh #meetingtools #website #tools #ai #freelancing ",
+      "content_desc": [
+        "This free AI tool can change your accent to sound American—in real time 🎤",
+        "",
+        "Website: Krisp AI",
+        "",
+        "Let’s be real—accents can sometimes create communication barriers, especially when working with foreign clients.",
+        "",
+        "And if you’ve ever felt self-conscious about your Filipino or Indian accent during client calls or meetings, this might help you feel more confident.",
+        "",
+        "The tool reduces strong accents and helps you sound more familiar to clients—especially those from the US.",
+        "",
+        "Perfect for freelancers, call center agents, or anyone doing Zoom meetings daily.",
+        "",
+        "#aivoice #aitool #krispai #callcenter #freelancer #accent #wfhtools #wfh #meetingtools #website #tools #ai #freelancing "
+      ],
+      "cover": "https://tikwm.com/video/cover/7537492388793650440.webp",
+      "duration": 67,
+      "play": "https://tikwm.com/video/media/play/7537492388793650440.mp4",
+      "wmplay": "https://tikwm.com/video/media/wmplay/7537492388793650440.mp4",
+      "size": 4760417,
+      "wm_size": 0,
+      "music": "https://tikwm.com/video/music/7537492388793650440.mp3",
+      "music_info": {
+        "id": "7537492531207047952",
+        "title": "original sound - john.tagudin",
+        "play": "https://v16-ies-music.tiktokcdn-eu.com/9459faf31bb5433ce4767c9aa49dc725/6a499708/video/tos/alisg/tos-alisg-v-27dcd7/oY2mDf9HUEfQIwGlOAogFBi1IUJoCAWmEB7AgS/?a=583965&bti=NTY6QGo0QHM6OjZANDQuYCMucCMxNDNg&&bt=125&ft=EKF4rKZWD03Q12NvJMpmzIxRSfYFpq_45SY&mime_type=audio_mpeg&rc=amwzbng5cjQ7NTMzODU8NEBpamwzbng5cjQ7NTMzODU8
+        
+        https://docs.prexzyapis.com/search/tiktoksearch?q=crysnova+AI
+        
+        
+        
+        lyrics 
+        
+        {
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "data": {
+    "title": "Assurance (Prod. by Speroach Beatz)",
+    "artist": "Davido",
+    "album": "GhanaMotion.com",
+    "duration": 244,
+    "lyrics": "Chei\nSperoach beat\nPut a bang bang\n\nBiggie biggie\nHeavy heavy\nBaby do you want me?\nHaba!\n\nBiggie biggie\nHeavy heavy (Oh)\nBaby do you want me?\nHaba\n\nYou're the one I want oh\nBefore my liver start to fail\nYou're the one I need oh\nBefore cassava start to hail\nAnd if I ever leave oh\nMake water carry me dey go\nFar away, far away\n\nSo I am looking for a sister\nChioma my lover oh\nShe get the dollar (Dollar)\nShe dey wear designer oh\n\nSo I am looking for a sister (I am looking for her)\nChioma my lover oh\nShe get the dollar (Dollar)\nShe dey wear designer oh\n\nShe say give me assurance\nAssurance\nI give my baby assurance\nI give my baby lifetime insurance\n\nAssurance, assurance\nI give my baby assurance\nI give my baby lifetime insurance\n\nBiggie biggie\nHeavy heavy (Chei)\nBaby do you want me?\nHaba (Put a bang bang)\n\nBiggie biggie\nHeavy heavy\nBaby do you want me?\nHaba\n\nBiggie biggie\nHeavy heavy (Oh)\nBaby do you want me?\nHaba\n\nBiggie biggie\nHeavy heavy (Heavy heavy)\nBaby do you want me? (Shekpe)\nHaba\n\nLove is sweet oh\nWhen money enter, love is sweeter\nPepper rest oh, so brother man go gat the liver\nCall Anita oh, tell am make she come dey go far away, far away\nMe I no dey do again\n\nAnd I am looking for a sister\nChioma my lover oh\nShe enter Atlanta, she go cause disaster oh\nAnd I am looking for a sister (I am looking for her)\nChioma my lover oh\nShe go follow go Atlanta\nThen cause disaster oh\n\nShe say give me assurance\nAssurance\nI give my baby assurance\nI give my baby lifetime insurance\n\nAssurance, assurance\nI give my baby assurance\nI give my baby lifetime insurance\n\nBiggie biggie\nHeavy heavy (Chei)\nBaby do you want me?\nHaba (Put a bang bang)\n\nBiggie biggie\nHeavy heavy\nBaby do you want me?\nHaba\n\nBiggie biggie\nHeavy heavy (Oh)\nBaby do you want me?\nHaba\n\nBiggie biggie\nHeavy heavy (Heavy heavy)\nBaby do you want me?\nHaba\n\nSo I am looking for a sister\nChioma my lover oh\nShe get the dollar (Dollar)\nShe dey wear designer oh\n\nSo I am looking for a sister (I am looking for her)\nChioma my lover oh\nShe get the dollar (Dollar)\nShe dey wear designer oh\n\nShe say give me assurance (Eh eh)\nAssurance\nI give my baby assurance\nI give my baby lifetime insurance\n\nAssurance, assurance\nI give my baby assurance\nI give my baby lifetime insurance\n\nBiggie biggie (I am looking for a sister)\nHeavy heavy\nBaby do you want me? (Chioma my lover)\nHaba\n\nBiggie biggie (She get the dollar)\nHeavy heavy\nBaby do you want me? (She dey wear designer)\nHaba\n\nBiggie biggie (I am looking for a sister)\nHeavy heavy\nBaby do you want me? (Chioma my lover)\nHaba\n\nBiggie biggie (She get the dollar)\nHeavy heavy\nBaby do you want me? (She dey wear designer)\nHaba\nSperoach beat\n\nBig sponsor",
+    "syncedLyrics": "[00:10.15] Chei\n[00:10.70] Speroach beat\n[00:10.91] Put a bang bang\n[00:11.24] Biggie biggie\n[00:11.40] Heavy heavy\n[00:12.44] Baby do you want me?\n[00:13.12] Haba!\n[00:13.97] Biggie biggie\n[00:14.81] Heavy heavy (Oh)\n[00:15.83] Baby do you want me?\n[00:17.92] Haba\n[00:18.73] You're the one I want oh\n[00:20.61] Before my liver start to fail\n[00:23.44] You're the one I need oh\n[00:26.08] Before cassava start to hail\n[00:28.10] And if I ever leave oh\n[00:30.48] Make water carry me dey go\n[00:32.68] Far away, far away\n[00:35.75] So I am looking for a sister\n[00:39.04] Chioma my lover oh\n[00:42.19] She get the dollar (Dollar)\n[00:44.44] She dey wear designer oh\n[00:46.21] So I am looking for a sister (I am looking for her)\n[00:49.69] Chioma my lover oh\n[00:51.25] She get the dollar (Dollar)\n[00:53.32] She dey wear designer oh\n[00:55.32] She say give me assurance\n[00:58.54] Assurance\n[01:00.28] I give my baby assurance\n[01:02.74] I give my baby lifetime insurance\n[01:04.88] Assurance, assurance\n[01:07.54] I give my baby assurance\n[01:09.35] I give my baby lifetime insurance\n[01:13.99] Biggie biggie\n[01:14.59] Heavy heavy (Chei)\n[01:15.65] Baby do you want me?\n[01:19.45] Haba (Put a bang bang)\n[01:21.82] \n[01:31.91] Biggie biggie\n[01:32.53] Heavy heavy\n[01:33.16] Baby do you want me?\n[01:33.75] Haba\n[01:33.95] Biggie biggie\n[01:34.20] Heavy heavy (Oh)\n[01:34.56] Baby do you want me?\n[01:34.80] Haba\n[01:35.09] Biggie biggie\n[01:35.66] Heavy heavy (Heavy heavy)\n[01:36.18] Baby do you want me? (Shekpe)\n[01:36.47] Haba\n[01:37.42] Love is sweet oh\n[01:38.12] When money enter, love is sweeter\n[01:38.47] Pepper rest oh, so brother man go gat the liver\n[01:38.76] Call Anita oh, tell am make she come dey go far away, far away\n[01:38.94] Me I no dey do again\n[01:41.65] \n[01:49.96] And I am looking for a sister\n[01:51.91] Chioma my lover oh\n[01:54.06] She enter Atlanta, she go cause disaster oh\n[01:58.28] And I am looking for a sister (I am looking for her)\n[02:01.89] \n[02:05.06] Chioma my lover oh\n[02:05.55] She go follow go Atlanta\n[02:06.83] Then cause disaster oh\n[02:08.04] She say give me assurance\n[02:10.60] Assurance\n[02:12.48] I give my baby assurance\n[02:14.44] I give my baby lifetime insurance\n[02:16.49] Assurance, assurance\n[02:21.24] I give my baby assurance\n[02:25.08] I give my baby lifetime insurance\n[02:25.71] Biggie biggie\n[02:28.87] Heavy heavy (Chei)\n[02:30.25] Baby do you want me?\n[02:30.96] Haba (Put a bang bang)\n[02:32.42] Biggie biggie\n[02:33.15] Heavy heavy\n[02:33.63] Baby do you want me?\n[02:34.52] Haba\n[02:35.94] Biggie biggie\n[02:37.30] Heavy heavy (Oh)\n[02:38.50] Baby do you want me?\n[02:40.41] Haba\n[02:41.72] Biggie biggie\n[02:42.33] Heavy heavy (Heavy heavy)\n[02:43.89] Baby do you want me?\n[02:44.18] Haba\n[02:46.27] So I am looking for a sister\n[02:47.85] Chioma my lover oh\n[02:50.30] She get the dollar (Dollar)\n[02:53.03] She dey wear designer oh\n[02:54.04] So I am looking for a sister (I am looking for her)\n[02:55.46] Chioma my lover oh\n[02:57.99] She get the dollar (Dollar)\n[02:59.98] She dey wear designer oh\n[03:01.80] She say give me assurance (Eh eh)\n[03:05.19] Assurance\n[03:06.36] I give my baby assurance\n[03:09.34] I give my baby lifetime insurance\n[03:10.99] Assurance, assurance\n[03:15.29] I give my baby assurance\n[03:17.83] I give my baby lifetime insurance\n[03:19.60] Biggie biggie (I am looking for a sister)\n[03:23.56] Heavy heavy\n[03:24.09] Baby do you want me? (Chioma my lover)\n[03:25.07] Haba\n[03:26.29] Biggie biggie (She get the dollar)\n[03:28.34] Heavy heavy\n[03:30.40] Baby do you want me? (She dey wear designer)\n[03:32.01] Haba\n[03:32.39] Biggie biggie (I am looking for a sister)\n[03:33.01] Heavy heavy\n[03:33.72] Baby do you want me? (Chioma my lover)\n[03:34.70] Haba\n[03:35.83] Biggie biggie (She get the dollar)\n[03:36.45] Heavy heavy\n[03:38.10] Baby do you want me? (She dey wear designer)\n[03:39.32] Haba\n[03:40.02] Speroach beat\n[03:40.35] Big sponsor\n[03:41.27] "
+  }
+}
+
+https://docs.prexzyapis.com/search/lyrics?title=Assurance+by+Davido
+
+universal download from all social media platforms 
+{
+  "status": true,
+  "statusCode": 200,
+  "creator": "prexzy",
+  "platform": "TikTok",
+  "original_url": "https://vt.tiktok.com/ZSCBFL8DM/",
+  "media_count": 3,
+  "has_images": false,
+  "has_videos": true,
+  "has_audios": true,
+  "medias": [
+    {
+      "type": "video",
+      "url": "https://api.tiktokv.com/aweme/v1/play/?faid=1340&file_id=cb71785ef49f4c44bb2f662060c250af&is_play_url=1&item_id=7649461378222148885&line=0&ply_type=2&signaturev3=dmlkZW9faWQ7ZmlsZV9pZDtpdGVtX2lkLjczOTVhOTY1ZTlhNjJjYjk4NmM4NmUzN2Q5Y2I2NGY0&tk=tt_chain_token&video_id=v1c044g50000d8k5h0vog65o2mg46qe0",
+      "quality": "hd_no_watermark",
+      "is_no_watermark": true
+    },
+    {
+      "type": "audio",
+      "url": "https://v16m.tiktokcdn.com/08cb357f4ed9b8ee5912eff88f0c27f6/6a41aeac/video/tos/alisg/tos-alisg-v-27dcd7/oUjofqgEEkDCKQQFFBBzAqWihAJBJUAAEAKMfh/?a=1180&bti=ODszNWYuMDE6&&bt=125&ft=.NpOcInz7ThPLwgGXq8Zmo&mime_type=audio_mpeg&rc=ajlvaGo5cjw4OzMzODU8NEBpajlvaGo5cjw4OzMzODU8NEBjLmJmMmQ0ZWhhLS1kMS1zYSNjLmJmMmQ0ZWhhLS1kMS1zcw%3D%3D&vvpl=1&l=20260628073014CFF1A0CD594625C18DA8&btag=e00048000",
+      "quality": "audio"
+    }
+  ]
+}
+
+https://docs.prexzyapis.com/download/aio?url=https%3A%2F%2Fvt.tiktok.com%2FZSCBFL8DM%2F
+
+
+text to voice 
+male
+https://docs.prexzyapis.com/tts/james?text=Hey+man
+
+female 
+https://docs.prexzyapis.com/tts/tts-en?text=Hello
