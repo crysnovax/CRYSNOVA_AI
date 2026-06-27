@@ -5,7 +5,7 @@ module.exports = {
     category: 'Tools',
     usage: '.quoted (reply to a message that quotes another)',
     reactions: { start: '📝', success: '💬', error: '📡' },
-    adminOnly: true,      
+    adminOnly: false,      
     ownerOnly: true,      
     groupOnly: false,     
 
