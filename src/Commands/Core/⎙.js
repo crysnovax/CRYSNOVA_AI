@@ -7,8 +7,8 @@
 
 module.exports = {
     name: 'repo',
-    alias: ['github', 'source', 'cody'],
-    desc: 'Show CODY creator panel & repositories',
+    alias: ['source', 'cody'],
+    desc: 'Show CODY/CRYSNOVA creator panel & repositories',
     category: 'Info',
     reactions: { start: '💠', success: '📑' },
     
@@ -24,7 +24,8 @@ module.exports = {
             `│ ◈ Role     : AI Developer\n` +
             `│ ◈ Version  : CODY V2\n` +
             `│ ◈ Status   : Active\n` +
-            `│ ◈ Engine   : Multi-Core AI�\n\n` +
+            `│ ◈ Engine   : Multi-Core AI�\n` +
+            `│ ◈ BAILEYS  : @crysnovax/baileys\n\n` +
             
             `*𓂀  R E P O S I T O R I E S 🜲*\n` +
             `│ ◈ CRYSN⚉VA_AI\n` +
@@ -34,8 +35,9 @@ module.exports = {
             `│   └─ github.com/crysnovax/CODY\n\n` +
             
             `*𓂀  C O N N E C T �*\n` +
-            `│ ◈ Channel  : wa.me/channel/0029Vb6pe77K0IBn48HLKb38\n` +
-            `│ ◈ Support  : chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax\n` +
+            `│ ◈ Channel1  : sl.crysnovax.link/CRYSNOVA\n` +
+            `│ ◈ Channel2  : sl.crysnovax.link/CODY\n` +
+            `│ ◈ Support  : sl.crysnovax.link/WHATSAPP\n` +
             `│ ◈ Contact  : wa.me/message/636PEVHM5BZUM1\n\n` +
             
             `*𓂀  S O C I A L ♧*\n` +
