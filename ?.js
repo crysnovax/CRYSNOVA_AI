@@ -16,6 +16,8 @@ const botFont = require('./src/Commands/Bot/botfont.js');
 
 const { translate } = require('./src/Commands/Core/✐.js');
 const { getLang }   = require('./src/Commands/Bot/botlang.js');
+const { setupMuteSchedules } = require('./src/Commands/Admin/Mute')
+//setupMuteSchedules(sock)
 
 const MARKER = '\u200E';
 
