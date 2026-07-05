@@ -112,7 +112,7 @@ function buildRepairPrompt(task, badOutput) {
 }
 
 async function requestCode(prompt) {
-    const url = `https://apis.prexzyvilla.site/ai/code-advanced?text=${encodeURIComponent(prompt)}`;
+    const url = `https://prexzyapis.com/ai/code-advanced?text=${encodeURIComponent(prompt)}`;
     return axios.get(url, {
         headers: { Accept: 'application/json' },
         timeout: 120000,
@@ -199,7 +199,7 @@ module.exports = {
             }
 
             await sock.sendMessage(m.chat, {
-                react: { text: '✅', key: m.key }
+                react: { text: '🍁', key: m.key }
             });
         } catch (err) {
             console.log('CODE CMD ERROR:', err?.message);
@@ -220,4 +220,3 @@ module.exports = {
         }
     }
 };
-            
