@@ -1,11 +1,23 @@
 const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
+const { exec } = require('child_process');
+
+function runFfmpeg(cmd) {
+    return new Promise((resolve, reject) => {
+        exec(cmd, (err) => {
+            if (err) reject(err);
+            else resolve();
+        });
+    });
+}
 
 module.exports = {
     name: 'resize',
     alias: ['resize', 'scale', 'fit', 'crop', 'square', 'widen', 'heighten', 'compress', 'optimize'],
-    desc: 'Resize, scale, crop, and optimize images with various modes',
+    desc: 'Resize, scale, crop, and optimize images with various modes. .resize also supports GIFs/video.',
     category: 'tools',
-    usage: 'Reply to image + .resize 1920x1080 | .scale 200% | .fit 800x600 | .crop 1:1 | .square | .compress 80',
+    usage: 'Reply to image + .resize 1920x1080 | .scale 200% | .fit 800x600 | .crop 1:1 | .square | .compress 80\nReply to GIF + .resize 640x360',
     owner: false,
 
     execute: async (sock, m, { args, reply }) => {
@@ -16,9 +28,77 @@ module.exports = {
 
         const quoted = m.quoted;
         const mtype = quoted.mtype || quoted.type || '';
+        const cmd = m.body.toLowerCase().split(/\s+/)[0].slice(1); // remove .
 
+        // ── GIF / VIDEO PATH ──
+        // WhatsApp GIFs are videoMessage with gifPlayback: true, not real .gif files.
+        // sharp cannot read video at all, so this goes through ffmpeg instead.
+        const isVideoType = mtype.includes('video');
+        const isGifPlayback = !!(quoted.gifPlayback || quoted.msg?.gifPlayback);
+
+        if (isVideoType) {
+            if (!isGifPlayback) {
+                return reply('⚉ This looks like a regular video, not a GIF. Resize currently supports GIFs and images only.');
+            }
+
+            if (cmd !== 'resize') {
+                return reply(`⚉ *.${cmd}* isn't supported for GIFs yet — only *.resize WIDTHxHEIGHT* works on GIFs right now (e.g. .resize 640x360).`);
+            }
+
+            const arg = args[0] || '';
+            if (!arg || !arg.includes('x')) {
+                return reply('⚉ Usage: .resize 640x360 (reply to a GIF)');
+            }
+
+            const [gifW, gifH] = arg.split('x').map(v => parseInt(v));
+            if (!gifW || !gifH || gifW < 2 || gifH < 2 || gifW > 4000 || gifH > 4000) {
+                return reply('𓄄 Invalid dimensions. Use something like .resize 640x360');
+            }
+
+            try {
+                await reply('_*✪ Processing GIF...*_');
+
+                const buffer = await quoted.download();
+                if (!buffer || buffer.length < 100) {
+                    return reply('_*✘ Failed to download GIF*_');
+                }
+
+                const tempDir = path.join(__dirname, '../../temp');
+                if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+                const stamp = Date.now();
+                const input = path.join(tempDir, `gifin_${stamp}.mp4`);
+                const output = path.join(tempDir, `gifout_${stamp}.mp4`);
+
+                fs.writeFileSync(input, buffer);
+
+                // scale to the requested size, then force even dimensions
+                // (H.264 rejects odd width/height — user-typed sizes aren't guaranteed even)
+                const cmdStr = `ffmpeg -y -i "${input}" -vf "scale=${gifW}:${gifH},scale=trunc(iw/2)*2:trunc(ih/2)*2:flags=lanczos" -c:v libx264 -pix_fmt yuv420p -movflags +faststart -an "${output}"`;
+
+                await runFfmpeg(cmdStr);
+
+                const outBuffer = fs.readFileSync(output);
+
+                await sock.sendMessage(m.chat, {
+                    video: outBuffer,
+                    gifPlayback: true,
+                    caption: `𓉤 Resized GIF → ${gifW}x${gifH}`
+                }, { quoted: m });
+
+                fs.unlinkSync(input);
+                fs.unlinkSync(output);
+                return;
+
+            } catch (err) {
+                console.error('[RESIZE GIF ERROR]', err.message || err);
+                return reply('𓄄 Failed to resize GIF\n' + (err.message || 'Unknown error'));
+            }
+        }
+
+        // ── IMAGE PATH (unchanged from original) ──
         if (!mtype.includes('image')) {
-            return reply('⚉ Reply to an *image* (not video/sticker/doc)');
+            return reply('⚉ Reply to an *image* or *GIF* (not video/sticker/doc)');
         }
 
         try {
@@ -35,8 +115,6 @@ module.exports = {
             const origWidth = metadata.width;
             const origHeight = metadata.height;
 
-            // Get command
-            const cmd = m.body.toLowerCase().split(/\s+/)[0].slice(1); // remove .
             const arg = args[0] || '';
             let outputBuffer;
             let caption = '';
@@ -224,3 +302,4 @@ module.exports = {
         }
     }
 };
+                                                          
