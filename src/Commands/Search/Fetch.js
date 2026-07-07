@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-// Extract og:image URL from already-fetched HTML
+// Extract og:image URL 
 function extractOgImage(html) {
     const patterns = [
         /<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i,
