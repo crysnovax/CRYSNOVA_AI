@@ -99,7 +99,7 @@ module.exports = {
             const env = readEnv();
             env[key]  = value;
             writeEnv(env);
-            reply(`✪ *${key}* = ${value}\n\n_Saved to .env + runtime. No restart needed._`);
+            reply(`*${key}* = ${value}`);
         } catch (err) {
             reply(`𓄄 *${key}* = ${value}\n\n_Runtime saved. .env write failed: ${err.message}_`);
         }
