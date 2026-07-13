@@ -43,7 +43,7 @@ function createAntiMessageModeration({
         category: 'Admin',
         groupOnly: true,
         adminOnly: true,
-        reactions: { start: '🛡️', success: '✅' },
+        reactions: { start: '🐾', success: '😡' },
         execute: async (sock, m, { args, reply }) => {
             const db = readJson(dbPath);
             const config = ensureConfig(db, m.chat);
