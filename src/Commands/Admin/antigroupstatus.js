@@ -27,7 +27,13 @@ const plugin = createAntiMessageModeration({
     databaseName: 'antigroupstatus.json',
     warningDatabaseName: 'antigroupstatus_warns.json',
     detector: isGroupStatusMessage,
-    violationLabel: 'group-status posts'
+    violationLabel: 'group-status posts',
+    deleteMessage: async (sock, m, mek) => {
+        if (typeof sock.deleteGroupStatus !== 'function') {
+            throw new Error('deleteGroupStatus is unavailable in this Baileys build');
+        }
+        await sock.deleteGroupStatus(m.chat, mek?.key || m.key);
+    }
 });
 
 plugin.handleAntiGroupStatus = plugin.handleModeration;

@@ -27,19 +27,26 @@ function createMessage(overrides = {}) {
     };
 }
 
-function createSocket({ admin = false } = {}) {
+function createSocket({ admin = false, botAdmin = true, deleteFails = false } = {}) {
     const sent = [];
     const removed = [];
+    const deletedStatuses = [];
     return {
         sent,
         removed,
+        deletedStatuses,
+        user: { id: '15559999@s.whatsapp.net' },
         groupMetadata: async () => ({
-            participants: [{
-                id: '15550001:8@s.whatsapp.net',
-                admin: admin ? 'admin' : null
-            }]
+            participants: [
+                { id: '15550001:8@s.whatsapp.net', admin: admin ? 'admin' : null },
+                { id: '15559999@s.whatsapp.net', admin: botAdmin ? 'admin' : null }
+            ]
         }),
-        sendMessage: async (jid, content) => sent.push({ jid, content }),
+        deleteGroupStatus: async (jid, key) => {
+            if (deleteFails) throw new Error('forbidden');
+            deletedStatuses.push({ jid, key });
+        },
+        sendMessage: async (jid, content, options) => sent.push({ jid, content, options }),
         groupParticipantsUpdate: async (jid, users, action) => removed.push({ jid, users, action })
     };
 }
@@ -91,7 +98,9 @@ test('delete action removes a matching group-status message', async () => {
     });
 
     assert.equal(handled, true);
-    assert.deepEqual(socket.sent[0].content, { delete: message.key });
+    assert.deepEqual(socket.deletedStatuses[0], { jid: message.chat, key: message.key });
+    assert.equal(socket.sent[0].content.mentions[0], message.sender);
+    assert.equal(socket.sent[0].options.quoted.message.groupStatusMessageV2 !== undefined, true);
     assert.equal(socket.removed.length, 0);
 });
 
@@ -111,6 +120,28 @@ test('disabled, from-me, and admin messages are exempt', async () => {
     const adminSocket = createSocket({ admin: true });
     assert.equal(await antiForward.handleAntiForward(adminSocket, createMessage(), payload), false);
     assert.equal(adminSocket.sent.length, 0);
+});
+
+test('does not claim deletion when group-status deletion fails', async () => {
+    writeDatabase('antigroupstatus.json', { '123@g.us': { enabled: true, action: 'delete' } });
+    const socket = createSocket({ deleteFails: true });
+    const message = createMessage();
+    const handled = await groupStatus.handleAntiGroupStatus(socket, message, {
+        key: message.key,
+        message: { groupStatusMessageV2: { message: { conversation: 'status' } } }
+    });
+
+    assert.equal(handled, false);
+    assert.match(socket.sent[0].content.text, /deletion failed/i);
+    assert.doesNotMatch(socket.sent[0].content.text, /was deleted/i);
+});
+
+test('requires bot admin permission before destructive moderation', async () => {
+    writeDatabase('antiforward.json', { '123@g.us': { enabled: true, action: 'delete' } });
+    const socket = createSocket({ botAdmin: false });
+    const payload = { message: { extendedTextMessage: { contextInfo: { isForwarded: true } } } };
+    assert.equal(await antiForward.handleAntiForward(socket, createMessage(), payload), false);
+    assert.match(socket.sent[0].content.text, /not a group admin/i);
 });
 
 test('warn action removes a member on the third violation and clears warnings', async () => {
@@ -141,6 +172,6 @@ test('kick action deletes first and immediately removes the sender', async () =>
         message: { groupStatusMessage: { message: { conversation: 'status' } } }
     });
 
-    assert.deepEqual(socket.sent[0].content, { delete: message.key });
+    assert.deepEqual(socket.deletedStatuses[0], { jid: message.chat, key: message.key });
     assert.equal(socket.removed.length, 1);
 });
