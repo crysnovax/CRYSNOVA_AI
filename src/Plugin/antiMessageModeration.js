@@ -107,14 +107,21 @@ function createAntiMessageModeration({
                 return false;
             }
 
+            const removalContext = {
+                metadata,
+                senderCandidates,
+                senderJid,
+                senderIdentity,
+                senderRecord,
+            };
             const removeMessage = deleteMessage
-                ? () => deleteMessage(sock, m, mek)
+                ? () => deleteMessage(sock, m, mek, removalContext)
                 : () => sock.sendMessage(m.chat, { delete: m.key });
             try {
                 await removeMessage();
             } catch (error) {
-                await sock.sendMessage(m.chat, { text: `${label} detected prohibited content, but deletion failed. Check the bot's admin permissions.` }, { quoted: mek }).catch(() => {});
-                console.error(`[${command.toUpperCase()} DELETE ERROR]`, error.message);
+                await sock.sendMessage(m.chat, { text: `${label} detected prohibited content, but WhatsApp rejected the delete request. The bot is already recognized as an admin; check the server log for the protocol error.` }, { quoted: mek }).catch(() => {});
+                console.error(`[${command.toUpperCase()} DELETE ERROR]`, error?.stack || error?.message || error);
                 return false;
             }
 
