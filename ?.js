@@ -489,7 +489,19 @@ try {
             try {
                 const antigm = require('./src/Commands/Admin/antigm.js');
                 if (antigm?.handleAntiGM) await antigm.handleAntiGM(sock, m, mek);
-            } catch {}
+            } catch (err) { console.error('[ANTIGM ERROR]', err.message); }
+
+            try {
+                const antigroupstatus = require('./src/Commands/Admin/antigroupstatus.js');
+                if (antigroupstatus?.handleAntiGroupStatus) {
+                    await antigroupstatus.handleAntiGroupStatus(sock, m, mek);
+                }
+            } catch (err) { console.error('[ANTIGROUPSTATUS ERROR]', err.message); }
+
+            try {
+                const antiforward = require('./src/Commands/Admin/antiforward.js');
+                if (antiforward?.handleAntiForward) await antiforward.handleAntiForward(sock, m, mek);
+            } catch (err) { console.error('[ANTIFORWARD ERROR]', err.message); }
 
             try {
                 const vvcmd = require('./src/Commands/Converter/vvcmd.js');

@@ -6,7 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "start": "node main.js",
-    "dev": "nodemon main.js"
+    "dev": "nodemon main.js",
+    "test": "node --test tests/*.test.js"
   },
   "keywords": [
     "whatsapp",
