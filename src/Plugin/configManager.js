@@ -47,13 +47,8 @@ const setVar = (key, value) => {
     runtime[key] = v;
     save();
 
-    /* ⭐ Clear require cache */
-    Object.keys(require.cache).forEach(k => {
-        if (k.includes('config') || k.includes('configManager')) {
-            delete require.cache[k];
-        }
-    });
-
+    // Configuration modules read runtime values through getVar. Do not evict
+    // arbitrary dependencies whose path happens to contain "config".
     return v;
 };
 

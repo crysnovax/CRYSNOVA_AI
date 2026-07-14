@@ -327,8 +327,8 @@ const handleMessage = async (sock, m, store) => {
         console.log(chalk.cyan(`[CMD] ${prefix}${cmdName} | ${senderNum}${isOwner ? ' [OWNER]' : isDual ? ' [DUAL]' : isSudo ? ' [SUDO]' : ''}`));
 
         await cmd.execute(sock, m, {
-            args, text, prefix, isOwner, isSudo, isDual, isAdmin, isBotAdmin,
-            isGroup: m.isGroup, groupMeta, reply, config: cfg, store, getVar
+            args, text, prefix, isOwner, isSudo, isDual, isAdmin, isGroupAdmin: isAdmin,
+            isBotAdmin, isOwnerAdmin, isGroup: m.isGroup, groupMeta, reply, config: cfg, store, getVar
         });
 
         if (global.crysStats) global.crysStats.commands++;

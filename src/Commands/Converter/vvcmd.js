@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys')
+const { downloadContentFromMessage } = require('@crysnovax/baileys')
 
 const DB_PATH = path.join(process.cwd(), 'database', 'vvcmd.json')
 

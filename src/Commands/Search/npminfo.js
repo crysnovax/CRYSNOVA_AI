@@ -18,7 +18,7 @@ module.exports = {
                 `│ ✪ *Examples:*\n` +
                 `│ ${prefix}npminfo axios\n` +
                 `│ ${prefix}npminfo react\n` +
-                `│ ${prefix}npminfo @crysnovax/baileys-stable\n│\n` +
+                `│ ${prefix}npminfo @crysnovax/baileys\n│\n` +
                 `│ 📦 *NPM Registry Info*\n` +
                 `╰──────────────────`
             );

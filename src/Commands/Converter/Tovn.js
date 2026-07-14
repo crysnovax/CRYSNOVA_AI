@@ -1,4 +1,4 @@
-const { downloadContentFromMessage, makeWASocket, generateWAMessageFromContent } = require('@whiskeysockets/baileys');
+const { downloadContentFromMessage, makeWASocket, generateWAMessageFromContent } = require('@crysnovax/baileys');
 const { spawn } = require('child_process');
 
 module.exports = {

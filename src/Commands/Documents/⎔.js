@@ -1,5 +1,5 @@
 const sharp = require('sharp');
-const { downloadContentFromMessage } = require('@itsliaaa/baileys');
+const { downloadContentFromMessage } = require('@crysnovax/baileys');
 
 // Store collage sessions: key = `${sender}_${chat}` -> { images: Buffer[], layout: string }
 const collageSessions = new Map();

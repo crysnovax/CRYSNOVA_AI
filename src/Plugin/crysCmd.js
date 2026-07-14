@@ -2,25 +2,32 @@ const registry = new Map();
 
 /* Add command (Singleton Safe) */
 const addCommand = (cmd) => {
-    if (!cmd?.name) return;
+    if (!cmd?.name || typeof cmd.execute !== 'function') return false;
 
     const name = cmd.name.toLowerCase();
 
-    // Prevent duplicate command registration
-    if (registry.has(name)) return;
+    if (registry.has(name)) {
+        console.warn(`[CMD COLLISION] "${name}" is already registered; skipping duplicate`);
+        return false;
+    }
 
     registry.set(name, cmd);
 
     // Register aliases safely
     if (Array.isArray(cmd.alias)) {
         for (const a of cmd.alias) {
+            if (typeof a !== 'string' || !a.trim()) continue;
             const alias = a.toLowerCase();
 
             if (!registry.has(alias)) {
                 registry.set(alias, cmd);
+            } else if (registry.get(alias) !== cmd) {
+                console.warn(`[CMD COLLISION] alias "${alias}" for "${name}" is already registered`);
             }
         }
     }
+
+    return true;
 };
 
 /* Register external/dynamic command (public API for plugins) */
