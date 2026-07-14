@@ -7,7 +7,7 @@ const addCommand = (cmd) => {
     const name = cmd.name.toLowerCase();
 
     if (registry.has(name)) {
-        console.warn(`[CMD COLLISION] "${name}" is already registered; skipping duplicate`);
+    //    console.warn(`[CMD COLLISION] "${name}" is already registered; skipping duplicate`);
         return false;
     }
 
@@ -22,7 +22,7 @@ const addCommand = (cmd) => {
             if (!registry.has(alias)) {
                 registry.set(alias, cmd);
             } else if (registry.get(alias) !== cmd) {
-                console.warn(`[CMD COLLISION] alias "${alias}" for "${name}" is already registered`);
+              //  console.warn(`[CMD COLLISION] alias "${alias}" for "${name}" is already registered`);
             }
         }
     }
