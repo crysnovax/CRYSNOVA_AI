@@ -27,19 +27,43 @@ function createMessage(overrides = {}) {
     };
 }
 
-function createSocket({ admin = false } = {}) {
+function createSocket({ admin = false, botAdmin = true, deleteFails = false, deleteFailures = 0 } = {}) {
     const sent = [];
     const removed = [];
+    const deletedStatuses = [];
+    let remainingDeleteFailures = deleteFailures;
     return {
         sent,
         removed,
+        deletedStatuses,
+        user: { id: '15559999@s.whatsapp.net' },
+        signalRepository: {
+            lidMapping: {
+                getPNForLID: async jid => jid === '999999@lid' ? '15550001@s.whatsapp.net' : null,
+                getLIDForPN: async jid => jid === '15550001@s.whatsapp.net' ? '999999@lid' : null,
+            }
+        },
         groupMetadata: async () => ({
-            participants: [{
-                id: '15550001:8@s.whatsapp.net',
-                admin: admin ? 'admin' : null
-            }]
+            participants: [
+                {
+                    id: '999999@lid',
+                    phoneNumber: '15550001@s.whatsapp.net',
+                    admin: admin ? 'admin' : null
+                },
+                { id: '15559999@s.whatsapp.net', admin: botAdmin ? 'admin' : null }
+            ]
         }),
-        sendMessage: async (jid, content) => sent.push({ jid, content }),
+        deleteGroupStatus: async (jid, key) => {
+            deletedStatuses.push({ jid, key, method: 'helper' });
+            if (deleteFails || remainingDeleteFailures-- > 0) throw new Error('forbidden');
+        },
+        sendMessage: async (jid, content, options) => {
+            if (content.delete) {
+                deletedStatuses.push({ jid, key: content.delete, method: 'standard' });
+                if (deleteFails || remainingDeleteFailures-- > 0) throw new Error('forbidden');
+            }
+            sent.push({ jid, content, options });
+        },
         groupParticipantsUpdate: async (jid, users, action) => removed.push({ jid, users, action })
     };
 }
@@ -91,8 +115,57 @@ test('delete action removes a matching group-status message', async () => {
     });
 
     assert.equal(handled, true);
-    assert.deepEqual(socket.sent[0].content, { delete: message.key });
+    assert.equal(socket.deletedStatuses[0].jid, message.chat);
+    assert.equal(socket.deletedStatuses[0].key.id, message.key.id);
+    assert.equal(socket.deletedStatuses[0].key.participant, message.sender);
+    assert.equal(socket.sent[0].content.mentions[0], message.sender);
+    assert.equal(socket.sent[0].options.quoted.message.groupStatusMessageV2 !== undefined, true);
     assert.equal(socket.removed.length, 0);
+});
+
+test('repairs a LID-only status key with the matching phone-number identity', async () => {
+    writeDatabase('antigroupstatus.json', { '123@g.us': { enabled: true, action: 'delete' } });
+    const socket = createSocket();
+    const message = createMessage({
+        sender: '999999@lid',
+        key: { id: 'lid-status', remoteJid: '123@g.us', fromMe: false, participant: '999999@lid' }
+    });
+
+    const handled = await groupStatus.handleAntiGroupStatus(socket, message, {
+        key: message.key,
+        message: { groupStatusMessageV2: { message: { conversation: 'status' } } }
+    });
+
+    assert.equal(handled, true);
+    assert.equal(socket.deletedStatuses[0].key.participant, '15550001@s.whatsapp.net');
+});
+
+test('falls back from the fork helper to the standard Baileys revoke path', async () => {
+    const socket = createSocket({ deleteFailures: 1 });
+    const message = createMessage();
+    const deletedKey = await groupStatus.deleteGroupStatus(socket, message, {
+        key: { ...message.key, participant: message.sender }
+    }, {
+        senderJid: message.sender,
+        senderRecord: { id: '999999@lid', phoneNumber: message.sender }
+    });
+
+    assert.equal(deletedKey.participant, message.sender);
+    assert.equal(socket.deletedStatuses[0].method, 'helper');
+    assert.equal(socket.deletedStatuses[1].method, 'standard');
+});
+
+test('builds deduplicated phone-first revoke keys and retains the raw key', () => {
+    const rawKey = { id: 'status-key', remoteJid: '123@g.us', participant: '999999@lid' };
+    const keys = groupStatus.buildDeleteKeys('123@g.us', rawKey.id, [
+        '999999@lid',
+        '15550001@s.whatsapp.net',
+        '15550001@s.whatsapp.net'
+    ].sort((a, b) => Number(a.endsWith('@lid')) - Number(b.endsWith('@lid'))), rawKey);
+
+    assert.equal(keys[0].participant, '15550001@s.whatsapp.net');
+    assert.equal(keys[1].participant, '999999@lid');
+    assert.equal(keys.length, 2);
 });
 
 test('disabled, from-me, and admin messages are exempt', async () => {
@@ -111,6 +184,28 @@ test('disabled, from-me, and admin messages are exempt', async () => {
     const adminSocket = createSocket({ admin: true });
     assert.equal(await antiForward.handleAntiForward(adminSocket, createMessage(), payload), false);
     assert.equal(adminSocket.sent.length, 0);
+});
+
+test('does not claim deletion when group-status deletion fails', async () => {
+    writeDatabase('antigroupstatus.json', { '123@g.us': { enabled: true, action: 'delete' } });
+    const socket = createSocket({ deleteFails: true });
+    const message = createMessage();
+    const handled = await groupStatus.handleAntiGroupStatus(socket, message, {
+        key: message.key,
+        message: { groupStatusMessageV2: { message: { conversation: 'status' } } }
+    });
+
+    assert.equal(handled, false);
+    assert.match(socket.sent[0].content.text, /WhatsApp rejected the delete request/i);
+    assert.doesNotMatch(socket.sent[0].content.text, /was deleted/i);
+});
+
+test('requires bot admin permission before destructive moderation', async () => {
+    writeDatabase('antiforward.json', { '123@g.us': { enabled: true, action: 'delete' } });
+    const socket = createSocket({ botAdmin: false });
+    const payload = { message: { extendedTextMessage: { contextInfo: { isForwarded: true } } } };
+    assert.equal(await antiForward.handleAntiForward(socket, createMessage(), payload), false);
+    assert.match(socket.sent[0].content.text, /not a group admin/i);
 });
 
 test('warn action removes a member on the third violation and clears warnings', async () => {
@@ -141,6 +236,8 @@ test('kick action deletes first and immediately removes the sender', async () =>
         message: { groupStatusMessage: { message: { conversation: 'status' } } }
     });
 
-    assert.deepEqual(socket.sent[0].content, { delete: message.key });
+    assert.equal(socket.deletedStatuses[0].jid, message.chat);
+    assert.equal(socket.deletedStatuses[0].key.id, message.key.id);
+    assert.equal(socket.deletedStatuses[0].key.participant, message.sender);
     assert.equal(socket.removed.length, 1);
 });
