@@ -1,4 +1,4 @@
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys')
+const { downloadContentFromMessage } = require('@crysnovax/baileys')
 
 module.exports = {
     name: "tovv",

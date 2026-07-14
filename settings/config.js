@@ -7,6 +7,24 @@ const fs   = require('fs');
 const path = require('path');
 const { getVar } = require('../src/Plugin/configManager');
 
+const parseBoolean = (value, fallback) => {
+    if (value === undefined || value === null || value === '') return fallback;
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value !== 0;
+    const normalized = String(value).trim().toLowerCase();
+    if (['true', '1', 'yes', 'on'].includes(normalized)) return true;
+    if (['false', '0', 'no', 'off'].includes(normalized)) return false;
+    return fallback;
+};
+
+const getBoolean = (key, userValue, fallback) => {
+    const envValue = process.env[key];
+    if (envValue !== undefined) return parseBoolean(envValue, fallback);
+    const runtimeValue = getVar(key, undefined);
+    if (runtimeValue !== undefined && runtimeValue !== null) return parseBoolean(runtimeValue, fallback);
+    return parseBoolean(userValue, fallback);
+};
+
 /*
 ──────────────────────────────────────────
 Load User Config (optional JSON override)
@@ -105,20 +123,20 @@ const config = {
     // BOT STATUS / MODE (ZEE BOT .env style)
     // ════════════════════════════════════════════
     status: {
-        public:   process.env.PUBLIC_MODE   !== undefined ? process.env.PUBLIC_MODE   === 'false'  : (getVar('PUBLIC_MODE')   ?? userConfig?.bot?.public   ?? true),
-        terminal: process.env.TERMINAL_MODE !== undefined ? process.env.TERMINAL_MODE !== 'false' : (getVar('TERMINAL_MODE') ?? userConfig?.bot?.terminal ?? true),
-        reactsw:  process.env.REACT_STATUS  !== undefined ? process.env.REACT_STATUS  !== 'false' : (getVar('REACT_STATUS')  ?? userConfig?.bot?.reactsw  ?? true)
+        public:   getBoolean('PUBLIC_MODE', userConfig?.bot?.public, true),
+        terminal: getBoolean('TERMINAL_MODE', userConfig?.bot?.terminal, true),
+        reactsw:  getBoolean('REACT_STATUS', userConfig?.bot?.reactsw, true)
     },
 
     // ════════════════════════════════════════════
     // BOT MODE FLAGS (ZEE BOT specific)
     // ════════════════════════════════════════════
     mode: {
-        autoRead:      process.env.AUTO_READ      !== 'false',
-        autoTyping:    process.env.AUTO_TYPING    === 'false',
-        autoRecording: process.env.AUTO_RECORDING === 'true',
-        alwaysOnline:  process.env.ALWAYS_ONLINE  !== 'true',
-        selfBot:       process.env.SELF_BOT       === 'true'
+        autoRead:      getBoolean('AUTO_READ', userConfig?.bot?.autoRead, true),
+        autoTyping:    getBoolean('AUTO_TYPING', userConfig?.bot?.autoTyping, false),
+        autoRecording: getBoolean('AUTO_RECORDING', userConfig?.bot?.autoRecording, false),
+        alwaysOnline:  getBoolean('ALWAYS_ONLINE', userConfig?.bot?.alwaysOnline, true),
+        selfBot:       getBoolean('SELF_BOT', userConfig?.bot?.selfBot, false)
     },
 
     // ════════════════════════════════════════════

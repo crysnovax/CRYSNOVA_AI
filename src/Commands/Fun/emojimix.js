@@ -26,9 +26,14 @@ module.exports = {
 
             let [emoji1, emoji2] = text.split("+").map(e => e.trim());
 
+            const tenorApiKey = process.env.TENOR_API_KEY;
+            if (!tenorApiKey) {
+                return reply('✘ Emoji Mix is unavailable because TENOR_API_KEY is not configured.');
+            }
+
             const url =
                 `https://tenor.googleapis.com/v2/featured?` +
-                `key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ` +
+                `key=${encodeURIComponent(tenorApiKey)}` +
                 `&contentfilter=high` +
                 `&media_filter=png_transparent` +
                 `&collection=emoji_kitchen_v5` +

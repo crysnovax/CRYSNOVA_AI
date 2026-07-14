@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+const { downloadContentFromMessage } = require('@crysnovax/baileys');
 
 const DATA_FILE = path.join(__dirname, '../../../database/vv-reactions.json');
 
