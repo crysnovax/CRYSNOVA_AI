@@ -64,13 +64,20 @@ async function buildAuthorCandidates(sock, m, mek, context = {}) {
 }
 
 function buildDeleteKeys(chat, messageId, authors, rawKey = {}) {
-    const keys = authors.map(participant => ({
-        remoteJid: chat,
-        fromMe: false,
-        id: messageId,
-        participant,
-    }));
-    if (rawKey?.id) keys.push({ ...rawKey, remoteJid: chat, fromMe: false });
+    const keys = [];
+
+    // Baileys 2.6.9 expects the complete key emitted with the original
+    // group-status message. Keep every protocol field and try it first.
+    if (rawKey?.id) keys.push({ ...rawKey, remoteJid: chat });
+
+    for (const participant of authors) {
+        keys.push({
+            remoteJid: chat,
+            fromMe: false,
+            id: messageId,
+            participant,
+        });
+    }
 
     const seen = new Set();
     return keys.filter(key => {
@@ -82,9 +89,9 @@ function buildDeleteKeys(chat, messageId, authors, rawKey = {}) {
 }
 
 async function deleteGroupStatus(sock, m, mek, context = {}) {
-    const rawKey = mek?.key || m.key || {};
+    const rawKey = { ...(m.key || {}), ...(mek?.key || {}) };
     const authors = await buildAuthorCandidates(sock, m, mek, context);
-    const keys = buildDeleteKeys(m.chat, rawKey.id || m.key?.id, authors, rawKey);
+    const keys = buildDeleteKeys(m.chat, rawKey.id, authors, rawKey);
     const failures = [];
 
     for (const key of keys) {

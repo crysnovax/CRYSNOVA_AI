@@ -123,12 +123,18 @@ test('delete action removes a matching group-status message', async () => {
     assert.equal(socket.removed.length, 0);
 });
 
-test('repairs a LID-only status key with the matching phone-number identity', async () => {
+test('passes the complete original LID status key to the Baileys 2.6.9 helper', async () => {
     writeDatabase('antigroupstatus.json', { '123@g.us': { enabled: true, action: 'delete' } });
     const socket = createSocket();
     const message = createMessage({
         sender: '999999@lid',
-        key: { id: 'lid-status', remoteJid: '123@g.us', fromMe: false, participant: '999999@lid' }
+        key: {
+            id: 'lid-status',
+            remoteJid: '123@g.us',
+            fromMe: false,
+            participant: '999999@lid',
+            participantAlt: '15550001@s.whatsapp.net'
+        }
     });
 
     const handled = await groupStatus.handleAntiGroupStatus(socket, message, {
@@ -137,7 +143,7 @@ test('repairs a LID-only status key with the matching phone-number identity', as
     });
 
     assert.equal(handled, true);
-    assert.equal(socket.deletedStatuses[0].key.participant, '15550001@s.whatsapp.net');
+    assert.deepEqual(socket.deletedStatuses[0].key, message.key);
 });
 
 test('falls back from the fork helper to the standard Baileys revoke path', async () => {
@@ -155,17 +161,23 @@ test('falls back from the fork helper to the standard Baileys revoke path', asyn
     assert.equal(socket.deletedStatuses[1].method, 'standard');
 });
 
-test('builds deduplicated phone-first revoke keys and retains the raw key', () => {
-    const rawKey = { id: 'status-key', remoteJid: '123@g.us', participant: '999999@lid' };
+test('tries the complete raw revoke key first and deduplicates identity fallbacks', () => {
+    const rawKey = {
+        id: 'status-key',
+        remoteJid: '123@g.us',
+        participant: '999999@lid',
+        participantAlt: '15550001@s.whatsapp.net'
+    };
     const keys = groupStatus.buildDeleteKeys('123@g.us', rawKey.id, [
-        '999999@lid',
         '15550001@s.whatsapp.net',
+        '999999@lid',
         '15550001@s.whatsapp.net'
-    ].sort((a, b) => Number(a.endsWith('@lid')) - Number(b.endsWith('@lid'))), rawKey);
+    ], rawKey);
 
-    assert.equal(keys[0].participant, '15550001@s.whatsapp.net');
-    assert.equal(keys[1].participant, '999999@lid');
-    assert.equal(keys.length, 2);
+    assert.deepEqual(keys[0], rawKey);
+    assert.equal(keys[1].participant, '15550001@s.whatsapp.net');
+    assert.equal(keys[2].participant, '999999@lid');
+    assert.equal(keys.length, 3);
 });
 
 test('disabled, from-me, and admin messages are exempt', async () => {
