@@ -58,7 +58,7 @@
 ### ✦ Quick Links
 
 [![Channel](https://img.shields.io/badge/WhatsApp%20Channel-Follow-25D366?style=for-the-badge&logo=whatsapp)](https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38)
-[![Support Group](https://img.shields.io/badge/Support%20Group-Join-25D366?style=for-the-badge&logo=whatsapp)](https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax)
+[![Support Group](https://img.shields.io/badge/Support%20Group-Join-25D366?style=for-the-badge&logo=whatsapp)](https://chat.whatsapp.com/FyYfUUpf20j7NeWiduGmHL?mode=gi_t)
 [![GitHub](https://img.shields.io/badge/GitHub-crysnovax-181717?style=for-the-badge&logo=github)](https://github.com/crysnovax)
 
 </div>
