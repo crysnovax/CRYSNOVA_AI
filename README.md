@@ -1,11 +1,17 @@
 <!-- CRYSNOVA AI V2 | Premium WhatsApp Bot -->
 
-<p align="center">
-  <img src="https://cdn.kord.live/serve/7Eoqeay8Ymfq.jpg" alt="CRYSNOVA AI V2 Banner" width="100%">
-  <img src="https://i.imgur.com/dBaSKWF.gif" height="20" width="100%">
-  <img src="https://i.imgur.com/dBaSKWF.gif" height="20" width="100%">
-  
+<div align="center">
+  <a href="https://cdn.crysnovax.link/files/1783556231432-0ba114c8-87b7-4a85-9476-2872943e68f5.mp4">
+    <img
+      src="./assets/baileys-demo.gif"
+      width="700"
+      alt="Baileys live demonstration"
+    />
+  </a>
 </div>
+
+<img src="https://i.imgur.com/dBaSKWF.gif" height="20" width="100%">
+<img src="https://i.imgur.com/dBaSKWF.gif" height="20" width="100%">
 
 
 
