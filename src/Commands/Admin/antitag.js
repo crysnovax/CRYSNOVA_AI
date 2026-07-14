@@ -25,59 +25,44 @@ function saveWarns(data) {
     fs.writeFileSync(WARN_DB_PATH, JSON.stringify(data, null, 2));
 }
 
-// Extract mentions from ALL possible locations in the raw message
-function getMentions(m) {
-    const raw = m.message || {};
-    const mentions = [];
-    let nonJidMentionCount = 0;
+function collectMentionData(value, state, seen = new WeakSet()) {
+    if (!value || typeof value !== 'object' || seen.has(value)) return;
+    seen.add(value);
 
-    // ── Get contextInfo from all possible message types ──
-    const ctxInfo = 
-        raw.extendedTextMessage?.contextInfo ||
-        raw.conversation?.contextInfo ||  // .hidetag sometimes comes as conversation
-        raw.imageMessage?.contextInfo ||
-        raw.videoMessage?.contextInfo ||
-        raw.documentMessage?.contextInfo ||
-        raw.audioMessage?.contextInfo ||
-        raw.stickerMessage?.contextInfo ||
-        m.msg?.contextInfo;
-
-    // ── @all / Mention Everyone detection ──
-    // WhatsApp native @all uses mentionAll flag
-    if (ctxInfo?.mentionAll) {
-        mentions.push('__ALL__');
+    for (const field of ['mentionedJid', 'mentionedJidAlt', 'statusMentions']) {
+        const entries = value[field];
+        if (Array.isArray(entries)) entries.filter(Boolean).forEach(jid => state.mentions.add(jid));
     }
 
-    // ── nonJidMentions: hidetag / @all count (THE KEY FIX!) ──
-    // Your hidetag uses extendedTextMessage with contextInfo.nonJidMentions
-    if (ctxInfo?.nonJidMentions > 0) {
-        nonJidMentionCount = ctxInfo.nonJidMentions;
-        mentions.push('__NONJID__');
+    if (value.mentionAll === true || value.isMentionAll === true) state.hasAllMention = true;
+    const nonJid = value.nonJidMentions;
+    if (Array.isArray(nonJid)) state.nonJidMentionCount += nonJid.length;
+    else if (Number(nonJid) > 0) state.nonJidMentionCount += Number(nonJid);
+
+    for (const child of Object.values(value)) {
+        if (Array.isArray(child)) child.forEach(item => collectMentionData(item, state, seen));
+        else collectMentionData(child, state, seen);
     }
-
-    // ── extendedTextMessage mentionedJid ──
-    const ext = raw.extendedTextMessage;
-    if (ext?.contextInfo?.mentionedJid?.length) {
-        mentions.push(...ext.contextInfo.mentionedJid);
-    }
-
-    // ── imageMessage, videoMessage, etc with caption ──
-    for (const type of ['imageMessage','videoMessage','documentMessage','audioMessage','stickerMessage']) {
-        if (raw[type]?.contextInfo?.mentionedJid?.length) {
-            mentions.push(...raw[type].contextInfo.mentionedJid);
-        }
-    }
-
-    // ── Already serialized by smsg ──
-    if (m.mentionedJid?.length) mentions.push(...m.mentionedJid);
-    if (m.msg?.contextInfo?.mentionedJid?.length) mentions.push(...m.msg.contextInfo.mentionedJid);
-
-    return { mentions: [...new Set(mentions)], nonJidMentionCount };
 }
 
-// Helper to normalize JID
+function getMentions(m) {
+    const state = { mentions: new Set(), nonJidMentionCount: 0, hasAllMention: false };
+    collectMentionData(m.message || {}, state);
+    collectMentionData(m.msg || {}, state);
+    for (const jid of m.mentionedJid || []) state.mentions.add(jid);
+    return { ...state, mentions: [...state.mentions] };
+}
+
 function norm(jid) {
-    return (jid || '').replace(/:\d+@/, '@').replace('@lid', '@s.whatsapp.net');
+    return String(jid || '').replace(/:\d+@/, '@').toLowerCase();
+}
+
+function sameIdentity(first, second) {
+    if (!first || !second) return false;
+    if (norm(first) === norm(second)) return true;
+    const firstNumber = norm(first).endsWith('@s.whatsapp.net') ? norm(first).split('@')[0] : '';
+    const secondNumber = norm(second).endsWith('@s.whatsapp.net') ? norm(second).split('@')[0] : '';
+    return Boolean(firstNumber && secondNumber && firstNumber === secondNumber);
 }
 
 // ── Command ────────────────────────────────────────────────────
@@ -186,10 +171,9 @@ module.exports.handleAntiTag = async function(sock, m) {
         const action     = db[group].action  || 'delete';
         
         // Get ALL mentions from the message
-        const { mentions, nonJidMentionCount } = getMentions(m);
-        const hasAllMention = mentions.includes('__ALL__');
-        const hasNonJid = mentions.includes('__NONJID__');
-        const uniqueMentions = [...new Set(mentions)].filter(m => !m.startsWith('__'));
+        const { mentions, nonJidMentionCount, hasAllMention } = getMentions(m);
+        const hasNonJid = nonJidMentionCount > 0;
+        const uniqueMentions = [...new Set(mentions.map(norm).filter(Boolean))];
         const mentionCount = uniqueMentions.length;
 
         // Get text for hidetag detection
@@ -207,13 +191,15 @@ module.exports.handleAntiTag = async function(sock, m) {
         if (!meta) return;
 
         // Admin exemption - admins are safe
-        const admins = meta.participants.filter(p => p.admin).map(p => norm(p.id));
-        const senderNorm = norm(m.sender);
-        if (admins.includes(senderNorm)) return;
+        const senderCandidates = [m.sender, m.key?.participant, m.key?.participantAlt].filter(Boolean);
+        const senderRecord = meta.participants.find(participant => {
+            const identities = [participant.id, participant.jid, participant.lid, participant.phoneNumber].filter(Boolean);
+            return identities.some(identity => senderCandidates.some(sender => sameIdentity(identity, sender)));
+        });
+        if (senderRecord?.admin) return;
 
-        // Bot exemption - bot is safe
-        const botJid = norm(sock.user?.id || '');
-        if (senderNorm === botJid) return;
+        const botCandidates = [sock.user?.id, sock.user?.lid].filter(Boolean);
+        if (senderCandidates.some(sender => botCandidates.some(bot => sameIdentity(sender, bot)))) return;
 
         const sender = m.sender;
         let triggerReason;
@@ -280,3 +266,6 @@ module.exports.handleAntiTag = async function(sock, m) {
         console.error('[ANTI TAG ERROR]', err.message);
     }
 };
+
+module.exports.getMentions = getMentions;
+module.exports.collectMentionData = collectMentionData;

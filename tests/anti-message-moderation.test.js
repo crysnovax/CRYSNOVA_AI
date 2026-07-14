@@ -10,6 +10,9 @@ process.chdir(temporaryDirectory);
 
 const groupStatus = require(path.join(originalCwd, 'src/Commands/Admin/antigroupstatus.js'));
 const antiForward = require(path.join(originalCwd, 'src/Commands/Admin/antiforward.js'));
+const antiTag = require(path.join(originalCwd, 'src/Commands/Admin/antitag.js'));
+const postStory = require(path.join(originalCwd, 'src/Commands/Owner/poststory.js'));
+const report = require(path.join(originalCwd, 'src/Commands/Owner/report.js'));
 
 function writeDatabase(name, value) {
     const databaseDirectory = path.join(temporaryDirectory, 'database');
@@ -94,6 +97,47 @@ test('detects forwarding metadata across message and supported wrapper types', (
     }), true);
 });
 
+test('detects deeply wrapped forwarding metadata', () => {
+    assert.equal(antiForward.isForwardedMessage({
+        interactiveMessage: { body: { nativeFlowMessage: { contextInfo: { forwardingScore: 4 } } } }
+    }), true);
+});
+
+test('collects alternate, media, mention-all, and non-JID tags recursively', () => {
+    const result = antiTag.getMentions({
+        mentionedJid: ['1@s.whatsapp.net'],
+        message: {
+            viewOnceMessageV2: { message: { imageMessage: { contextInfo: {
+                mentionedJidAlt: ['2@lid'], mentionAll: true, nonJidMentions: 3
+            } } } }
+        }
+    });
+    assert.deepEqual(new Set(result.mentions), new Set(['1@s.whatsapp.net', '2@lid']));
+    assert.equal(result.hasAllMention, true);
+    assert.equal(result.nonJidMentionCount, 3);
+});
+
+test('builds a deduplicated phone-only story audience and excludes self', async () => {
+    const audience = await postStory.buildStatusAudience({
+        user: { id: '3@s.whatsapp.net' },
+        store: { contacts: new Map([
+            ['one', { id: '1@s.whatsapp.net' }],
+            ['duplicate', { phoneNumber: '1@s.whatsapp.net' }],
+            ['lid', { id: '2@lid' }],
+            ['self', { id: '3@s.whatsapp.net' }],
+        ]) },
+        signalRepository: { lidMapping: { getPNForLID: async () => '2@s.whatsapp.net' } },
+    });
+    assert.deepEqual(audience.sort(), ['1@s.whatsapp.net', '2@s.whatsapp.net']);
+});
+
+test('protects official contact identities and groups from reporting', async () => {
+    assert.equal(report.PROTECTED_GROUPS.has('120363425067362165@g.us'), true);
+    assert.equal(await report.isProtectedContact({ signalRepository: { lidMapping: {
+        getLIDForPN: async () => '120495928283239@lid'
+    } } }, '2348077134210@s.whatsapp.net'), true);
+});
+
 test('does not treat quoted or unrelated context as forwarded', () => {
     assert.equal(antiForward.isForwardedMessage({
         extendedTextMessage: { contextInfo: { quotedMessage: { conversation: 'hello' } } }
@@ -140,7 +184,7 @@ test('repairs a LID-only status key with the matching phone-number identity', as
     assert.equal(socket.deletedStatuses[0].key.participant, '15550001@s.whatsapp.net');
 });
 
-test('falls back from the fork helper to the standard Baileys revoke path', async () => {
+test('retries identity variants through the dedicated group-status API', async () => {
     const socket = createSocket({ deleteFailures: 1 });
     const message = createMessage();
     const deletedKey = await groupStatus.deleteGroupStatus(socket, message, {
@@ -150,9 +194,10 @@ test('falls back from the fork helper to the standard Baileys revoke path', asyn
         senderRecord: { id: '999999@lid', phoneNumber: message.sender }
     });
 
-    assert.equal(deletedKey.participant, message.sender);
+    assert.equal(deletedKey.participant, '999999@lid');
     assert.equal(socket.deletedStatuses[0].method, 'helper');
-    assert.equal(socket.deletedStatuses[1].method, 'standard');
+    assert.equal(socket.deletedStatuses[1].method, 'helper');
+    assert.equal(socket.deletedStatuses.some(entry => entry.method === 'standard'), false);
 });
 
 test('builds deduplicated phone-first revoke keys and retains the raw key', () => {

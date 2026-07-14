@@ -1,28 +1,22 @@
 const { createAntiMessageModeration } = require('../../Plugin/antiMessageModeration');
 
-const NESTED_MESSAGE_KEYS = [
-    'ephemeralMessage',
-    'viewOnceMessage',
-    'viewOnceMessageV2',
-    'viewOnceMessageV2Extension',
-    'documentWithCaptionMessage',
-    'groupStatusMessage',
-    'groupStatusMessageV2'
-];
-
 function contextIsForwarded(contextInfo) {
     return contextInfo?.isForwarded === true || Number(contextInfo?.forwardingScore) > 0;
 }
 
-function isForwardedMessage(message) {
+function isForwardedMessage(message, seen = new WeakSet()) {
     if (!message || typeof message !== 'object') return false;
+    if (seen.has(message)) return false;
+    seen.add(message);
 
-    for (const [key, value] of Object.entries(message)) {
-        if (NESTED_MESSAGE_KEYS.includes(key)) continue;
-        if (contextIsForwarded(value?.contextInfo)) return true;
-    }
+    if (contextIsForwarded(message.contextInfo)) return true;
 
-    return NESTED_MESSAGE_KEYS.some(key => isForwardedMessage(message[key]?.message));
+    return Object.values(message).some(value => {
+        if (Array.isArray(value)) {
+            return value.some(item => isForwardedMessage(item, seen));
+        }
+        return isForwardedMessage(value, seen);
+    });
 }
 
 const plugin = createAntiMessageModeration({

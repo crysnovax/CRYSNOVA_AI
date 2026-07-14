@@ -85,25 +85,24 @@ async function deleteGroupStatus(sock, m, mek, context = {}) {
     const rawKey = mek?.key || m.key || {};
     const authors = await buildAuthorCandidates(sock, m, mek, context);
     const keys = buildDeleteKeys(m.chat, rawKey.id || m.key?.id, authors, rawKey);
+    // Prefer a resolved phone identity when available. The untouched raw key remains
+    // in the candidate list as the final compatibility attempt.
     const failures = [];
+    const hasDedicatedDelete = typeof sock.deleteGroupStatus === 'function';
 
     for (const key of keys) {
-        const methods = [];
-        if (typeof sock.deleteGroupStatus === 'function') {
-            methods.push(() => sock.deleteGroupStatus(m.chat, key));
-        }
-        methods.push(() => sock.sendMessage(m.chat, { delete: key }));
-
-        for (const method of methods) {
-            try {
-                await method();
-                return key;
-            } catch (error) {
-                failures.push({
-                    participantType: key.participant?.endsWith('@lid') ? 'lid' : 'phone',
-                    message: error?.message || String(error),
-                });
+        try {
+            if (hasDedicatedDelete) {
+                await sock.deleteGroupStatus(m.chat, key);
+            } else {
+                await sock.sendMessage(m.chat, { delete: key });
             }
+            return key;
+        } catch (error) {
+            failures.push({
+                participantType: key.participant?.endsWith('@lid') ? 'lid' : 'phone',
+                message: error?.message || String(error),
+            });
         }
     }
 
