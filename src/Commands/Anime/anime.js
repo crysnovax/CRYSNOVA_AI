@@ -117,7 +117,7 @@ const utilityCommands = [
         alias: ['aanimefact', 'afact'],
         category: 'Fun',
         desc: 'Get a random fact',
-        usage: `${prefix}anekofact`,
+        usage: 'anekofact',
         reactions: { start: '📚', success: '💡' },
         
         execute: async (sock, m, { reply }) => {
@@ -136,7 +136,7 @@ const utilityCommands = [
         alias: ['aanimename', 'arandomname'],
         category: 'Fun',
         desc: 'Generate a random anime name',
-        usage: `${prefix}anekoname`,
+        usage: 'anekoname',
         reactions: { start: '📛', success: '✨' },
         
         execute: async (sock, m, { reply }) => {
@@ -155,7 +155,7 @@ const utilityCommands = [
         alias: ['aowo', 'aowotext'],
         category: 'Fun',
         desc: 'OwOify your text',
-        usage: `${prefix}aowoify <text>`,
+        usage: 'aowoify <text>',
         reactions: { start: '😸', success: '✨' },
         
         execute: async (sock, m, { args, reply }) => {
@@ -176,7 +176,7 @@ const utilityCommands = [
         alias: ['anekoswhy', 'arandomwhy'],
         category: 'Fun',
         desc: 'Get a random "why" question',
-        usage: `${prefix}awhy`,
+        usage: 'awhy',
         reactions: { start: '🤔', success: '❓' },
         
         execute: async (sock, m, { reply }) => {
@@ -195,7 +195,7 @@ const utilityCommands = [
         alias: ['anekocat', 'arandomcat'],
         category: 'Fun',
         desc: 'Get a random cat image',
-        usage: `${prefix}acat`,
+        usage: 'acat',
         reactions: { start: '🐱', success: '😻' },
         
         execute: async (sock, m, { reply }) => {
@@ -217,7 +217,7 @@ const utilityCommands = [
         alias: ['anekos8ball', 'aask'],
         category: 'Fun',
         desc: 'Ask the magic 8ball',
-        usage: `${prefix}a8ball <question>`,
+        usage: 'a8ball <question>',
         reactions: { start: '🎱', success: '🔮' },
         
         execute: async (sock, m, { args, reply }) => {
@@ -248,7 +248,7 @@ const utilityCommands = [
         alias: ['anekospoiler', 'ahidetext'],
         category: 'Fun',
         desc: 'Hide text as spoiler',
-        usage: `${prefix}aspoiler <text>`,
+        usage: 'aspoiler <text>',
         reactions: { start: '🫣', success: '🙈' },
         
         execute: async (sock, m, { args, reply }) => {
@@ -269,7 +269,7 @@ const utilityCommands = [
         alias: ['anekoschat', 'aaichat'],
         category: 'Fun',
         desc: 'Chat with Nekos AI',
-        usage: `${prefix}achat <message>`,
+        usage: 'achat <message>',
         reactions: { start: '💬', success: '🤖' },
         
         execute: async (sock, m, { args, reply }) => {
