@@ -37,11 +37,11 @@ module.exports = [
         }
     },
 
-    // ── SET GROUP ICON ───────────────────────────────────────────────────────
+    // ── SET GROUP ICON (HD Flag) ─────────────────────────────────────────────
     {
         name: 'setgroupicon',
-        alias: ['setgrouppp', 'setgppicon', 'groupicon'],
-        desc: 'Set group profile picture',
+        alias: ['setgrouppp', 'setgppicon', 'groupicon', 'setgpphd'],
+        desc: 'Set group profile picture with HD full-size upload',
         category: 'Owner',
         owner: true,
         usage: 'setgroupicon (reply to image)',
@@ -58,8 +58,9 @@ module.exports = [
 
             try {
                 const image = await m.quoted.download();
-                await sock.updateGroupPicture(m.chat, image);
-                return reply(`✓ *Group icon updated*`);
+                // Use HD full-size upload flag
+                await sock.updateGroupPicture(m.chat, image, { quality: 'full' });
+                return reply(`✓ *Group icon updated (HD)*`);
             } catch (err) {
                 return reply(`${prefix}⊘ Error: ${err.message}`);
             }
@@ -86,39 +87,6 @@ module.exports = [
             try {
                 const result = await sock.groupAcceptInviteCode(code);
                 return reply(`✓ *Joined group:* ${result}`);
-            } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
-            }
-        }
-    },
-
-    // ── SET PRESENCE ─────────────────────────────────────────────────────────
-    {
-        name: 'presence',
-        alias: ['setonline', 'online', 'status', 'activity'],
-        desc: 'Set online presence status',
-        category: 'Owner',
-        owner: true,
-        usage: 'presence <typing|recording|paused>',
-        reactions: { start: '⏱️', success: '✓', error: '❌' },
-
-        execute: async (sock, m, { args, reply, prefix }) => {
-            const status = args[0]?.toLowerCase();
-            const valid = ['typing', 'recording', 'paused'];
-
-            if (!status || !valid.includes(status)) {
-                return reply(
-                    `${prefix}⊘ *Usage:* presence typing|recording|paused\n\n` +
-                    `Available statuses:\n` +
-                    `• typing - Show typing\n` +
-                    `• recording - Show recording audio\n` +
-                    `• paused - Stop showing status`
-                );
-            }
-
-            try {
-                await sock.updateOnlinePresence(m.chat, status);
-                return reply(`✓ *Presence set to:* ${status}`);
             } catch (err) {
                 return reply(`${prefix}⊘ Error: ${err.message}`);
             }
@@ -155,30 +123,6 @@ module.exports = [
         }
     },
 
-    // ── DELETE FOR EVERYONE ──────────────────────────────────────────────────
-    {
-        name: 'deleteall',
-        alias: ['del', 'delall', 'removemsg'],
-        desc: 'Delete a message for everyone',
-        category: 'Owner',
-        owner: true,
-        usage: 'deleteall (reply to message)',
-        reactions: { start: '🗑️', success: '✓', error: '❌' },
-
-        execute: async (sock, m, { reply, prefix }) => {
-            if (!m.quoted?.key) {
-                return reply(`${prefix}⊘ *Usage:* Reply to a message to delete it`);
-            }
-
-            try {
-                await sock.sendMessage(m.chat, { delete: m.quoted.key });
-                return reply(`✓ *Message deleted for everyone*`);
-            } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
-            }
-        }
-    },
-
     // ── CHECK WHATSAPP VERSION ───────────────────────────────────────────────
     {
         name: 'waversion',
@@ -204,6 +148,100 @@ module.exports = [
                     `WhatsApp: ${info.version}\n` +
                     `Bot Status: ${info.connected}`
                 );
+            } catch (err) {
+                return reply(`${prefix}⊘ Error: ${err.message}`);
+            }
+        }
+    },
+
+    // ── CREATE NEWSLETTER ────────────────────────────────────────────────────
+    {
+        name: 'createnewsletter',
+        alias: ['mkchannels', 'createchannel', 'newabc'],
+        desc: 'Create a new newsletter/channel',
+        category: 'Owner',
+        owner: true,
+        usage: 'createnewsletter <channel_name>',
+        reactions: { start: '📰', success: '✓', error: '❌' },
+
+        execute: async (sock, m, { args, reply, prefix }) => {
+            const name = args.join(' ');
+
+            if (!name) {
+                return reply(`${prefix}⊘ *Usage:* createnewsletter <name>`);
+            }
+
+            try {
+                const channel = await sock.newsletterCreate(name);
+                return reply(
+                    `✓ *Newsletter created*\n\n` +
+                    `ID: ${channel.id}\n` +
+                    `Name: ${name}`
+                );
+            } catch (err) {
+                return reply(`${prefix}⊘ Error: ${err.message}`);
+            }
+        }
+    },
+
+    // ── LEAVE NEWSLETTER ────────────────────────────────────────────────────
+    {
+        name: 'leavesubscription',
+        alias: ['leavenewsletter', 'leavechannel', 'unsubnews'],
+        desc: 'Leave a newsletter/channel subscription',
+        category: 'Owner',
+        owner: true,
+        usage: 'leavesubscription (reply in newsletter)',
+        reactions: { start: '🚪', success: '✓', error: '❌' },
+
+        execute: async (sock, m, { reply, prefix }) => {
+            if (!m.chat.endsWith('@newsletter')) {
+                return reply(`${prefix}⊘ *Usage:* Use this command in a newsletter`);
+            }
+
+            try {
+                await sock.newsletterLeave(m.chat);
+                return reply(`✓ *Left the newsletter*`);
+            } catch (err) {
+                return reply(`${prefix}⊘ Error: ${err.message}`);
+            }
+        }
+    },
+
+    // ── UPDATE NEWSLETTER SETTINGS ───────────────────────────────────────────
+    {
+        name: 'updatechannel',
+        alias: ['updatenewsletter', 'editchannel', 'channelsettings'],
+        desc: 'Update newsletter/channel settings',
+        category: 'Owner',
+        owner: true,
+        usage: 'updatechannel <setting> <value>',
+        reactions: { start: '⚙️', success: '✓', error: '❌' },
+
+        execute: async (sock, m, { args, reply, prefix }) => {
+            if (!m.chat.endsWith('@newsletter')) {
+                return reply(`${prefix}⊘ *Usage:* Use this command in a newsletter`);
+            }
+
+            const setting = args[0]?.toLowerCase();
+            const value = args.slice(1).join(' ');
+
+            if (!setting || !value) {
+                return reply(
+                    `${prefix}⊘ *Usage:* updatechannel <setting> <value>\n\n` +
+                    `Settings:\n` +
+                    `• name - Change channel name\n` +
+                    `• description - Update description`
+                );
+            }
+
+            try {
+                const updates = {};
+                if (setting === 'name') updates.name = value;
+                if (setting === 'description') updates.description = value;
+
+                await sock.newsletterUpdateSettings(m.chat, updates);
+                return reply(`✓ *${setting} updated*`);
             } catch (err) {
                 return reply(`${prefix}⊘ Error: ${err.message}`);
             }
