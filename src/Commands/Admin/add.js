@@ -3,73 +3,127 @@ const fetch = require('node-fetch');
 module.exports = {
     name: 'add',
     alias: ['adduser'],
+    desc: 'Add user(s) to the group',
     category: 'Admin',
-    admin: true,
-    group: true,
+    // Enforced by the command dispatcher (crysMsg.js):
+    groupOnly: true,
+    adminOnly: true,
+    botAdmin: false,
+    reactions: { start: '♾️', success: '🎉' },
 
     execute: async (sock, m, { args, reply }) => {
         try {
             if (!m.isGroup) return reply('`⟁⃝GROUP ONLY!℘`');
-            if (!args.length) {
-                return reply('_*📞 Provide a phone number*_\n_Example: .add 0807 752 8901_');
+
+            // ── Build target list (identical parsing to promote/demote) ──
+            let targets = [];
+
+            // Reply to a message
+            if (m.quoted?.sender) {
+                targets.push(m.quoted.sender);
             }
 
-            // ✅ FORMAT NUMBER
-            let number = args.join(' ').replace(/[^0-9]/g, '');
-            if (number.startsWith('0')) number = '234' + number.slice(1);
-            if (!number.startsWith('234')) number = '234' + number;
+            // @mentions
+            if (m.mentionedJid?.length) {
+                for (const jid of m.mentionedJid) {
+                    if (!targets.includes(jid)) targets.push(jid);
+                }
+            }
 
-            const jid = number + '@s.whatsapp.net';
+            // Phone numbers from args (only when no mention/reply target)
+            if (!targets.length) {
+                for (const arg of args) {
+                    let number = arg.replace(/[^0-9]/g, '');
+                    if (!number) continue;
+                    if (number.startsWith('0')) number = '234' + number.slice(1);
+                    if (number.length < 7) continue;
+                    const jid = number + '@s.whatsapp.net';
+                    if (!targets.includes(jid)) targets.push(jid);
+                }
+            }
+
+            if (!targets.length) {
+                return reply(
+                    `𓄄 *How to use .add:*\n\n` +
+                    `• Reply to a message → adds that person\n` +
+                    `• .add @user\n` +
+                    `• .add 2348012345678`
+                );
+            }
+
             const meta = await sock.groupMetadata(m.chat);
             const groupName = meta.subject;
 
-            // ✅ TRY DIRECT ADD
-            let res = await sock.groupParticipantsUpdate(m.chat, [jid], 'add');
-            const status = res?.[0]?.status;
+            const added   = [];
+            const invited = [];
+            const failed  = [];
 
-            if (status == 200 || status == '200') {
-                return await sock.sendMessage(m.chat, {
-                    text: `_*⟁⃝  @${number} has been added to the group.*_`,
-                    mentions: [jid]
-                }, { quoted: m });
-            }
-
-            // ❌ PRIVACY BLOCK → SEND INVITE WITH ?mode=gi_t
-            if (['403', '401', '409'].includes(String(status))) {
-                const freshCode = await sock.groupInviteCode(m.chat);
-                const inviteLink = `https://chat.whatsapp.com/${freshCode}?mode=gi_t`;
-
-                // Thumbnail
-                let thumbnail = null;
+            for (const jid of targets) {
                 try {
-                    const pp = await sock.profilePictureUrl(m.chat, 'image');
-                    thumbnail = await fetch(pp).then(r => r.buffer());
-                } catch {}
+                    const res = await sock.groupParticipantsUpdate(m.chat, [jid], 'add');
+                    const status = String(res?.[0]?.status ?? '');
 
-                // ✅ RAW PROTO — forces ?mode=gi_t to persist
-                await sock.sendMessage(jid, {
-                    extendedTextMessage: {
-                        text: inviteLink,
-                        matchedText: inviteLink,
-                        canonicalUrl: inviteLink,
-                        title: groupName,
-                        description: 'WhatsApp Group Invite',
-                        previewType: 1,
-                        jpegThumbnail: thumbnail
-                    },
-                    raw: true
-                });
+                    if (status === '200') {
+                        added.push(jid);
+                        continue;
+                    }
 
-                return await sock.sendMessage(m.chat, {
-                    text: `_*📩 Invite sent to @${number}—͟͟͞͞𖣘*_`,
-                    mentions: [jid]
-                }, { quoted: m });
+                    // Privacy block → send invite link in DM
+                    if (['403', '401', '409'].includes(status)) {
+                        const freshCode  = await sock.groupInviteCode(m.chat);
+                        const inviteLink = `https://chat.whatsapp.com/${freshCode}?mode=gi_t`;
+
+                        let thumbnail = null;
+                        try {
+                            const pp = await sock.profilePictureUrl(m.chat, 'image');
+                            thumbnail = await fetch(pp).then(r => r.buffer());
+                        } catch {}
+
+                        await sock.sendMessage(jid, {
+                            extendedTextMessage: {
+                                text: inviteLink,
+                                matchedText: inviteLink,
+                                canonicalUrl: inviteLink,
+                                title: groupName,
+                                description: 'WhatsApp Group Invite',
+                                previewType: 1,
+                                jpegThumbnail: thumbnail
+                            },
+                            raw: true
+                        });
+
+                        invited.push(jid);
+                        continue;
+                    }
+
+                    failed.push(jid);
+                } catch {
+                    failed.push(jid);
+                }
+
+                await new Promise(r => setTimeout(r, 600));
             }
 
-            // ❌ OTHER ERROR
-            return await sock.sendMessage(m.chat, {
-                text: `_*✘ Failed to add @${number} (status: ${status})*_`,
-                mentions: [jid]
+            // ── Report — mentions render as exactly @user ──
+            const mentions = [...added, ...invited, ...failed];
+            let text = '';
+
+            if (added.length) {
+                text += `_*⟁⃝ Added to the group:*_\n` +
+                        added.map(j => `✦ @${j.split('@')[0]}`).join('\n') + '\n\n';
+            }
+            if (invited.length) {
+                text += `_*📩 Invite sent (privacy on):*_\n` +
+                        invited.map(j => `✦ @${j.split('@')[0]}`).join('\n') + '\n\n';
+            }
+            if (failed.length) {
+                text += `_*✘ Failed:*_\n` +
+                        failed.map(j => `✦ @${j.split('@')[0]}`).join('\n');
+            }
+
+            await sock.sendMessage(m.chat, {
+                text: text.trim(),
+                mentions
             }, { quoted: m });
 
         } catch (e) {
