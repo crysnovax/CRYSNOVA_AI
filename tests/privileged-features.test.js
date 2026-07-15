@@ -55,6 +55,20 @@ test('mention matching covers sudo and dual LID identities', async () => {
     }, {}), false);
 });
 
+test('mention matching ignores replies without an explicit tag', async () => {
+    const sock = mappingSocket();
+    assert.equal(await mention.isPrivilegedMentioned(sock, {
+        key: { fromMe: false },
+        quoted: { sender: 'sudo@lid' },
+        msg: {
+            contextInfo: {
+                participant: 'sudo@lid',
+                participantAlt: '15550001111@s.whatsapp.net',
+            },
+        },
+    }, {}), false);
+});
+
 test('AFK stores and disables independent sudo and dual records', async () => {
     const sock = mappingSocket();
     const replies = [];
