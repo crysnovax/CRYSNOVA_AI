@@ -264,9 +264,17 @@ test('promotion guard enforces even when group metadata fetch fails', async () =
 
 test('device command predicts device from message ID patterns', () => {
     const device = require(path.join(originalCwd, 'src/Commands/Tools/device.js'));
+    // Classic lengths
     assert.equal(device.detectDevice('3A123456789012345678'), 'ios');
     assert.equal(device.detectDevice('3EB0123456789ABCDEF012'), 'web');
-    assert.equal(device.detectDevice('A1B2C3D4E5F6G7H8I9J0K'), 'android');
+    // Modern variable-length IDs the stale exact-length Baileys rules missed
+    assert.equal(device.detectDevice('3A1234567890ABCDEF1234567890'), 'ios');
+    assert.equal(device.detectDevice('3EB0546A2C7E982B4FC8'), 'web');
+    assert.equal(device.detectDevice('3EB0AB12CD34EF56AB78CD90EF12'), 'web');
+    assert.equal(device.detectDevice('3F1234567890ABCDEF12'), 'desktop');
+    assert.equal(device.detectDevice('BAE5123456789ABCDEF0'), 'desktop');
+    assert.equal(device.detectDevice('A1B2C3D4E5F60718293A4B5C6D7E8F90'), 'android');
+    assert.equal(device.detectDevice(''), 'unknown');
 });
 
 test('default creator immunity is permanent and bypasses corrections', async () => {

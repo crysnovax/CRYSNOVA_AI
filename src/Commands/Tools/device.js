@@ -7,16 +7,15 @@ const DEVICE_LABELS = {
 };
 
 function detectDevice(messageId) {
-    try {
-        const { getDevice } = require('@crysnovax/baileys');
-        if (typeof getDevice === 'function') return getDevice(messageId);
-    } catch {}
-    // Fallback: same prediction rules Baileys uses internally.
-    const id = String(messageId || '');
-    if (/^3A.{18}$/.test(id)) return 'ios';
-    if (/^3E.{20}$/.test(id)) return 'web';
-    if (/^(.{21}|.{32})$/.test(id)) return 'android';
-    if (/^(3F|.{18}$)/.test(id)) return 'desktop';
+    // Modern WhatsApp message IDs vary in length, so the exact-length rules in
+    // Baileys' getDevice (e.g. /^3E.{20}$/) miss current iOS and Web IDs.
+    // Prefix-based rules identify the platform reliably regardless of length.
+    const id = String(messageId || '').trim().toUpperCase();
+    if (!id) return 'unknown';
+    if (id.startsWith('3EB0')) return 'web';
+    if (id.startsWith('3A')) return 'ios';
+    if (id.startsWith('3F') || id.startsWith('BAE5')) return 'desktop';
+    if (/^[0-9A-F]{16,40}$/.test(id)) return 'android';
     return 'unknown';
 }
 
