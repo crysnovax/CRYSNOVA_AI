@@ -26,7 +26,7 @@ module.exports = {
     desc: 'Detect the device a message was sent from',
     category: 'Tools',
     usage: '.device (reply to a message)',
-    reactions: { start: '📱', success: '✅', error: '❌' },
+    reactions: { start: '💭', success: '🐾', error: '🪲' },
 
     execute: async (sock, m, { reply }) => {
         const quotedId = m.quoted?.key?.id || m.quoted?.id
@@ -45,7 +45,7 @@ module.exports = {
         const who = quotedId ? `@${String(targetSender).split('@')[0]}` : 'You';
 
         return sock.sendMessage(m.chat, {
-            text: `📱 *Device Check*\n\n${who} sent that message from: *${label}*\n\n_Prediction is based on the WhatsApp message ID pattern._`,
+            text: `${who} sent that message from: *${label}*`,
             mentions: quotedId && String(targetSender).includes('@') ? [targetSender] : [],
         }, { quoted: m });
     },
