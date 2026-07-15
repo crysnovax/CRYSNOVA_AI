@@ -88,10 +88,11 @@ module.exports = {
     category: 'Converter',
     reactions: { start: '👁️', success: '🤫' },
 
-    execute: async (sock, m, { args, reply }) => {
+    execute: async (sock, m, { args, reply, prefix }) => {
 
         const sender = m.sender
         const sub    = args[0]
+        const cmd = prefix + 'vvcmd'
 
         // .vvcmd 👌 — set emoji
         if (sub && sub !== 'off' && sub !== 'status') {
@@ -127,9 +128,9 @@ module.exports = {
         return reply(
             `╭─❍ *VV Reply Trigger*\n` +
             `│\n` +
-            `│ ✦ .vvcmd 👌    → set emoji\n` +
-            `│ ✦ .vvcmd off   → remove\n` +
-            `│ ✦ .vvcmd status → check\n` +
+            `│ ✦ ${cmd} 👌    → set emoji\n` +
+            `│ ✦ ${cmd} off   → remove\n` +
+            `│ ✦ ${cmd} status → check\n` +
             `│\n` +
             `│ Reply to view-once with\n` +
             `│ your emoji → DMs content\n` +
