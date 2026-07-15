@@ -1,7 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
-const { Sticker } = require('wa-sticker-formatter');
+// Use the pure-JS exif writer (node-webpmux) instead of wa-sticker-formatter,
+// which pulls in the native "sharp" module and crashes on hosts without a
+// prebuilt sharp binary (e.g. bot-hosting.net linux-x64).
+const { addExif } = require('../../../library/exif');
 
 module.exports = {
     name: 'sticker',
@@ -85,14 +88,8 @@ module.exports = {
             // Read the generated WebP
             let buffer = fs.readFileSync(output);
 
-            // Add metadata using wa-sticker-formatter
-            const sticker = new Sticker(buffer, {
-                pack: 'CRYSNOVA AI',
-                author: 'crysnovax',
-                type: 'full',
-                quality: 70
-            });
-            buffer = await sticker.toBuffer();
+            // Add sticker metadata (pack/author) without the native sharp dep
+            buffer = await addExif(buffer, 'CRYSNOVA AI', 'crysnovax', ['🔥']);
 
             // Send the sticker
             await sock.sendMessage(m.chat, { sticker: buffer }, { quoted: m });

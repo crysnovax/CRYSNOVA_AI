@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
-const { Sticker } = require('wa-sticker-formatter');
+// Pure-JS exif writer (node-webpmux) instead of wa-sticker-formatter -> sharp.
+const { addExif } = require('../../../library/exif');
 
 module.exports = {
     name: 'rounds',
@@ -53,14 +54,8 @@ module.exports = {
 
             let buffer = fs.readFileSync(output);
 
-            // Add metadata
-            const sticker = new Sticker(buffer, {
-                pack: 'CRYSNOVA AI',
-                author: 'crysnovax',
-                type: 'full',
-                quality: 70
-            });
-            buffer = await sticker.toBuffer();
+            // Add metadata (pure-JS, no sharp)
+            buffer = await addExif(buffer, 'CRYSNOVA AI', 'crysnovax', ['🔥']);
 
             if (buffer.length / 1024 > 500) {
                 fs.unlinkSync(input);

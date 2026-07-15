@@ -2,7 +2,8 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
-const { Sticker } = require('wa-sticker-formatter');
+// Pure-JS exif writer (node-webpmux) instead of wa-sticker-formatter -> sharp.
+const { addExif } = require('../../../library/exif');
 
 module.exports = {
     name: 'tgsticker',
@@ -124,13 +125,7 @@ module.exports = {
                     }
 
                     try {
-                        const stickerObj = new Sticker(finalBuffer, {
-                            pack: 'CRYSNOVA AI',
-                            author: 'crysnovax',
-                            type: 'full',
-                            quality: 70
-                        });
-                        finalBuffer = await stickerObj.toBuffer();
+                        finalBuffer = await addExif(finalBuffer, 'CRYSNOVA AI', 'crysnovax', ['🔥']);
                     } catch (stickerErr) {}
 
                     await sock.sendMessage(chatId, { sticker: finalBuffer });
