@@ -11,7 +11,7 @@ module.exports = [
         usage: '.lastseen <all/contacts/contact_blacklist/none>',
         reactions: { start: '👁️', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const setting = args[0]?.toLowerCase();
             const valid = ['all', 'contacts', 'contact_blacklist', 'none'];
 
@@ -27,7 +27,7 @@ module.exports = [
                 return reply(`✓ *Last seen set to:* ${setting}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -42,7 +42,7 @@ module.exports = [
         usage: '.setonline <all/match_last_seen>',
         reactions: { start: '🟢', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const setting = args[0]?.toLowerCase();
             const valid = ['all', 'match_last_seen'];
 
@@ -58,7 +58,7 @@ module.exports = [
                 return reply(`✓ *Online privacy set to:* ${setting}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -73,7 +73,7 @@ module.exports = [
         usage: '.pfpprivacy <all/contacts/contact_blacklist/none>',
         reactions: { start: '🖼️', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const setting = args[0]?.toLowerCase();
             const valid = ['all', 'contacts', 'contact_blacklist', 'none'];
 
@@ -89,7 +89,7 @@ module.exports = [
                 return reply(`✓ *Profile picture privacy set to:* ${setting}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -104,7 +104,7 @@ module.exports = [
         usage: '.statusprivacy <all/contacts/contact_blacklist/none>',
         reactions: { start: '📱', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const setting = args[0]?.toLowerCase();
             const valid = ['all', 'contacts', 'contact_blacklist', 'none'];
 
@@ -120,7 +120,7 @@ module.exports = [
                 return reply(`✓ *Status privacy set to:* ${setting}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -135,7 +135,7 @@ module.exports = [
         usage: '.groupprivacy <all/contacts/contact_blacklist/none>',
         reactions: { start: '👥', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const setting = args[0]?.toLowerCase();
             const valid = ['all', 'contacts', 'contact_blacklist', 'none'];
 
@@ -151,7 +151,7 @@ module.exports = [
                 return reply(`✓ *Groups add privacy set to:* ${setting}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -166,7 +166,7 @@ module.exports = [
         usage: '.readreceipts <all/none>',
         reactions: { start: '💙', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const setting = args[0]?.toLowerCase();
             const valid = ['all', 'none'];
 
@@ -182,7 +182,7 @@ module.exports = [
                 return reply(`✓ *Read receipts set to:* ${setting}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -198,7 +198,7 @@ module.exports = [
         usage: '.callsprivacy <all/known>',
         reactions: { start: '📞', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const setting = args[0]?.toLowerCase();
             const valid = ['all', 'known'];
 
@@ -214,7 +214,7 @@ module.exports = [
                 return reply(`✓ *Call privacy set to:* ${setting}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -229,7 +229,7 @@ module.exports = [
         usage: '.messagesprivacy <all/contacts/contact_blacklist/none>',
         reactions: { start: '💬', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const setting = args[0]?.toLowerCase();
             const valid = ['all', 'contacts', 'contact_blacklist', 'none'];
 
@@ -245,7 +245,7 @@ module.exports = [
                 return reply(`✓ *Messages privacy set to:* ${setting}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -260,7 +260,7 @@ module.exports = [
         usage: '.linkpreview <on/off>',
         reactions: { start: '🔗', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const setting = args[0]?.toLowerCase();
             if (!setting || !['on', 'off'].includes(setting)) {
                 return reply(`${prefix}⊘ *Usage:* linkpreview on/off`);
@@ -272,10 +272,10 @@ module.exports = [
                 // true = previews disabled
                 await sock.updateDisableLinkPreviewsPrivacy(setting === 'off');
                 await sock.sendMessage(m.chat, { react: { text: '🍃', key: m.key } });
-                return reply(`${prefix}✓ *Link previews:* ${settingtoUpperCase()}`);
+                return reply(`${prefix}✓ *Link previews:* ${setting.toUpperCase()}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -287,10 +287,10 @@ module.exports = [
         desc: 'Set default disappearing message timer for new chats',
         category: 'Privacy',
         owner: true,
-        usage: `${prefix}disappearing <seconds>`,
+        usage: 'disappearing <seconds>',
         reactions: { start: '⏳', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const seconds = parseInt(args[0]);
 
             if (isNaN(seconds) || seconds < 0) {
@@ -312,7 +312,7 @@ module.exports = [
                 return reply(`✓ *Default disappearing set to:* ${displayTime}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -325,10 +325,10 @@ module.exports = [
         desc: 'View all your current privacy settings',
         category: 'Privacy',
         owner: true,
-        usage: `${prefix}myprivacy`,
+        usage: 'myprivacy',
         reactions: { start: '🔒', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { reply }) => {
+        execute: async (sock, m, { reply, prefix }) => {
             await sock.sendMessage(m.chat, { react: { text: '🔒', key: m.key } });
 
             try {
@@ -353,7 +353,7 @@ module.exports = [
                 await sock.sendMessage(m.chat, { react: { text: '🍃', key: m.key } });
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -368,7 +368,7 @@ module.exports = [
         usage: '.block (reply) | .block @user | .block <number>',
         reactions: { start: '🚫', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             let targetJid = null;
 
             if (m.quoted) {
@@ -390,7 +390,7 @@ module.exports = [
                 return reply('`⌬ Blocked`');
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -405,7 +405,7 @@ module.exports = [
         usage: '.unblock (reply) | .unblock @user | .unblock <number>',
         reactions: { start: '🔓', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             let targetJid = null;
 
             if (m.quoted) {
@@ -427,7 +427,7 @@ module.exports = [
                 return reply('`✆ Unblocked`');
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -439,10 +439,10 @@ module.exports = [
         desc: 'Get list of blocked users with their names',
         category: 'Moderation',
         owner: true,
-        usage: `${prefix}blocklist`,
+        usage: 'blocklist',
         reactions: { start: '📋', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { reply }) => {
+        execute: async (sock, m, { reply, prefix }) => {
             await sock.sendMessage(m.chat, { react: { text: '📋', key: m.key } });
 
             try {
@@ -466,10 +466,10 @@ module.exports = [
                 });
 
                 await sock.sendMessage(m.chat, { react: { text: '🍃', key: m.key } });
-                return reply(`${prefix}🚫 *BLOCKED USERS*\n\n${linesjoin('\n')}\n\n_Total: ${blocked.length}_`);
+                return reply(`${prefix}🚫 *BLOCKED USERS*\n\n${lines.join('\n')}\n\n_Total: ${blocked.length}_`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -481,10 +481,10 @@ module.exports = [
         desc: 'Generate a WhatsApp video call link',
         category: 'Utility',
         owner: true,
-        usage: `${prefix}calllink`,
+        usage: 'videocall',
         reactions: { start: '📹', success: '🏷️', error: '🥵' },
 
-        execute: async (sock, m, { reply }) => {
+        execute: async (sock, m, { reply, prefix }) => {
             await sock.sendMessage(m.chat, { react: { text: '📹', key: m.key } });
 
             try {
@@ -500,7 +500,7 @@ module.exports = [
                 await sock.sendMessage(m.chat, { react: { text: '🐜', key: m.key } });
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -511,10 +511,10 @@ module.exports = [
         alias: ['metabots', 'aibots', 'botlist'],
         desc: 'List available Meta AI bots on WhatsApp',
         category: 'Utility',
-        usage: `${prefix}mybots`,
+        usage: 'mybots',
         reactions: { start: '🤖', success: '🐾', error: '🥵' },
 
-        execute: async (sock, m, { reply }) => {
+        execute: async (sock, m, { reply, prefix }) => {
             await sock.sendMessage(m.chat, { react: { text: '🤖', key: m.key } });
 
             try {
@@ -534,7 +534,7 @@ module.exports = [
                 await sock.sendMessage(m.chat, { react: { text: '🍃', key: m.key } });
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -546,10 +546,10 @@ module.exports = [
         desc: 'Resolve a phone number or LID to full user IDs',
         category: 'Utility',
         owner: true,
-        usage: `${prefix}finduser <number or LID>`,
+        usage: 'finduser <number or LID>',
         reactions: { start: '🔍', success: '🐾', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const input = args[0]?.trim();
             if (!input) return reply('✘ Usage: *.finduser <number or LID>*');
 
@@ -568,7 +568,7 @@ module.exports = [
                 await sock.sendMessage(m.chat, { react: { text: '🍃', key: m.key } });
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -582,7 +582,7 @@ module.exports = [
         usage: '.star | .unstar',
         reactions: { start: '⭐', success: '🍃', error: '🥵' },
 
-        execute: async (sock, m, { reply }) => {
+        execute: async (sock, m, { reply, prefix }) => {
             const isUnstar = m.text?.toLowerCase().startsWith('/unstar') || m.text?.toLowerCase().startsWith('.unstar');
 
             if (!m.quoted) return reply(`✘ Reply to a message to ${isUnstar ? 'unstar' : 'star'} it.`);
@@ -599,7 +599,7 @@ module.exports = [
                 return reply(`✓ *${isUnstar ? 'Unstarred' : 'Starred'}*`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -614,7 +614,7 @@ module.exports = [
         usage: '.contact add <number> <name> | .contact remove <number>',
         reactions: { start: '👤', success: '🐾', error: '🥵' },
 
-        execute: async (sock, m, { args, reply }) => {
+        execute: async (sock, m, { args, reply, prefix }) => {
             const action = args[0]?.toLowerCase();
 
             if (!action || !['add', 'remove'].includes(action)) {
@@ -648,7 +648,7 @@ module.exports = [
                 }
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`${prefix}⊘ ${errmessage}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     }
