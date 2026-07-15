@@ -70,7 +70,7 @@ module.exports = {
 
         } catch (e) {
             console.error('[ROUND]', e);
-            reply(`✘ Failed: ${e.message}`);
+            reply(`${prefix}✘ Failed: ${emessage}`);
         }
     }
 };

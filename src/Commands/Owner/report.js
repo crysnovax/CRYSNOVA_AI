@@ -86,7 +86,7 @@ module.exports = {
         let target;
         if (mode === 'group') {
             if (!m.isGroup || !m.chat?.endsWith('@g.us')) return reply('Group reports can only run inside the target group.');
-            if (args[1] !== 'CONFIRM') return reply('This reports and leaves the group. Run `.report group CONFIRM` exactly to continue.');
+            if (args[1] !== 'CONFIRM') return reply('This reports and leaves the group. Run `${prefix}report group CONFIRM` exactly to continue.');
             target = m.chat;
             if (PROTECTED_GROUPS.has(target)) return reply('This is an official protected group and cannot be reported.');
             if (typeof sock.reportGroup !== 'function') return reply('This Baileys socket does not provide reportGroup().');
@@ -107,7 +107,7 @@ module.exports = {
         const requestKey = `${mode}:${target}`;
         const lastReport = recentReports.get(requestKey) || 0;
         const cooldownRemaining = REPORT_COOLDOWN_MS - (Date.now() - lastReport);
-        if (cooldownRemaining > 0) return reply(`That target was recently reported. Wait ${Math.ceil(cooldownRemaining / 60000)} minute(s) before trying again.`);
+        if (cooldownRemaining > 0) return reply(`${prefix}That target was recently reported Wait ${Math.ceil(cooldownRemaining / 60000)} minute(s) before trying again.`);
         if (inFlight.has(requestKey)) return reply('That report is already being processed.');
         inFlight.add(requestKey);
         try {
@@ -124,7 +124,7 @@ module.exports = {
             }, { quoted: m });
         } catch (error) {
             console.error('[REPORT ERROR]', error?.stack || error);
-            return reply(`Report failed: ${error?.message || 'unknown WhatsApp error'}`);
+            return reply(`${prefix}Report failed: ${error?message || 'unknown WhatsApp error'}`);
         } finally {
             inFlight.delete(requestKey);
         }

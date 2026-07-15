@@ -68,7 +68,7 @@ module.exports = {
 
         } catch (e) {
             console.error(e);
-            reply(`✘ Failed: ${e.message}`);
+            reply(`${prefix}✘ Failed: ${emessage}`);
         }
     }
 };

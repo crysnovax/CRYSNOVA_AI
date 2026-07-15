@@ -18,7 +18,7 @@ module.exports = {
     alias: ['facts', 'randomfact', 'didyouknow'],
     desc: 'Get random interesting facts',
     category: 'Fun',
-    usage: '.fact',
+    usage: `${prefix}fact`,
     reactions: { start: '🧠', success: '🎭', error: '💤' },
 
     execute: async (sock, m, { reply }) => {

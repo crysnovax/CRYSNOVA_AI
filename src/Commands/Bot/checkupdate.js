@@ -206,7 +206,7 @@ module.exports = {
     category: 'Owner',
     ownerOnly: true,
     desc: 'Check for new updates without applying (skips personal data)',
-    usage: '.checkup',
+    usage: `${prefix}checkup`,
     reactions: { start: '🔍', success: '💾', error: '🏗️' },
     execute: newUpdate
 };

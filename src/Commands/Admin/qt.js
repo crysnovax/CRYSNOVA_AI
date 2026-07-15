@@ -3,7 +3,7 @@ module.exports = {
     alias: ['getquoted', 'showquoted'],
     desc: 'Get the exact quoted message content',
     category: 'Tools',
-    usage: '.quoted (reply to a message that quotes another)',
+    usage: `${prefix}quoted (reply to a message that quotes another)`,
     reactions: { start: '📝', success: '💬', error: '📡' },
     adminOnly: false,      
     ownerOnly: true,      
@@ -131,7 +131,7 @@ module.exports = {
         } catch (error) {
             console.error('[QUOTED ERROR]', error);
             await sock.sendMessage(m.chat, { react: { text: '🙈', key: m.key } });
-            reply(`⊘ *Error:* ${error.message}`);
+            reply(`${prefix}⊘ *Error:* ${errormessage}`);
         }
     }
 };

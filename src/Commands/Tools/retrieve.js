@@ -3,7 +3,7 @@ module.exports = {
     alias: ['getdeleted', 'retrieve'],
     desc: 'Recover the last deleted message in this chat',
     category: 'Tools',
-    usage: '.deleted',
+    usage: `${prefix}deleted`,
     reactions: { start: '🗑️', success: '💬', error: '🙈' },
 
     execute: async (sock, m, { reply }) => {
@@ -83,7 +83,7 @@ module.exports = {
         } catch (error) {
             console.error('[DELETED ERROR]', error);
             await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } });
-            reply(`⊘ *Error:* ${error.message}`);
+            reply(`${prefix}⊘ *Error:* ${errormessage}`);
         }
     }
 };

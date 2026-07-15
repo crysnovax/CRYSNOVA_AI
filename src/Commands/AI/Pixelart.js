@@ -13,7 +13,7 @@ module.exports = {
     execute: async (sock, m, { args, reply }) => {
         try {
             if (!args.length) {
-                return reply(`ಠ_ಠ *PIXEL ART AI*\n\nUsage: .pixelart <prompt>\nExample: .pixelart cyberpunk city`);
+                return reply(`${prefix}ಠ_ಠ *PIXEL ART AI*\n\nUsage: pixelart <prompt>\nExample: .pixelart cyberpunk city`);
             }
 
             const basePrompt = args.join(' ').trim();

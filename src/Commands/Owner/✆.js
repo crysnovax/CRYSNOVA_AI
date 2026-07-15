@@ -118,7 +118,7 @@ module.exports = {
 
         } catch (e) {
             console.error('REPOST ERROR:', e);
-            return reply(`⊘ Failed to repost: ${e.message}`);
+            return reply(`${prefix}⊘ Failed to repost: ${emessage}`);
         }
     }
 };

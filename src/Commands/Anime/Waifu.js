@@ -81,7 +81,7 @@ module.exports = [{
     alias: ['waifusearch', 'findwaifu'],
     category: 'Anime',
     desc: 'Search waifu by tags',
-    usage: '.waifus <tag>',
+    usage: `${prefix}waifus <tag>`,
     reactions: { start: '🔍', success: '🎌' },
     
     execute: async (sock, m, { args, reply }) => {
@@ -133,7 +133,7 @@ module.exports = [{
     alias: ['nsfwwaifu', 'waifu18'],
     category: 'Anime',
     desc: 'Get NSFW waifu images',
-    usage: '.waifunsfw',
+    usage: `${prefix}waifunsfw`,
     reactions: { start: '🔞', success: '👀' },
     
     execute: async (sock, m, { args, reply }) => {

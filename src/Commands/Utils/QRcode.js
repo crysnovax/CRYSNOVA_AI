@@ -84,7 +84,7 @@ module.exports = {
                 });
 
                 if (code?.data) {
-                    return reply(`✓ _*QR Decoded:*_\n\n${code.data}`);
+                    return reply(`${prefix}✓ _*QR Decoded:*_\n\n${codedata}`);
                 }
 
                 return reply(
@@ -96,7 +96,7 @@ module.exports = {
 
             } catch (err) {
                 console.error('QR read error:', err.message || err);
-                return reply(`✘ Error reading QR:\n${err.message}`);
+                return reply(`${prefix}✘ Error reading QR:\n${errmessage}`);
             }
         }
 
@@ -104,9 +104,9 @@ module.exports = {
         else {
             return reply(
                 '*QR Code Commands:*\n\n' +
-                '`.qr <text>` — generate QR from text\n' +
-                '`.qr` _(reply to a message)_ — generate QR from that message\n' +
-                '`.qrread` _(reply to a QR image)_ — decode QR'
+                '`${prefix}qr <text>` — generate QR from text\n' +
+                '`${prefix}qr` _(reply to a message)_ — generate QR from that message\n' +
+                '`${prefix}qrread` _(reply to a QR image)_ — decode QR'
             );
         }
     }

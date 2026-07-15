@@ -6,13 +6,13 @@ module.exports = {
     alias: ['ttsearch', 'tiktoks'],
     desc: 'Search TikTok and return the closest match',
     category: 'Search',
-    usage: '.tiktok <search query>',
+    usage: `${prefix}tiktok <search query>`,
     examples: ['.tiktok AI automation', '.tt Ronaldo funny'],
     reactions: { start: '📥', success: '❤️‍🩹', error: '❔' },
 
     execute: async (sock, m, { args, reply }) => {
         const query = args.join(' ').trim();
-        if (!query) return reply(`Usage: .tiktok <query>`);
+        if (!query) return reply(`${prefix}Usage: tiktok <query>`);
 
         await sock.sendMessage(m.chat, { react: { text: '📥', key: m.key } });
 

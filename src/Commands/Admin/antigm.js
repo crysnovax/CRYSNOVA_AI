@@ -98,13 +98,13 @@ module.exports = {
         }
         if (sub === 'resetwarn') {
             const mentioned = m.mentionedJid?.[0];
-            if (!mentioned) return reply(`✐ Usage: .antigm resetwarn @user`);
+            if (!mentioned) return reply(`${prefix}✐ Usage: antigm resetwarn @user`);
             const warns = loadWarns();
             const key = `${group}_${mentioned}`;
             if (warns[key]) {
                 delete warns[key];
                 saveWarns(warns);
-                return reply(`✓ Warnings reset for @${mentioned.split('@')[0]}`, { mentions: [mentioned] });
+                return reply(`${prefix}✓ Warnings reset for @${mentionedsplit('@')[0]}`, { mentions: [mentioned] });
             }
             return reply(`✘ User has no warnings.`);
         }

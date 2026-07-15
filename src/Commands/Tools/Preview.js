@@ -8,7 +8,7 @@ module.exports = {
     alias: ['lpreview', 'linkcard'],
     desc: 'Send a message with custom link preview',
     category: 'Utility',
-    usage: '.preview <url> | <title> | <description>',
+    usage: `${prefix}preview <url> | <title> | <description>`,
     
     execute: async (sock, m, { args, reply }) => {
         const fs = require('fs');
@@ -61,7 +61,7 @@ module.exports = {
        //     reply('✅ Link preview sent!');
         } catch (e) {
             console.error('[PREVIEW]', e);
-            reply(`☠︎︎ Error: ${e.message}`);
+            reply(`${prefix}☠︎︎ Error: ${emessage}`);
         }
     }
 };

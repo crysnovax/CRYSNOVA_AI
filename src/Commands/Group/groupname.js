@@ -13,7 +13,7 @@ module.exports = {
         const newDesc = args.join(' ').trim();
 
         if (!newDesc)
-            return reply('_ⓘ Provide new Name_\n✪ `.gcname New group name`');
+            return reply('_ⓘ Provide new Name_\n✪ `${prefix}gcname New group name`');
 
         try {
 

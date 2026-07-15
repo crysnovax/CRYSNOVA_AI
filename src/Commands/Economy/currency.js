@@ -5,7 +5,7 @@ module.exports = {
     alias: ['convert', 'exchange', 'fxconvert'],
     desc: 'Convert between currencies with live rates',
     category: 'Search',
-    usage: '.currency <amount> <from> <to>',
+    usage: `${prefix}currency <amount> <from> <to>`,
     reactions: { start: '💱', success: '🪙', error: '🏗️' },
 
     execute: async (sock, m, { args, reply, prefix }) => {

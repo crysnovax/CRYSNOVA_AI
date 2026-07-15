@@ -125,7 +125,7 @@ module.exports = {
                         try {
                             await performFullSync(sock);
                         } catch (e) {
-                            return reply(`✘ Sync failed: ${e.message}`);
+                            return reply(`${prefix}✘ Sync failed: ${emessage}`);
                         }
 
                         store = loadStore();
@@ -153,7 +153,7 @@ module.exports = {
                     try {
                         await performFullSync(sock);
                     } catch (e) {
-                        return reply(`✘ Sync failed: ${e.message}`);
+                        return reply(`${prefix}✘ Sync failed: ${emessage}`);
                     }
 
                     const store = loadStore();
@@ -242,7 +242,7 @@ module.exports = {
 
         } catch (err) {
             console.error('[LABELS]', err.message);
-            reply(`✘ ${err.message}`);
+            reply(`${prefix}✘ ${errmessage}`);
         }
     }
 };

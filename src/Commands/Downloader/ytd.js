@@ -6,13 +6,13 @@ module.exports = {
     alias: ['youtube', 'ytdl', 'youtubedownload'],
     desc: 'Download YouTube video',
     category: 'Search',
-    usage: '.yt <url>',
+    usage: `${prefix}yt <url>`,
     examples: ['.yt https://youtu.be/rsF9VaubHWM'],
     reactions: { start: '📥', success: '❤️‍🩹', error: '❔' },
 
     execute: async (sock, m, { args, reply }) => {
         const url = args[0]?.trim();
-        if (!url) return reply(`Usage: .yt <url>`);
+        if (!url) return reply(`${prefix}Usage: yt <url>`);
 
         await sock.sendMessage(m.chat, { react: { text: '📥', key: m.key } });
 

@@ -61,7 +61,7 @@ module.exports = {
 
                 } catch (err) {
                     await sock.sendMessage(m.chat, { react: { text: '🙈', key: m.key } });
-                    return reply(`⊘ *Invalid or expired group invite link!*\n\n${err.message}`);
+                    return reply(`${prefix}⊘ *Invalid or expired group invite link!*\n\n${errmessage}`);
                 }
             }
 

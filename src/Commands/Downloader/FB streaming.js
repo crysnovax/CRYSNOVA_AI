@@ -9,7 +9,7 @@ module.exports = {
     alias: ['fbs', 'fbsdown'],
     desc: 'Download Facebook video via CRYSNOVA Gateway it is streaming not buffer best for very large files',
     category: 'downloader',
-    usage: '.fb <Facebook URL> (or reply to a message containing URL)',
+    usage: `${prefix}fb <Facebook URL> (or reply to a message containing URL)`,
     owner: false,
 
     execute: async (sock, m, { args, reply, quoted }) => {
@@ -31,7 +31,7 @@ module.exports = {
             return reply(
                 '𓄄 *Provide a valid Facebook URL!*\n\n' +
                 '`.fb https://facebook.com/...`\n' +
-                '`.fb` (reply to message with URL)'
+                '`${prefix}fb` (reply to message with URL)'
             );
         }
 

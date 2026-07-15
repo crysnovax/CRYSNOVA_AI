@@ -49,7 +49,7 @@ module.exports = {
 
         // Validate option length
         for (const opt of options) {
-            if (opt.length > 100) return reply(`_✘ Option too long: "${opt.slice(0, 20)}..."_`)
+            if (opt.length > 100) return reply(`${prefix}_✘ Option too long: "${optslice(0, 20)}..."_`)
         }
 
         if (question.length > 255) return reply('_✘ Question too long (max 255 characters)_')
@@ -65,7 +65,7 @@ module.exports = {
             }, { quoted: m })
         } catch (err) {
             console.error('[POLL ERROR]', err.message)
-            reply(`_✘ Failed to create poll: ${err.message}_`)
+            reply(`${prefix}_✘ Failed to create poll: ${errmessage}_`)
         }
     }
 }

@@ -3,7 +3,7 @@ module.exports = {
     alias: ['myphone', 'ringme'],
     desc: 'Share a call button with your WhatsApp number',
     category: 'Utils',
-    usage: '.callme <text>',
+    usage: `${prefix}callme <text>`,
     reactions: { start: '📞', success: '✨', error: '❔' },
 
     execute: async (sock, m, { args, reply, prefix }) => {
@@ -31,7 +31,7 @@ module.exports = {
             console.error('[CALLME ERROR]', error.message);
             await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } });
             
-       //     reply(`📞 *Call me:* https://wa.me/${phoneNumber}`);
+       //     reply(`${prefix}📞 *Call me:* https://wame/${phoneNumber}`);
         }
     }
 };

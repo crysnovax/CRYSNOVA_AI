@@ -109,7 +109,7 @@ module.exports = {
 
         } catch (err) {
             console.error('[BIZUPDATE]', err.message);
-            reply(`✘ ${err.message}`);
+            reply(`${prefix}✘ ${errmessage}`);
         }
     }
 };

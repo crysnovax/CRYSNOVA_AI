@@ -61,7 +61,7 @@ module.exports = {
                     raw: true
                 }, { quoted: m });
             } else {
-                await reply(`_Group "${result.subject}" created successfully!_${inviteLink ? '\n\n🔗 ' + inviteLink : ''}`);
+                await reply(`${prefix}_Group "${resultsubject}" created successfully!_${inviteLink ? '\n\n🔗 ' + inviteLink : ''}`);
             }
 
         } catch (error) {

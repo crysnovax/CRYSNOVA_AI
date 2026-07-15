@@ -25,7 +25,7 @@ module.exports = {
                 core.activeCrons[s.id]?.stop();
                 delete core.activeCrons[s.id];
             }
-            return reply(`✦ ${removed.length} schedule(s) cancelled for this group`);
+            return reply(`${prefix}✦ ${removedlength} schedule(s) cancelled for this group`);
         }
 
         // ── SHOW SCHEDULES ────────────────────────────────────
@@ -42,7 +42,7 @@ module.exports = {
         if (sub === 'for') {
             const timeArg = args[1];
             const ms = core.parseTime(timeArg);
-            if (!ms) return reply('⚉ Use: `.mute for 10m | 2h | 1d | 2w`');
+            if (!ms) return reply('⚉ Use: `${prefix}mute for 10m | 2h | 1d | 2w`');
             if (ms > 60 * 24 * 60 * 60 * 1000) return reply('⚉ Maximum is 60 days');
 
             await sock.groupSettingUpdate(groupJid, 'announcement');
@@ -69,7 +69,7 @@ module.exports = {
             const repeat    = args[4]?.toLowerCase() || 'daily';
 
             if (!startTime || !endTime || toWord !== 'to') {
-                return reply('⚉ Use: `.mute from 12pm to 5am daily` or `once`');
+                return reply('⚉ Use: `${prefix}mute from 12pm to 5am daily` or `once`');
             }
 
             const startCron = core.timeToCron(startTime);

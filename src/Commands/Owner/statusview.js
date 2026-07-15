@@ -35,6 +35,6 @@ module.exports = {
         const value = arg === 'on';
         setVar(setting.key, value);
         await sock.sendMessage(m.chat, { react: { text: '✓', key: m.key } });
-        return reply(`✓ *${setting.label}* → ${value ? 'ON' : 'OFF'}`);
+        return reply(`${prefix}✓ *${settinglabel}* → ${value ? 'ON' : 'OFF'}`);
     }
 };

@@ -26,7 +26,7 @@ module.exports = {
 
         // ── HELP ──
         if (!sub || sub === 'help') {
-            return reply(`📝 *GIST PLUGIN HELP*
+            return reply(`${prefix}📝 *GIST PLUGIN HELP*
 
 Commands:
 • ${prefix}gist start [filename] - Start a new session
@@ -36,7 +36,7 @@ Commands:
 • ${prefix}gist cancel - Abort session
 
 Workflow:
-1. ${prefix}gist start myscript.js
+1 ${prefix}gist start myscript.js
 2. ${prefix}gist code=console.log("Hello")
 3. Repeat step 2 for multiple snippets
 4. ${prefix}gist push My description`);
@@ -44,7 +44,7 @@ Workflow:
 
         // ── START SESSION ──
         if (sub === 'start') {
-            if (sessions.has(sessionKey)) return reply('⚠️ Session already active! Use `.gist push` or `.gist cancel`');
+            if (sessions.has(sessionKey)) return reply('⚠️ Session already active! Use `${prefix}gist push` or `${prefix}gist cancel`');
             const filename = args[1] || `snippet_${Date.now()}.txt`;
             sessions.set(sessionKey, { filename, code: [], startedAt: Date.now() });
             return reply(`✅ Session started with file: ${filename}\n➡️ Add snippets with \`${prefix}gist code=<your code>\``);
@@ -53,7 +53,7 @@ Workflow:
         // ── ADD CODE ──
         if (args[0]?.startsWith('code=')) {
             const session = sessions.get(sessionKey);
-            if (!session) return reply('❌ No active session. Start one with `.gist start`');
+            if (!session) return reply('❌ No active session. Start one with `${prefix}gist start`');
 
             const snippet = args.join(' ').replace(/^code=/i, '').trim();
             if (!snippet) return reply('⚠️ No code detected after `code=`');
@@ -61,7 +61,7 @@ Workflow:
             session.code.push(snippet);
             sessions.set(sessionKey, session);
 
-            return reply(`➕ Snippet added! Total snippets: ${session.code.length}`);
+            return reply(`${prefix}➕ Snippet added! Total snippets: ${sessioncode.length}`);
         }
 
         // ── STATUS ──
@@ -131,10 +131,10 @@ Workflow:
                 );
             } catch (err) {
                 console.error('[GIST PUSH ERROR]', err);
-                return reply(`❌ Failed to create Gist: ${err.message}`);
+                return reply(`${prefix}❌ Failed to create Gist: ${errmessage}`);
             }
         }
 
-        return reply('⚠️ Unknown subcommand. Use `.gist help`');
+        return reply('⚠️ Unknown subcommand. Use `${prefix}gist help`');
     }
 };

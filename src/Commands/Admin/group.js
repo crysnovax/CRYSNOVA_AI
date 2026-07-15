@@ -8,7 +8,7 @@ module.exports = [
         category: 'Group',
         admin: true,
         group: true,
-        usage: '.ephemeral <seconds>',
+        usage: `${prefix}ephemeral <seconds>`,
         examples: ['.ephemeral 86400', '.ephemeral 0', '.ephemeral 604800'],
         reactions: { start: '⏳', success: '🍃', error: '🥵' },
 
@@ -16,7 +16,7 @@ module.exports = [
             const seconds = parseInt(args[0]);
 
             if (isNaN(seconds) || seconds < 0) {
-                return reply(`⊘ *Usage:* .ephemeral <seconds>\n\nCommon values:\n• 0 - Off\n• 86400 - 24 hours\n• 604800 - 7 days\n• 2592000 - 30 days`);
+                return reply(`${prefix}⊘ *Usage:* ephemeral <seconds>\n\nCommon values:\n• 0 - Off\n• 86400 - 24 hours\n• 604800 - 7 days\n• 2592000 - 30 days`);
             }
 
             await sock.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
@@ -34,7 +34,7 @@ module.exports = [
                 return reply(`✓ *Disappearing messages set to:* ${displayTime}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`⊘ *Error:* ${err.message}`);
+                return reply(`${prefix}⊘ *Error:* ${errmessage}`);
             }
         }
     },
@@ -56,7 +56,7 @@ module.exports = [
             const valid = ['admin_add', 'all_member_add'];
 
             if (!mode || !valid.includes(mode)) {
-                return reply(`⊘ *Usage:* .addmode admin_add/all_member_add\n\nOptions:\n• admin_add - Only admins can add members\n• all_member_add - All members can add members`);
+                return reply(`${prefix}⊘ *Usage:* addmode admin_add/all_member_add\n\nOptions:\n• admin_add - Only admins can add members\n• all_member_add - All members can add members`);
             }
 
             await sock.sendMessage(m.chat, { react: { text: '👥', key: m.key } });
@@ -64,10 +64,10 @@ module.exports = [
             try {
                 await sock.groupMemberAddMode(m.chat, mode);
                 await sock.sendMessage(m.chat, { react: { text: '🍃', key: m.key } });
-                return reply(`✓ *Member add mode set to:* ${mode.replace('_', ' ').toUpperCase()}`);
+                return reply(`${prefix}✓ *Member add mode set to:* ${modereplace('_', ' ').toUpperCase()}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`⊘ *Error:* ${err.message}`);
+                return reply(`${prefix}⊘ *Error:* ${errmessage}`);
             }
         }
     },
@@ -89,7 +89,7 @@ module.exports = [
             const valid = ['on', 'off'];
 
             if (!setting || !valid.includes(setting)) {
-                return reply(`⊘ *Usage:* .approval on/off\n\nOptions:\n• on - Admins must approve new members\n• off - Anyone can join without approval`);
+                return reply(`${prefix}⊘ *Usage:* approval on/off\n\nOptions:\n• on - Admins must approve new members\n• off - Anyone can join without approval`);
             }
 
             await sock.sendMessage(m.chat, { react: { text: '🔐', key: m.key } });
@@ -97,10 +97,10 @@ module.exports = [
             try {
                 await sock.groupJoinApprovalMode(m.chat, setting);
                 await sock.sendMessage(m.chat, { react: { text: '🍃', key: m.key } });
-                return reply(`✓ *Join approval mode set to:* ${setting.toUpperCase()}`);
+                return reply(`${prefix}✓ *Join approval mode set to:* ${settingtoUpperCase()}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`⊘ *Error:* ${err.message}`);
+                return reply(`${prefix}⊘ *Error:* ${errmessage}`);
             }
         }
     },
@@ -115,7 +115,7 @@ module.exports = [
         category: 'Group',
         admin: true,
         group: true,
-        usage: '.bottag <label>',
+        usage: `${prefix}bottag <label>`,
         examples: ['.bottag ⚉ CRYSNOVA AI', '.bottag Admin Bot'],
         reactions: { start: '🏷️', success: '🍃', error: '🥵' },
 
@@ -123,11 +123,11 @@ module.exports = [
             const label = args.join(' ').trim();
 
             if (!label) {
-                return reply(`⊘ *Usage:* .bottag <label>\n\n_Sets the bot's own display tag in this group._\n_Max 30 characters._`);
+                return reply(`${prefix}⊘ *Usage:* bottag <label>\n\n_Sets the bot's own display tag in this group._\n_Max 30 characters._`);
             }
 
             if (label.length > 30) {
-                return reply(`⊘ Label too long — max 30 characters (yours: ${label.length})`);
+                return reply(`${prefix}⊘ Label too long — max 30 characters (yours: ${labellength})`);
             }
 
             await sock.sendMessage(m.chat, { react: { text: '🏷️', key: m.key } });
@@ -138,7 +138,7 @@ module.exports = [
                 return reply(`✓ *Bot tag set to:* ${label}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`⊘ *Error:* ${err.message}`);
+                return reply(`${prefix}⊘ *Error:* ${errmessage}`);
             }
         }
     }

@@ -10,7 +10,7 @@ module.exports = {
     alias: ['facebook', 'fbdown'],
     desc: 'Download Facebook video via CRYSNOVA Gateway',
     category: 'downloader',
-    usage: '.fb <Facebook URL> (or reply to a message containing URL)',
+    usage: `${prefix}fb <Facebook URL> (or reply to a message containing URL)`,
     owner: false,
 
     execute: async (sock, m, { args, reply, quoted }) => {
@@ -34,7 +34,7 @@ module.exports = {
                 '𓄄 *Provide a valid Facebook URL!*\n\n' +
                 '*Usage:*\n' +
                 '`.fb https://facebook.com/...`\n' +
-                '`.fb` (reply to message with URL)\n\n' +
+                '`${prefix}fb` (reply to message with URL)\n\n' +
                 '*Example:*\n' +
                 '`.fb https://facebook.com/watch?v=...`'
             );
@@ -91,7 +91,7 @@ module.exports = {
             }, { quoted: m });
 
         } catch (err) {
-            reply(`✘ Download failed: ${err.message || 'Unknown error'}`);
+            reply(`${prefix}✘ Download failed: ${errmessage || 'Unknown error'}`);
         }
     }
 };

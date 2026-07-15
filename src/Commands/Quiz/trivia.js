@@ -16,7 +16,7 @@ module.exports = {
     alias: ['quiz', 'question', 'triviaquestion'],
     desc: 'Get random trivia questions',
     category: 'Quiz',
-    usage: '.trivia',
+    usage: `${prefix}trivia`,
     reactions: { start: '❓', success: '🔖', error: '💤' },
 
     execute: async (sock, m, { reply }) => {

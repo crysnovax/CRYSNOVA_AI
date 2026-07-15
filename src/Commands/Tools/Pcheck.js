@@ -25,7 +25,7 @@ module.exports = {
     alias: ['passwd', 'passcheck', 'strength'],
     desc: 'Check password strength',
     category: 'Games',
-    usage: '.password <your password>',
+    usage: `${prefix}password <your password>`,
     reactions: { start: '🔐', success: '🎭', error: '🏗️' },
 
     execute: async (sock, m, { args, reply, prefix }) => {

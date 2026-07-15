@@ -27,7 +27,7 @@ module.exports = {
     desc: 'Unbind command from sticker',
     category: 'owner',
     ownerOnly: true,
-    usage: '.delcmd (reply to sticker)',
+    usage: `${prefix}delcmd (reply to sticker)`,
 
     execute: async (sock, m, { reply }) => {
         const quotedMsg = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
