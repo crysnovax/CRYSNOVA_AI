@@ -1,5 +1,7 @@
 const fs   = require('fs');
 const path = require('path');
+const { getList } = require('../../Plugin/accessListManager');
+const { getContextInfo, identityVariants, normalizeJid } = require('../../Plugin/identityUtils');
 
 const MENTION_FILE = path.join(__dirname, '../../../database/mention_config.json');
 
@@ -34,14 +36,53 @@ const saveMentionConfig = () => {
 loadMentionConfig();
 
 // Helper: normalize JID for comparison
-const norm = (j) => (j || '').replace(/:\d+@/, '@').toLowerCase().trim();
+const norm = (j) => normalizeJid(j).toLowerCase().trim();
+
+async function getPrivilegedIdentities(sock) {
+    const config = require('../../../settings/config');
+    const ownerNumber = (process.env.OWNER_NUMBER || config.owner || '').replace(/\D/g, '');
+    const phoneJids = [
+        ownerNumber && `${ownerNumber}@s.whatsapp.net`,
+        normalizeJid(sock.user?.id || ''),
+        ...getList('SUDO_NUMBERS').map(number => `${number}@s.whatsapp.net`),
+        ...getList('DUAL_NUMBERS').map(number => `${number}@s.whatsapp.net`),
+    ].filter(Boolean);
+
+    const identities = new Set();
+    for (const jid of phoneJids) {
+        for (const variant of await identityVariants(sock, jid)) identities.add(norm(variant));
+    }
+    if (sock.user?.lid) identities.add(norm(sock.user.lid));
+    return identities;
+}
+
+async function isPrivilegedMentioned(sock, m, mek) {
+    if (m.key?.fromMe) return false;
+    const context = getContextInfo(m);
+    const mentions = [...new Set([
+        ...(context.mentionedJid || []),
+        ...(m.mentionedJid || []),
+        ...(m.msg?.contextInfo?.mentionedJid || []),
+        context.participant,
+        context.participantAlt,
+        m.quoted?.sender,
+    ].filter(Boolean))];
+    if (!mentions.length) return false;
+
+    const privileged = await getPrivilegedIdentities(sock);
+    for (const jid of mentions) {
+        const variants = await identityVariants(sock, jid);
+        if ([...variants].some(variant => privileged.has(norm(variant)))) return true;
+    }
+    return false;
+}
 
 module.exports = {
     name:      'mention',
     alias:     ['tagme', 'owntag'],
-    desc:      'Set action when owner is mentioned in any chat',
-    category:  'Owner',
-    ownerOnly: true,
+    desc:           'Set action when owner, sudo, or dual is mentioned',
+    category:       'Owner',
+    privilegedOnly: true,
 
     execute: async (sock, m, { args, reply, prefix }) => {
         const option = args[0]?.toLowerCase();
@@ -96,7 +137,7 @@ module.exports = {
         // HELP
         return reply(
             `╭─❍ *MENTION CONFIGURATION*\n│\n` +
-            `│ Configure auto-response when owner is mentioned.\n│\n` +
+            `│ Configure one auto-response for owner, sudo, and dual mentions.\n│\n` +
             `│ ⚉ *Commands:*\n│\n` +
             `│ ➫ ${prefix}mention off\n` +
             `│   Disable mention responses\n│\n` +
@@ -113,6 +154,8 @@ module.exports = {
     }
 };
 
-module.exports.mentionConfig     = mentionConfig;
+module.exports.mentionConfig = mentionConfig;
 module.exports.loadMentionConfig = loadMentionConfig;
+module.exports.getPrivilegedIdentities = getPrivilegedIdentities;
+module.exports.isPrivilegedMentioned = isPrivilegedMentioned;
 module.exports.norm = norm;

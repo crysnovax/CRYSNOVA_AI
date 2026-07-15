@@ -6,9 +6,9 @@ function contactValues(contacts) {
     return contacts instanceof Map ? [...contacts.values()] : Object.values(contacts);
 }
 
-async function buildStatusAudience(sock) {
+async function buildStatusAudience(sock, store) {
     const audience = new Set();
-    const contacts = contactValues(sock.store?.contacts);
+    const contacts = contactValues(store?.contacts || sock.store?.contacts);
     const mapper = sock?.signalRepository?.lidMapping;
 
     for (const contact of contacts) {
@@ -55,9 +55,9 @@ module.exports = {
     category: 'Owner',
     ownerOnly: true,
     desc: 'Post text or replied media to WhatsApp Status',
-    execute: async (sock, m, { args, reply }) => {
+    execute: async (sock, m, { args, reply, store }) => {
         try {
-            const statusJidList = await buildStatusAudience(sock);
+            const statusJidList = await buildStatusAudience(sock, store);
             if (!statusJidList.length) return reply('No valid WhatsApp contacts are available for the status audience.');
 
             const text = args.join(' ').trim();

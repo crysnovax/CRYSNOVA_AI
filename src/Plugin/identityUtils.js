@@ -20,6 +20,32 @@ async function resolvePhoneJid(sock, candidates = []) {
     return null;
 }
 
+async function identityVariants(sock, jid) {
+    const normalized = normalizeJid(jid);
+    const variants = new Set(normalized ? [normalized] : []);
+    const mapper = sock?.signalRepository?.lidMapping;
+
+    try {
+        if (normalized.endsWith('@lid') && mapper?.getPNForLID) {
+            const pn = await mapper.getPNForLID(normalized);
+            if (pn) variants.add(normalizeJid(pn));
+        } else if (normalized.endsWith('@s.whatsapp.net') && mapper?.getLIDForPN) {
+            const lid = await mapper.getLIDForPN(normalized);
+            if (lid) variants.add(normalizeJid(lid));
+        }
+    } catch {}
+
+    return variants;
+}
+
+async function identitiesOverlap(sock, left, right) {
+    const [leftVariants, rightVariants] = await Promise.all([
+        identityVariants(sock, left),
+        identityVariants(sock, right),
+    ]);
+    return [...leftVariants].some(jid => rightVariants.has(jid));
+}
+
 function getContextInfo(m) {
     return m?.msg?.contextInfo
         || m?.message?.extendedTextMessage?.contextInfo
@@ -48,6 +74,8 @@ async function resolveCommandTarget(sock, m, rawValue = '') {
 module.exports = {
     cleanNumber,
     getContextInfo,
+    identitiesOverlap,
+    identityVariants,
     isPhoneJid,
     normalizeJid,
     resolveCommandTarget,
