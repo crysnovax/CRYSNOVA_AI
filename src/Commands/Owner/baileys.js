@@ -1,169 +1,15 @@
 // ── BAILEYS SOCKET METHODS AS COMMANDS ──────────────────────────────────────
 module.exports = [
 
-    // ── BLOCK USER ───────────────────────────────────────────────────────────
-    {
-        name: 'block',
-        alias: ['blockuser', 'blockjid'],
-        desc: 'Block a user from messaging you',
-        category: 'Owner',
-        owner: true,
-        usage: 'block <@user or phone>',
-        reactions: { start: '🚫', success: '✓', error: '❌' },
-
-        execute: async (sock, m, { args, reply, prefix }) => {
-            let target;
-            if (m.mentionedJid?.[0]) {
-                target = m.mentionedJid[0];
-            } else if (m.quoted?.sender) {
-                target = m.quoted.sender;
-            } else if (args[0]) {
-                target = args[0].replace(/[^\d]/g, '') + '@s.whatsapp.net';
-            }
-
-            if (!target) {
-                return reply(`${prefix}⊘ *Usage:* block <@user or phone>`);
-            }
-
-            try {
-                await sock.updateBlockStatus(target, 'block');
-                return reply(`✓ *Blocked:* @${target.split('@')[0]}`);
-            } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
-            }
-        }
-    },
-
-    // ── UNBLOCK USER ─────────────────────────────────────────────────────────
-    {
-        name: 'unblock',
-        alias: ['unblockuser', 'unblockjid'],
-        desc: 'Unblock a user from messaging you',
-        category: 'Owner',
-        owner: true,
-        usage: 'unblock <@user or phone>',
-        reactions: { start: '🔓', success: '✓', error: '❌' },
-
-        execute: async (sock, m, { args, reply, prefix }) => {
-            let target;
-            if (m.mentionedJid?.[0]) {
-                target = m.mentionedJid[0];
-            } else if (m.quoted?.sender) {
-                target = m.quoted.sender;
-            } else if (args[0]) {
-                target = args[0].replace(/[^\d]/g, '') + '@s.whatsapp.net';
-            }
-
-            if (!target) {
-                return reply(`${prefix}⊘ *Usage:* unblock <@user or phone>`);
-            }
-
-            try {
-                await sock.updateBlockStatus(target, 'unblock');
-                return reply(`✓ *Unblocked:* @${target.split('@')[0]}`);
-            } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
-            }
-        }
-    },
-
-    // ── GET BLOCKED USERS ────────────────────────────────────────────────────
-    {
-        name: 'blocklist',
-        alias: ['blocked', 'getblocked', 'blockstatus'],
-        desc: 'View all blocked users',
-        category: 'Owner',
-        owner: true,
-        usage: 'blocklist',
-        reactions: { start: '📋', success: '✓', error: '❌' },
-
-        execute: async (sock, m, { reply, prefix }) => {
-            try {
-                const store = sock.store?.contactsDB;
-                if (!store) {
-                    return reply(`${prefix}⊘ No contact database available`);
-                }
-
-                const blocked = Object.values(store)
-                    .filter(contact => contact?.blocked === true)
-                    .map(contact => `• @${contact.id.split('@')[0]}`)
-                    .join('\n');
-
-                if (!blocked) {
-                    return reply(`${prefix}ℹ No blocked users`);
-                }
-
-                return reply(`📋 *Blocked Users*\n\n${blocked}`);
-            } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
-            }
-        }
-    },
-
-    // ── SET PROFILE PICTURE ──────────────────────────────────────────────────
-    {
-        name: 'setpp',
-        alias: ['setprofilepic', 'profilepic', 'avatar'],
-        desc: 'Set your profile picture from an image',
-        category: 'Owner',
-        owner: true,
-        usage: 'setpp <reply to image>',
-        reactions: { start: '📷', success: '✓', error: '❌' },
-
-        execute: async (sock, m, { reply, prefix }) => {
-            if (!m.quoted?.mediaType?.startsWith('image')) {
-                return reply(`${prefix}⊘ Reply to an image to set as profile picture`);
-            }
-
-            try {
-                const buffer = await m.quoted.download();
-                await sock.updateProfilePicture(buffer);
-                return reply(`✓ *Profile picture updated*`);
-            } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
-            }
-        }
-    },
-
-    // ── UPDATE PROFILE NAME ──────────────────────────────────────────────────
-    {
-        name: 'setname',
-        alias: ['profilename', 'setprofile', 'myname'],
-        desc: 'Update your profile name',
-        category: 'Owner',
-        owner: true,
-        usage: 'setname <new name>',
-        reactions: { start: '📝', success: '✓', error: '❌' },
-
-        execute: async (sock, m, { args, reply, prefix }) => {
-            const newName = args.join(' ');
-
-            if (!newName) {
-                return reply(`${prefix}⊘ *Usage:* setname <new name>`);
-            }
-
-            if (newName.length > 25) {
-                return reply(`${prefix}⊘ Name must be 25 characters or less`);
-            }
-
-            try {
-                await sock.updateProfileName(newName);
-                return reply(`✓ *Profile name updated to:* ${newName}`);
-            } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
-            }
-        }
-    },
-
     // ── GET USER STATUS ──────────────────────────────────────────────────────
     {
         name: 'getstatus',
-        alias: ['userstatus', 'status', 'viewstatus'],
-        desc: 'View a user\'s status message',
+        alias: ['userstatus', 'statuscheck', 'viewstatus'],
+        desc: 'Get a user\'s status message',
         category: 'Owner',
         owner: true,
         usage: 'getstatus <@user or phone>',
-        reactions: { start: '📖', success: '✓', error: '❌' },
+        reactions: { start: '👁️', success: '✓', error: '❌' },
 
         execute: async (sock, m, { args, reply, prefix }) => {
             let target;
@@ -180,66 +26,101 @@ module.exports = [
             }
 
             try {
-                const status = await sock.fetchStatus(target);
-                const text = status?.status || '(no status)';
-                return reply(`📖 *Status:* ${text}\n\n_Last updated: ${new Date(status?.setAt).toLocaleString()}_`);
+                const status = await sock.getUserStatus(target);
+                return reply(
+                    `👁️ *Status for* @${target.split('@')[0]}\n\n` +
+                    `${status.status || 'No status set'}`
+                );
             } catch (err) {
                 return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
 
-    // ── UPDATE GROUP ICON ────────────────────────────────────────────────────
+    // ── SET GROUP ICON ───────────────────────────────────────────────────────
     {
         name: 'setgroupicon',
-        alias: ['groupicon', 'grouppp', 'setgrouppp'],
-        desc: 'Update group profile picture',
+        alias: ['setgrouppp', 'setgppicon', 'groupicon'],
+        desc: 'Set group profile picture',
         category: 'Owner',
         owner: true,
-        usage: 'setgroupicon <reply to image>',
+        usage: 'setgroupicon (reply to image)',
         reactions: { start: '🖼️', success: '✓', error: '❌' },
 
         execute: async (sock, m, { reply, prefix }) => {
             if (!m.isGroup) {
-                return reply(`${prefix}⊘ This command only works in groups`);
+                return reply(`${prefix}⊘ *Usage:* Only works in groups`);
             }
 
-            if (!m.quoted?.mediaType?.startsWith('image')) {
-                return reply(`${prefix}⊘ Reply to an image to set as group picture`);
+            if (!m.quoted?.mimetype?.startsWith('image/')) {
+                return reply(`${prefix}⊘ *Usage:* Reply to an image`);
             }
 
             try {
-                const buffer = await m.quoted.download();
-                await sock.updateGroupPicture(m.chat, buffer);
-                return reply(`✓ *Group picture updated*`);
+                const image = await m.quoted.download();
+                await sock.updateGroupPicture(m.chat, image);
+                return reply(`✓ *Group icon updated*`);
             } catch (err) {
                 return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
 
-    // ── ACCEPT GROUP INVITE CODE ─────────────────────────────────────────────
+    // ── JOIN GROUP ───────────────────────────────────────────────────────────
     {
         name: 'joingroup',
-        alias: ['join', 'acceptinvite', 'acceptcode'],
-        desc: 'Join a group using an invite code',
+        alias: ['join', 'joingc', 'inviteaccept', 'acceptinvite'],
+        desc: 'Join a group using invite code',
         category: 'Owner',
         owner: true,
-        usage: 'joingroup <invite code>',
+        usage: 'joingroup <invite_code>',
         reactions: { start: '🔗', success: '✓', error: '❌' },
 
         execute: async (sock, m, { args, reply, prefix }) => {
             const code = args[0];
 
             if (!code) {
-                return reply(`${prefix}⊘ *Usage:* joingroup <invite code>`);
+                return reply(`${prefix}⊘ *Usage:* joingroup <invite_code>`);
             }
 
             try {
                 const result = await sock.groupAcceptInviteCode(code);
-                return reply(`✓ *Joined group successfully*\n\nGroup: ${result.gid}`);
+                return reply(`✓ *Joined group:* ${result}`);
             } catch (err) {
-                return reply(`${prefix}⊘ Invalid invite code or error: ${err.message}`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
+            }
+        }
+    },
+
+    // ── SET PRESENCE ─────────────────────────────────────────────────────────
+    {
+        name: 'presence',
+        alias: ['setonline', 'online', 'status', 'activity'],
+        desc: 'Set online presence status',
+        category: 'Owner',
+        owner: true,
+        usage: 'presence <typing|recording|paused>',
+        reactions: { start: '⏱️', success: '✓', error: '❌' },
+
+        execute: async (sock, m, { args, reply, prefix }) => {
+            const status = args[0]?.toLowerCase();
+            const valid = ['typing', 'recording', 'paused'];
+
+            if (!status || !valid.includes(status)) {
+                return reply(
+                    `${prefix}⊘ *Usage:* presence typing|recording|paused\n\n` +
+                    `Available statuses:\n` +
+                    `• typing - Show typing\n` +
+                    `• recording - Show recording audio\n` +
+                    `• paused - Stop showing status`
+                );
+            }
+
+            try {
+                await sock.updateOnlinePresence(m.chat, status);
+                return reply(`✓ *Presence set to:* ${status}`);
+            } catch (err) {
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     },
@@ -247,28 +128,26 @@ module.exports = [
     // ── EDIT MESSAGE ─────────────────────────────────────────────────────────
     {
         name: 'editmsg',
-        alias: ['edit', 'edittext', 'editmessage'],
+        alias: ['edit', 'editmessage', 'msgupdate'],
         desc: 'Edit a previously sent message',
         category: 'Owner',
         owner: true,
-        usage: 'editmsg <new text> (reply to message)',
+        usage: 'editmsg <new_text> (reply to message)',
         reactions: { start: '✏️', success: '✓', error: '❌' },
 
         execute: async (sock, m, { args, reply, prefix }) => {
-            if (!m.quoted?.key) {
-                return reply(`${prefix}⊘ Reply to the message you want to edit`);
+            const newText = args.join(' ');
+
+            if (!newText) {
+                return reply(`${prefix}⊘ *Usage:* editmsg <new_text>`);
             }
 
-            const newText = args.join(' ');
-            if (!newText) {
-                return reply(`${prefix}⊘ *Usage:* editmsg <new text>`);
+            if (!m.quoted?.key) {
+                return reply(`${prefix}⊘ *Usage:* Reply to a message to edit it`);
             }
 
             try {
-                await sock.relayMessage(m.chat, 
-                    { protocolMessage: { key: m.quoted.key, type: 14, editedMessage: { conversation: newText } } },
-                    { messageId: m.id }
-                );
+                await sock.editMessage(m.chat, m.quoted.key, { text: newText });
                 return reply(`✓ *Message edited*`);
             } catch (err) {
                 return reply(`${prefix}⊘ Error: ${err.message}`);
@@ -276,19 +155,19 @@ module.exports = [
         }
     },
 
-    // ── REVOKE MESSAGE (DELETE FOR EVERYONE) ─────────────────────────────────
+    // ── DELETE FOR EVERYONE ──────────────────────────────────────────────────
     {
-        name: 'revoke',
-        alias: ['recall', 'unsend', 'deleteforeveryone'],
+        name: 'deleteall',
+        alias: ['del', 'delall', 'removemsg'],
         desc: 'Delete a message for everyone',
         category: 'Owner',
         owner: true,
-        usage: 'revoke (reply to message)',
-        reactions: { start: '🔄', success: '✓', error: '❌' },
+        usage: 'deleteall (reply to message)',
+        reactions: { start: '🗑️', success: '✓', error: '❌' },
 
         execute: async (sock, m, { reply, prefix }) => {
             if (!m.quoted?.key) {
-                return reply(`${prefix}⊘ Reply to the message you want to delete`);
+                return reply(`${prefix}⊘ *Usage:* Reply to a message to delete it`);
             }
 
             try {
@@ -300,57 +179,33 @@ module.exports = [
         }
     },
 
-    // ── UPDATE ONLINE PRESENCE ───────────────────────────────────────────────
-    {
-        name: 'presence',
-        alias: ['setonline', 'typing', 'recording'],
-        desc: 'Set your online presence status',
-        category: 'Owner',
-        owner: true,
-        usage: 'presence <available/unavailable/typing/recording/paused>',
-        reactions: { start: '📡', success: '✓', error: '❌' },
-
-        execute: async (sock, m, { args, reply, prefix }) => {
-            const status = args[0]?.toLowerCase();
-            const valid = ['available', 'unavailable', 'typing', 'recording', 'paused'];
-
-            if (!status || !valid.includes(status)) {
-                return reply(`${prefix}⊘ *Usage:* presence <${valid.join('/')}>`);
-            }
-
-            try {
-                await sock.sendPresenceUpdate(status, m.chat);
-                return reply(`✓ *Presence updated to:* ${status}`);
-            } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
-            }
-        }
-    },
-
-    // ── GET WHATSAPP VERSION ────────────────────────────────────────────────
+    // ── CHECK WHATSAPP VERSION ───────────────────────────────────────────────
     {
         name: 'waversion',
-        alias: ['appversion', 'botversion', 'whatsappversion'],
-        desc: 'Check WhatsApp/Bot version info',
+        alias: ['version', 'waver', 'botversion', 'checkversion'],
+        desc: 'Check WhatsApp and bot version info',
         category: 'Owner',
         owner: true,
         usage: 'waversion',
-        reactions: { start: '📊', success: '✓', error: '❌' },
+        reactions: { start: '📱', success: '✓', error: '❌' },
 
-        execute: async (sock, m, { reply }) => {
+        execute: async (sock, m, { reply, prefix }) => {
             try {
-                const version = sock.ws?.url || 'Unknown';
-                const ua = sock.store?.browserDescription || ['Unknown', 'Unknown', 'Unknown'];
-                
+                const wa = await sock.getWAVersionInfo?.();
+                const info = {
+                    version: wa?.version || 'Unknown',
+                    connected: sock.state?.connection || 'Unknown',
+                    platform: wa?.platform || 'WhatsApp',
+                };
+
                 return reply(
-                    `📊 *WhatsApp Bot Info*\n\n` +
-                    `Browser: ${ua[0]} ${ua[1]}\n` +
-                    `OS: ${ua[2]}\n` +
-                    `Status: Connected\n\n` +
-                    `_CRYSNOVA AI v2.0_`
+                    `📱 *Version Information*\n\n` +
+                    `Platform: ${info.platform}\n` +
+                    `WhatsApp: ${info.version}\n` +
+                    `Bot Status: ${info.connected}`
                 );
             } catch (err) {
-                return reply(`ℹ *Bot Status:* Active\n_CRYSNOVA AI v2.0_`);
+                return reply(`${prefix}⊘ Error: ${err.message}`);
             }
         }
     }
