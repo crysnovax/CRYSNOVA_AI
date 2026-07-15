@@ -185,7 +185,7 @@ function createGuardCommand(mode) {
         desc: `${label} group protection and immunity list`,
         groupOnly: true,
         adminOnly: true,
-        botAdmin: true,
+       // botAdmin: true,
         execute: async (sock, m, { args, reply }) => {
             const sub = args[0]?.toLowerCase();
             if (sub === 'on' || sub === 'off') {
