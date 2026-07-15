@@ -59,13 +59,12 @@ async function getPrivilegedIdentities(sock) {
 async function isPrivilegedMentioned(sock, m, mek) {
     if (m.key?.fromMe) return false;
     const context = getContextInfo(m);
+    // Only explicit @tags count. Reply metadata (participant/quoted sender)
+    // must not trigger the configured mention response.
     const mentions = [...new Set([
         ...(context.mentionedJid || []),
         ...(m.mentionedJid || []),
         ...(m.msg?.contextInfo?.mentionedJid || []),
-        context.participant,
-        context.participantAlt,
-        m.quoted?.sender,
     ].filter(Boolean))];
     if (!mentions.length) return false;
 
