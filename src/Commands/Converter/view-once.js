@@ -28,13 +28,15 @@ module.exports = {
     success: '🤫'
   },
 
-  execute: async (sock, m, { args, reply }) => {
+  execute: async (sock, m, { args, reply, prefix }) => {
     try {
       const cmd = m.body.split(' ')[0].toLowerCase();
       const sender = m.sender;
+      const vvCmd = prefix + 'vv';
+      const vvpCmd = prefix + 'vvp';
 
       // ───── SET REACTION TRIGGER ─────
-      if (cmd === '.vv' && args[0] === 'cmd' && args[1]) {
+      if (cmd === vvCmd && args[0] === 'cmd' && args[1]) {
         reactionTriggers[sender] = args[1];
         saveTriggers();
         return reply(`╭─❍ *CRYSNOVA AI V2.0*\n│ ✓ Reaction trigger set: ${args[1]}\n╰──────────────────`);
@@ -85,7 +87,7 @@ module.exports = {
       if (!sendType) return reply('╭─❍ *CRYSNOVA AI V2.0*\n│ ✘ Unsupported type.\n╰──────────────────');
 
       // ───── PRIVATE (.vvp) ─────
-      if (cmd === '.vvp') {
+      if (cmd === vvpCmd) {
         await sock.sendMessage(sender, {
           [sendType]: buffer,
           caption: `╭─❍ *CRYSNOVA AI V2.0*\n│ ✓ View-once saved privately.\n╰──────────────────`

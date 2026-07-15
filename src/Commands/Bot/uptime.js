@@ -1,1 +1,83 @@
-const a0_0x2dbc09=a0_0x3d00;(function(_0x2d2aa5,_0x5a2207){const _0x225d75=a0_0x3d00,_0x574c2d=_0x2d2aa5();while(!![]){try{const _0x58a56f=parseInt(_0x225d75(0x217))/0x1*(-parseInt(_0x225d75(0x218))/0x2)+-parseInt(_0x225d75(0x1fb))/0x3*(-parseInt(_0x225d75(0x213))/0x4)+-parseInt(_0x225d75(0x216))/0x5+parseInt(_0x225d75(0x1f6))/0x6*(parseInt(_0x225d75(0x20f))/0x7)+parseInt(_0x225d75(0x212))/0x8*(parseInt(_0x225d75(0x1ff))/0x9)+-parseInt(_0x225d75(0x21a))/0xa+-parseInt(_0x225d75(0x202))/0xb;if(_0x58a56f===_0x5a2207)break;else _0x574c2d['push'](_0x574c2d['shift']());}catch(_0xc02a49){_0x574c2d['push'](_0x574c2d['shift']());}}}(a0_0x4361,0xbedaf),require(a0_0x2dbc09(0x210))[a0_0x2dbc09(0x1f9)]());const fs=require('fs'),path=require(a0_0x2dbc09(0x20b)),{getTimezone,getTimeData}=require('../Core/®.js'),ENV_PATH=path[a0_0x2dbc09(0x1fa)](__dirname,a0_0x2dbc09(0x201)),getUserTimezone=_0x2b1e16=>{const _0x2b9c7f=a0_0x2dbc09,_0x5a26c1=_0x2b9c7f(0x1f4)+_0x2b1e16[_0x2b9c7f(0x20d)](/[^a-zA-Z0-9]/g,'_');if(process.env[_0x5a26c1])return process.env[_0x5a26c1];const _0x5baeac=path[_0x2b9c7f(0x1fa)](__dirname,'../../database/timezones.json');if(fs[_0x2b9c7f(0x1f3)](_0x5baeac)){const _0x11294c=JSON[_0x2b9c7f(0x1fd)](fs[_0x2b9c7f(0x21b)](_0x5baeac,_0x2b9c7f(0x1fc)));if(_0x11294c[_0x2b1e16])return _0x11294c[_0x2b1e16];}return'Lagos';},saveUserTimezone=(_0x4cbd6b,_0x2e9d93)=>{const _0x263711=a0_0x2dbc09,_0x571eaf=path['join'](__dirname,_0x263711(0x204)),_0x5909e0=fs[_0x263711(0x1f3)](_0x571eaf)?JSON[_0x263711(0x1fd)](fs[_0x263711(0x21b)](_0x571eaf,_0x263711(0x1fc))):{};_0x5909e0[_0x4cbd6b]=_0x2e9d93,fs[_0x263711(0x1fe)](_0x571eaf,JSON[_0x263711(0x208)](_0x5909e0,null,0x2));const _0x4c8b=_0x263711(0x1f4)+_0x4cbd6b[_0x263711(0x20d)](/[^a-zA-Z0-9]/g,'_');let _0x400108=fs[_0x263711(0x1f3)](ENV_PATH)?fs[_0x263711(0x21b)](ENV_PATH,_0x263711(0x1fc)):'';_0x400108=_0x400108[_0x263711(0x20d)](new RegExp(_0x4c8b+'=.*\x5cn?','g'),''),_0x400108+='\x0a'+_0x4c8b+'='+_0x2e9d93+'\x0a',fs[_0x263711(0x1fe)](ENV_PATH,_0x400108);};function a0_0x3d00(_0x5171ef,_0xa354ce){_0x5171ef=_0x5171ef-0x1f3;const _0x4361c0=a0_0x4361();let _0x3d0086=_0x4361c0[_0x5171ef];return _0x3d0086;}module[a0_0x2dbc09(0x203)]={'name':'uptime','alias':['up'],'desc':a0_0x2dbc09(0x214),'category':'Info','usage':a0_0x2dbc09(0x205),'reactions':{'start':'📡','success':'🐾'},'execute':async(_0x417e04,_0x4ad717,{reply:_0x33a323})=>{const _0x3377e6=a0_0x2dbc09;try{const _0x4e342f=_0x4ad717[_0x3377e6(0x219)]||_0x4ad717['key']?.[_0x3377e6(0x20a)]||_0x4ad717[_0x3377e6(0x215)]?.[_0x3377e6(0x211)],_0x4baf85=getUserTimezone(_0x4e342f),_0x2f26c8=getTimezone(_0x4baf85)||'Africa/Lagos';let _0x403561;try{const {data:_0x570dff}=await getTimeData(_0x2f26c8),_0x583a40=new Date(_0x570dff[_0x3377e6(0x20c)]);_0x403561=_0x583a40['toLocaleTimeString'](_0x3377e6(0x206),{'hour':'numeric','minute':_0x3377e6(0x209),'hour12':!![],'timeZone':_0x2f26c8});}catch(_0x2d82aa){_0x403561=new Date()['toLocaleTimeString'](_0x3377e6(0x206),{'hour':'numeric','minute':_0x3377e6(0x209),'hour12':!![]});}const _0xf0061e=Math[_0x3377e6(0x207)](process['uptime']()),_0x4b7518=Math['floor'](_0xf0061e/0x15180),_0x2baf08=Math[_0x3377e6(0x207)](_0xf0061e%0x15180/0xe10),_0x4a83e2=Math[_0x3377e6(0x207)](_0xf0061e%0xe10/0x3c),_0x2e309d=_0xf0061e%0x3c,_0x5a2124=_0x4b7518+'d-'+_0x2baf08+'h-'+_0x4a83e2+'m-'+_0x2e309d+'s',_0x56a0f1=_0x3377e6(0x1f8)+(_0x3377e6(0x1f5)+_0x5a2124+'`\x0a')+_0x3377e6(0x200)+('╰─\x20𓄄\x20`'+_0x403561+'['+_0x4baf85+']`');await _0x33a323(_0x56a0f1);}catch(_0x2244e5){console[_0x3377e6(0x1f7)](_0x3377e6(0x20e),_0x2244e5),_0x33a323('⚉\x20Failed\x20to\x20get\x20uptime');}}};function a0_0x4361(){const _0x2e97a1=['config','join','3249339cGDdKi','utf8','parse','writeFileSync','81XwIrgt','│\x20⚉\x20\x20_online_\x0a','../../.env','1358841EYgPLP','exports','../../database/timezones.json','.uptime','en-US','floor','stringify','2-digit','participant','path','datetime','replace','[UPTIME\x20ERROR]','572866fFUhrZ','dotenv','remoteJid','417064iJTtTj','4HELByX','Show\x20bot\x20uptime\x20with\x20your\x20local\x20time','key','3566045dcryZC','4TozzYY','575326thrmZw','sender','3380970CswDJm','readFileSync','existsSync','USER_TZ_','│\x20❏\x20`','114qrqbzY','error','╭─❍📡\x20*UPTIME!*\x0a'];a0_0x4361=function(){return _0x2e97a1;};return a0_0x4361();}
+// src/Commands/Bot/uptime.js — Bot uptime with correct time calculation
+const axios = require('axios');
+
+// Store start time when module loads
+const BOT_START_TIME = Date.now();
+
+// Get current time from Google (stable, free, no auth needed)
+async function getServerTime() {
+    try {
+        const res = await axios.get('https://www.google.com', {
+            timeout: 5000,
+            headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+        // Parse from response headers: Date header contains current server time
+        const dateHeader = res.headers['date'];
+        if (dateHeader) {
+            return new Date(dateHeader).getTime();
+        }
+    } catch (e) {
+        // Fallback to local time if Google fails
+    }
+    return Date.now();
+}
+
+// Format milliseconds to human-readable uptime
+function formatUptime(ms) {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    
+    const displayDays = days;
+    const displayHours = hours % 24;
+    const displayMinutes = minutes % 60;
+    const displaySeconds = seconds % 60;
+    
+    return {
+        days: displayDays,
+        hours: displayHours,
+        minutes: displayMinutes,
+        seconds: displaySeconds,
+        formatted: `${displayDays}d ${displayHours}h ${displayMinutes}m ${displaySeconds}s`
+    };
+}
+
+module.exports = {
+    name: 'uptime',
+    alias: ['stats', 'botuptime'],
+    desc: 'Show bot uptime and server stats',
+    category: 'Bot',
+    reactions: { start: '⏱️', success: '✅' },
+
+    execute: async (sock, m, { reply }) => {
+        try {
+            // Get current server time (fixes timezone-dependent off-by-1 hour bug)
+            const currentTime = await getServerTime();
+            const uptimeMs = currentTime - BOT_START_TIME;
+            const uptime = formatUptime(uptimeMs);
+            
+            // Get process memory
+            const memUsage = process.memoryUsage();
+            const heapUsedMB = (memUsage.heapUsed / 1024 / 1024).toFixed(2);
+            const heapTotalMB = (memUsage.heapTotal / 1024 / 1024).toFixed(2);
+            
+            // Format response
+            const uptimeText = `${uptime.days}d ${uptime.hours}h ${uptime.minutes}m ${uptime.seconds}s`;
+            const memoryText = `${heapUsedMB}MB / ${heapTotalMB}MB`;
+            
+            reply(
+                `╭─❍ *BOT STATUS*\n` +
+                `│\n` +
+                `│ ⏱️ Uptime: ${uptimeText}\n` +
+                `│ 📊 Memory: ${memoryText}\n` +
+                `│ ✓ Status: Online\n` +
+                `│\n` +
+                `╰──────────────────`
+            );
+        } catch (err) {
+            console.error('[UPTIME ERROR]', err.message);
+            reply('╭─❍ *ERROR*\n│ ❌ Failed to get uptime\n╰──────────────────');
+        }
+    }
+};
