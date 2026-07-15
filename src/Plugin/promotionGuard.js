@@ -77,17 +77,6 @@ async function isNaturallyTrusted(sock, metadata, jid) {
     return [...candidate].some(value => trustedVariants.has(normalizeJid(value)));
 }
 
-function participantJids(participant = {}) {
-    return [participant.id, participant.phoneNumber, participant.lid].filter(Boolean).map(normalizeJid);
-}
-
-async function findParticipant(sock, metadata, jid) {
-    const target = await identityVariants(sock, jid);
-    return (metadata?.participants || []).find(participant =>
-        participantJids(participant).some(value => target.has(value))
-    ) || null;
-}
-
 function correctionKey(groupId, action, jid) {
     return `${groupId}:${action}:${normalizeJid(jid)}`;
 }
@@ -125,28 +114,32 @@ async function handleParticipantUpdate(sock, event) {
     if ((action === 'promote' && !settings.antipromote) || (action === 'demote' && !settings.antidemote)) return;
 
     const participants = (event.participants || []).map(normalizeJid).filter(Boolean);
-    if (participants.length && participants.every(jid => consumeCorrection(groupId, action, jid))) return;
+    if (!participants.length) return;
 
-    const actor = normalizeJid(event.author || event.actor || event.participant || '');
-    if (!actor) return;
+    // Skip only events that are entirely the bot's own corrections.
+    const pending = participants.filter(jid => !consumeCorrection(groupId, action, jid));
+    if (!pending.length) return;
 
     const metadata = await sock.groupMetadata(groupId).catch(() => null);
     if (!metadata) return;
-    const bot = await findParticipant(sock, metadata, sock.user?.id || '');
-    if (!bot?.admin) return;
-    if (await isNaturallyTrusted(sock, metadata, actor) || await isImmune(sock, groupId, actor)) return;
 
-    const actorParticipant = await findParticipant(sock, metadata, actor);
-    const actorCanBeDemoted = Boolean(actorParticipant?.admin)
-        && !(await isNaturallyTrusted(sock, metadata, actor))
-        && !(await isImmune(sock, groupId, actor));
+    const actor = normalizeJid(event.author || event.actor || '');
+    const botJids = await variantsForMany(sock, [sock.user?.id, sock.user?.lid].filter(Boolean));
+
+    // The bot's own actions (including corrections) are never punished.
+    if (actor && botJids.has(normalizeJid(actor))) return;
+
+    let actorIsTrusted = false;
+    if (actor) {
+        actorIsTrusted = await isNaturallyTrusted(sock, metadata, actor) || await isImmune(sock, groupId, actor);
+        if (actorIsTrusted) return;
+    }
+
     const corrected = [];
 
-    for (const target of participants) {
-        if (consumeCorrection(groupId, action, target)) continue;
+    for (const target of pending) {
+        if (botJids.has(normalizeJid(target))) continue;
         if (await isNaturallyTrusted(sock, metadata, target) || await isImmune(sock, groupId, target)) continue;
-        const targetParticipant = await findParticipant(sock, metadata, target);
-        if (!targetParticipant) continue;
 
         if (action === 'promote') {
             if (await applyCorrection(sock, groupId, target, 'demote')) corrected.push(`demoted @${target.split('@')[0]}`);
@@ -155,12 +148,12 @@ async function handleParticipantUpdate(sock, event) {
         }
     }
 
-    if (corrected.length && actorCanBeDemoted) {
+    if (corrected.length && actor) {
         if (await applyCorrection(sock, groupId, actor, 'demote')) corrected.push(`demoted actor @${actor.split('@')[0]}`);
     }
 
     if (corrected.length) {
-        const mentions = [...new Set([actor, ...participants])];
+        const mentions = [...new Set([actor, ...participants].filter(Boolean))];
         await sock.sendMessage(groupId, {
             text: `Promotion guard enforced: ${corrected.join(', ')}.`,
             mentions,

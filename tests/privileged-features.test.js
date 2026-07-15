@@ -107,6 +107,22 @@ test('report evidence must belong to the selected contact', async () => {
     }, '15550004444@s.whatsapp.net', evidence), false);
 });
 
+test('access list target resolution returns a phone JID for unmapped LID mentions', async () => {
+    const identity = require(path.join(originalCwd, 'src/Plugin/identityUtils.js'));
+    const sock = mappingSocket();
+    sock.groupMetadata = async () => ({
+        participants: [
+            { id: 'unmapped@lid', phoneNumber: '15550006666@s.whatsapp.net' },
+        ],
+    });
+    const resolved = await identity.resolveCommandTarget(sock, {
+        chat: 'group@g.us',
+        mentionedJid: ['unmapped@lid'],
+        msg: { contextInfo: {} },
+    }, '');
+    assert.equal(resolved, '15550006666@s.whatsapp.net');
+});
+
 function guardSocket() {
     const actions = [];
     const sent = [];
@@ -159,6 +175,41 @@ test('anti-demote restores target and demotes actor', async () => {
         ['15550005555@s.whatsapp.net', 'promote'],
         ['15550004444@s.whatsapp.net', 'demote'],
     ]);
+});
+
+test('anti-promote still enforces when the bot is missing from stale metadata', async () => {
+    const groupId = 'stale@g.us';
+    guard.updateGroupConfig(groupId, { antipromote: true });
+    const sock = guardSocket();
+    sock.groupMetadata = async () => ({
+        owner: '15550007777@s.whatsapp.net',
+        participants: [
+            { id: '15550004444@s.whatsapp.net', admin: 'admin' },
+        ],
+    });
+    await guard.handleParticipantUpdate(sock, {
+        id: groupId,
+        action: 'promote',
+        author: '15550004444@s.whatsapp.net',
+        participants: ['15550005555@s.whatsapp.net'],
+    });
+    assert.deepEqual(sock.actions.map(item => [item.users[0], item.action]), [
+        ['15550005555@s.whatsapp.net', 'demote'],
+        ['15550004444@s.whatsapp.net', 'demote'],
+    ]);
+});
+
+test('promotion guard ignores events performed by the bot itself', async () => {
+    const groupId = 'botself@g.us';
+    guard.updateGroupConfig(groupId, { antipromote: true });
+    const sock = guardSocket();
+    await guard.handleParticipantUpdate(sock, {
+        id: groupId,
+        action: 'promote',
+        author: sock.user.id,
+        participants: ['15550005555@s.whatsapp.net'],
+    });
+    assert.equal(sock.actions.length, 0);
 });
 
 test('default creator immunity is permanent and bypasses corrections', async () => {
