@@ -11,12 +11,32 @@ async function resolvePhoneJid(sock, candidates = []) {
     if (mapper?.getPNForLID) {
         for (const jid of values.filter(value => value.endsWith('@lid'))) {
             try {
-                const mapped = await mapper.getPNForLID(jid);
-                if (mapped) return normalizeJid(mapped);
+                const mapped = normalizeJid(await mapper.getPNForLID(jid) || '');
+                if (isPhoneJid(mapped)) return mapped;
             } catch {}
         }
     }
 
+    return null;
+}
+
+async function resolvePhoneJidWithMetadata(sock, chatId, candidates = []) {
+    const direct = await resolvePhoneJid(sock, candidates);
+    if (direct) return direct;
+
+    if (!String(chatId).endsWith('@g.us')) return null;
+    const metadata = await sock.groupMetadata?.(chatId)?.catch?.(() => null) || null;
+    if (!metadata?.participants) return null;
+
+    const wanted = new Set(candidates.filter(Boolean).map(normalizeJid));
+    for (const participant of metadata.participants) {
+        const ids = [participant.id, participant.lid, participant.jid].filter(Boolean).map(normalizeJid);
+        if (ids.some(jid => wanted.has(jid))) {
+            const phone = [participant.phoneNumber, participant.id, participant.jid]
+                .filter(Boolean).map(normalizeJid).find(isPhoneJid);
+            if (phone) return phone;
+        }
+    }
     return null;
 }
 
@@ -68,7 +88,7 @@ async function resolveCommandTarget(sock, m, rawValue = '') {
         contextInfo.participant,
     ];
 
-    return resolvePhoneJid(sock, candidates);
+    return resolvePhoneJidWithMetadata(sock, m?.chat, candidates);
 }
 
 module.exports = {
@@ -80,4 +100,5 @@ module.exports = {
     normalizeJid,
     resolveCommandTarget,
     resolvePhoneJid,
+    resolvePhoneJidWithMetadata,
 };
