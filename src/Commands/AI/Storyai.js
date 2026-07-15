@@ -13,7 +13,7 @@ module.exports = {
     execute: async (sock, m, { args, reply }) => {
         try {
             if (!args.length) {
-                return reply(`ಠ_ಠ *STORYTELLING AI*\n\nUsage:\n.story <prompt>\n.story creative <prompt>\n.story short <prompt>\n.story long <prompt>`);
+                return reply(`${prefix}ಠ_ಠ *STORYTELLING AI*\n\nUsage:\nstory <prompt>\n.story creative <prompt>\n.story short <prompt>\n.story long <prompt>`);
             }
 
             let length = 'medium';

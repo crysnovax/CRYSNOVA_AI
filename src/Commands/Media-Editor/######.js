@@ -5,7 +5,7 @@ module.exports = {
     alias: [],
     desc: 'Create a decorative 3D metal text effect',
     category: 'textmaker',
-    usage: '.metallic <text>',
+    usage: `${prefix}metallic <text>`,
     reactions: {
         start: '⚙️',
         success: '🪙'

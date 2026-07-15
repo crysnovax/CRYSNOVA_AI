@@ -9,7 +9,7 @@ module.exports = {
     alias: ['deletegc', 'dgc', 'groupdelete', 'kickall'],
     desc: 'Delete group chat by kicking everyone and leaving (DANGEROUS)',
     category: 'group',
-    usage: '.delgc',
+    usage: `${prefix}delgc`,
      // ⭐ Reaction config
     reactions: {
         start: '☠️',
@@ -77,7 +77,7 @@ module.exports = {
 
             if (toRemove.length > 0) {
                 await sock.groupParticipantsUpdate(chatId, toRemove, 'remove');
-                await reply(`_*Kicked ${toRemove.length} members...*_`);
+                await reply(`${prefix}_*Kicked ${toRemovelength} members...*_`);
             }
 
             // Bot leaves the group

@@ -11,7 +11,7 @@ module.exports = {
         try {
 
             if (!text) {
-                return reply("✘ Provide a video name\nExample: `.video Alan Walker Lily`");
+                return reply("✘ Provide a video name\nExample: `${prefix}video Alan Walker Lily`");
             }
 
             await sock.sendMessage(m.chat, {

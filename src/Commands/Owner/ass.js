@@ -60,7 +60,7 @@ module.exports = {
             }
             config.mode = mode;
             saveConfig();
-            return reply(`Mode set to: *${mode.toUpperCase()}*`);
+            return reply(`${prefix}Mode set to: *${modetoUpperCase()}*`);
         }
 
         // --- SET TARGET ---

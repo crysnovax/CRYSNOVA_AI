@@ -48,7 +48,7 @@ module.exports = {
 
         } catch (e) {
             console.error('GLINK ERROR:', e);
-            reply(`𓆉 Error: ${e.message}`);
+            reply(`${prefix}𓆉 Error: ${emessage}`);
         }
     }
 };

@@ -13,10 +13,10 @@ module.exports = {
     execute: async (sock, m, { reply, args, quoted }) => {
         let text = args.join(' ') || quoted?.text;
         if (!text) {
-            return reply(`⚉ Provide text to convert to speech
+            return reply(`${prefix}⚉ Provide text to convert to speech
 
 Examples:
-.tts Hello world
+tts Hello world
 .tts en Hello world
 .tts (reply to message)
 

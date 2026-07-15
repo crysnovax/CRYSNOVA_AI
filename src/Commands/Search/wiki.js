@@ -12,7 +12,7 @@ module.exports = {
 
     ownerOnly: true, // owner-only command
 
-    usage: '.wiki <term>',
+    usage: `${prefix}wiki <term>`,
      // ⭐ Reaction config
     reactions: {
         start: '🔎',

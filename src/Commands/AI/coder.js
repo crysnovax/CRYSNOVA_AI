@@ -146,7 +146,7 @@ module.exports = {
                 await sock.sendMessage(m.chat, {
                     react: { text: '😞', key: m.key }
                 });
-                return reply(`✘ API request failed (${res.status})`);
+                return reply(`${prefix}✘ API request failed (${resstatus})`);
             }
 
             if (!data?.status || !data?.response) {

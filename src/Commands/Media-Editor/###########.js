@@ -5,7 +5,7 @@ module.exports = {
     alias: [],
     desc: 'Create an ice/frozen text effect',
     category: 'textmaker',
-    usage: '.ice <text>',
+    usage: `${prefix}ice <text>`,
     reactions: {
         start: '❄️',
         success: '🧊'

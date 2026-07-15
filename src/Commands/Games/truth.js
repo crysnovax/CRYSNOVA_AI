@@ -14,7 +14,7 @@ module.exports = {
     alias: ['truths', 'telltruth'],
     desc: 'Random truth questions',
     category: 'Games',
-    usage: '.truth',
+    usage: `${prefix}truth`,
     reactions: { start: '😳', success: '🎭', error: '🏗️' },
 
     execute: async (sock, m, { reply }) => {

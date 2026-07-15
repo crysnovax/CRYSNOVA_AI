@@ -5,7 +5,7 @@ module.exports = {
     alias: ['country', 'nation', 'flag'],
     desc: 'Get detailed country information',
     category: 'Search',
-    usage: '.countryinfo <country name>',
+    usage: `${prefix}countryinfo <country name>`,
     reactions: { start: '🌍', success: '✨', error: '🏗️' },
 
     execute: async (sock, m, { args, reply, prefix }) => {

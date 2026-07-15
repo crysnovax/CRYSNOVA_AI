@@ -5,7 +5,7 @@ module.exports = [{
     alias: ['allfont'],
     category: 'Converter',
     desc: 'Generate fancy text styles',
-    usage: '.styletext <text>',
+    usage: `${prefix}styletext <text>`,
     reactions: { start: '✨', success: '🎨' },
     
     execute: async (sock, m, { args, reply }) => {

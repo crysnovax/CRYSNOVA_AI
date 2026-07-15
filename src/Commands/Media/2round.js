@@ -10,7 +10,7 @@ module.exports = {
     alias: ['2round', 'makeround', 'tround'],
     category: 'Media',
     desc: 'Convert video/sticker to a large round sticker (10s limit)',
-    usage: '.toround (reply to video or sticker)',
+    usage: `${prefix}toround (reply to video or sticker)`,
 
     execute: async (sock, m, { reply }) => {
         const quoted = m.quoted || m;
@@ -93,7 +93,7 @@ module.exports = {
 
         } catch (e) {
             console.error('[TOROUND]', e);
-            reply(`✘ Failed: ${e.message}`);
+            reply(`${prefix}✘ Failed: ${emessage}`);
         }
     }
 };

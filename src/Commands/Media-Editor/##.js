@@ -5,7 +5,7 @@ module.exports = {
     alias: [],
     desc: 'Create a purple text effect',
     category: 'textmaker',
-    usage: '.purplet <text>',
+    usage: `${prefix}purplet <text>`,
     reactions: {
         start: '💜',
         success: '🟣'

@@ -19,11 +19,11 @@ module.exports = {
 
             console.error('[LEAVE ERROR]', err);
 
-            reply(`
+            reply(`${prefix}
 𓉤 CRYSNOVA AI
 
 ✘ Failed to Leave
-${err.message || 'Unknown Error'}
+${errmessage || 'Unknown Error'}
 `);
         }
     }

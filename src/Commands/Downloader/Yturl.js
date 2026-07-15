@@ -24,7 +24,7 @@ module.exports = {
 
             // Fetch audio info
             const res = await fetch(apiUrl);
-            if (!res.ok) return reply(`⚉ API failed: ${res.status}`);
+            if (!res.ok) return reply(`${prefix}⚉ API failed: ${resstatus}`);
             const data = await res.json();
 
             if (!data.download || !data.title) return reply('𓉤 Failed to get audio');

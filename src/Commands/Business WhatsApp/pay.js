@@ -14,7 +14,7 @@ module.exports = [
         execute: async (sock, m, { args, reply }) => {
             const type = parseInt(args[0]);
             if (![1, 2, 3].includes(type)) {
-                return reply(`⊘ *Usage:* .payinvite 1/2/3\n\n• 1 - Service Type 1\n• 2 - Service Type 2\n• 3 - Service Type 3`);
+                return reply(`${prefix}⊘ *Usage:* payinvite 1/2/3\n\n• 1 - Service Type 1\n• 2 - Service Type 2\n• 3 - Service Type 3`);
             }
 
             await sock.sendMessage(m.chat, { react: { text: '💳', key: m.key } });
@@ -27,7 +27,7 @@ module.exports = [
                 await sock.sendMessage(m.chat, { react: { text: '🍃', key: m.key } });
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`⊘ ${err.message}`);
+                return reply(`${prefix}⊘ ${errmessage}`);
             }
         }
     },
@@ -39,7 +39,7 @@ module.exports = [
         desc: 'Send an invoice note (NGN) - requires image',
         category: 'Payment',
         owner: true,
-        usage: '.invoice <amount> <note> (reply to image)',
+        usage: `${prefix}invoice <amount> <note> (reply to image)`,
         examples: ['.invoice 5000 Payment for design'],
         reactions: { start: '📄', success: '🍃', error: '🥵' },
 
@@ -48,7 +48,7 @@ module.exports = [
             const note = args.slice(1).join(' ').trim() || 'Invoice';
 
             if (!amount || isNaN(amount)) {
-                return reply(`⊘ *Usage:* Reply to an image with .invoice <amount> <note>\n\nExample: .invoice 5000 Payment for design`);
+                return reply(`${prefix}⊘ *Usage:* Reply to an image with invoice <amount> <note>\n\nExample: .invoice 5000 Payment for design`);
             }
 
             if (!m.quoted) {
@@ -74,7 +74,7 @@ module.exports = [
            //     return reply(`✓ *Invoice sent:* NGN ${amount}\n📝 ${note}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`⊘ ${err.message}`);
+                return reply(`${prefix}⊘ ${errmessage}`);
             }
         }
     },
@@ -86,7 +86,7 @@ module.exports = [
         desc: 'Send an order message with thumbnail (reply to image)',
         category: 'Payment',
         owner: true,
-        usage: '.order <text> (reply to an image)',
+        usage: `${prefix}order <text> (reply to an image)`,
         examples: ['.order Order #1234'],
         reactions: { start: '🛍️', success: '🍃', error: '🥵' },
 
@@ -94,7 +94,7 @@ module.exports = [
             const orderText = args.join(' ').trim() || '🛍️ Order';
 
             if (!m.quoted) {
-                return reply(`⊘ *Usage:* Reply to an image with .order <text>\n\nExample: .order Order #1234`);
+                return reply(`${prefix}⊘ *Usage:* Reply to an image with order <text>\n\nExample: .order Order #1234`);
             }
 
             const isImage = m.quoted.mtype === 'imageMessage' || m.quoted.message?.imageMessage;
@@ -116,7 +116,7 @@ module.exports = [
               //  return reply(`✓ *Order sent:* ${orderText}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`⊘ ${err.message}`);
+                return reply(`${prefix}⊘ ${errmessage}`);
             }
         }
     },
@@ -142,7 +142,7 @@ module.exports = [
             }
 
             if (!targetJid) {
-                return reply(`⊘ *Usage:* .requestpay @user or reply to a user\n\nExample: .requestpay @user`);
+                return reply(`${prefix}⊘ *Usage:* requestpay @user or reply to a user\n\nExample: .requestpay @user`);
             }
 
             await sock.sendMessage(m.chat, { react: { text: '💰', key: m.key } });
@@ -154,10 +154,10 @@ module.exports = [
                 }, { quoted: m });
 
                 await sock.sendMessage(m.chat, { react: { text: '🍃', key: m.key } });
-               // return reply(`✓ *Payment request sent to:* ${targetJid.split('@')[0]}\n💵 *Currency:* NGN (Naira)`);
+               // return reply(`${prefix}✓ *Payment request sent to:* ${targetJidsplit('@')[0]}\n💵 *Currency:* NGN (Naira)`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`⊘ ${err.message}`);
+                return reply(`${prefix}⊘ ${errmessage}`);
             }
         }
     },
@@ -169,7 +169,7 @@ module.exports = [
         desc: 'Send a product message with customizable price (NGN)',
         category: 'Payment',
         owner: true,
-        usage: '.product <name> <price> (reply to image)',
+        usage: `${prefix}product <name> <price> (reply to image)`,
         examples: ['.product Premium Package 5000'],
         reactions: { start: '📦', success: '🍃', error: '🥵' },
 
@@ -178,7 +178,7 @@ module.exports = [
             const name = args.slice(0, -1).join(' ').trim() || 'Product';
 
             if (!price || isNaN(price)) {
-                return reply(`⊘ *Usage:* .product <name> <price> (reply to image)\n\nExample: .product Premium Package 5000`);
+                return reply(`${prefix}⊘ *Usage:* product <name> <price> (reply to image)\n\nExample: .product Premium Package 5000`);
             }
 
             if (!m.quoted) {
@@ -206,10 +206,10 @@ module.exports = [
                 }, { quoted: m });
 
                 await sock.sendMessage(m.chat, { react: { text: '🍃', key: m.key } });
-                //return reply(`✓ *Product sent:* ${name}\n💰 NGN ${parseInt(price).toLocaleString()}`);
+                //return reply(`${prefix}✓ *Product sent:* ${name}\n💰 NGN ${parseInt(price)toLocaleString()}`);
             } catch (err) {
                 await sock.sendMessage(m.chat, { react: { text: '🥵', key: m.key } });
-                return reply(`⊘ ${err.message}`);
+                return reply(`${prefix}⊘ ${errmessage}`);
             }
         }
     }

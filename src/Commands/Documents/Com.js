@@ -58,7 +58,7 @@ module.exports = {
 
         } catch (e) {
             console.error('[COMPRESS]', e);
-            reply(`✘ Failed: ${e.message}`);
+            reply(`${prefix}✘ Failed: ${emessage}`);
         }
     }
 };

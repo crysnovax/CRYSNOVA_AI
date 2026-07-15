@@ -12,7 +12,7 @@ module.exports = {
     alias: ['8ball', 'magic8', 'fortune'],
     desc: 'Ask the Magic 8-Ball a question',
     category: 'Games',
-    usage: '.8ball <your question>',
+    usage: `${prefix}8ball <your question>`,
     reactions: { start: '🎱', success: '🎭', error: '🏗️' },
 
     execute: async (sock, m, { args, reply, prefix }) => {

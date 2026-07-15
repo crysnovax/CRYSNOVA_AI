@@ -50,7 +50,7 @@ module.exports = {
                 `.anticall reject add/remove/list <number or JID>\n` +
                 `.anticall whitelist add/remove/list <number or JID>\n` +
                 `.anticall status\n` +
-                `.anticall reset`
+                `${prefix}anticall reset`
             );
         }
 

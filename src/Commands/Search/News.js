@@ -237,7 +237,7 @@ module.exports = {
             
         } catch (err) {
             console.error('[NEWS ERROR]', err.message);
-            reply(`⚉ Failed to generate news: ${err.message}`);
+            reply(`${prefix}⚉ Failed to generate news: ${errmessage}`);
         }
     }
 };

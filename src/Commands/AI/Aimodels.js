@@ -81,7 +81,7 @@ module.exports = {
                 await sock.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
             } catch (err) {
                 console.error('[AIWRITER] List error:', err.message);
-                reply(`✘ Failed to load models: ${err.message}`);
+                reply(`${prefix}✘ Failed to load models: ${errmessage}`);
             }
             return;
         }
@@ -99,7 +99,7 @@ module.exports = {
         if (isNumber) {
             const index = parseInt(firstPart) - 1;
             if (!models || index < 0 || index >= models.length) {
-                return reply(`✘ Invalid model number. Choose 1–${models?.length || 0}.`);
+                return reply(`${prefix}✘ Invalid model number Choose 1–${models?.length || 0}.`);
             }
             selectedModel = models[index];
             prompt = parts.slice(1).join(' ').trim();
@@ -110,13 +110,13 @@ module.exports = {
                 m.code?.toLowerCase().includes(searchTerm)
             );
             if (!selectedModel) {
-                return reply(`✘ Model "${firstPart}" not found. Use .aiwriter to list models.`);
+                return reply(`${prefix}✘ Model "${firstPart}" not found Use .aiwriter to list models.`);
             }
             prompt = parts.slice(1).join(' ').trim();
         }
         
         if (!prompt) {
-            return reply(`✘ Please provide a prompt.\nExample: .aiwriter ${firstPart} Hello world`);
+            return reply(`${prefix}✘ Please provide a prompt\nExample: .aiwriter ${firstPart} Hello world`);
         }
         
         try {
@@ -142,7 +142,7 @@ module.exports = {
             await sock.sendMessage(m.chat, { react: { text: '✅', key: m.key } });
         } catch (err) {
             console.error('[AIWRITER CHAT]', err.message);
-            reply(`✘ Failed to get response from ${selectedModel.name}.`);
+            reply(`${prefix}✘ Failed to get response from ${selectedModelname}.`);
         }
     }
 };

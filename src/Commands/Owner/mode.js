@@ -21,7 +21,7 @@ module.exports = {
         // 2. Persist to runtime-config.json so it survives restarts
         setVar('PUBLIC_MODE', isPublic);
 
-        reply(`_*❏◦SET TO ${mode.toUpperCase()} 彡*_`);
+        reply(`${prefix}_*❏◦SET TO ${modetoUpperCase()} 彡*_`);
     }
 };
 

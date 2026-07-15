@@ -13,7 +13,7 @@ module.exports = {
     execute: async (sock, m, { args, reply }) => {
         try {
             if (!args.length) {
-                return reply(`ಠ_ಠ *HORROR AI*\n\nUsage: .horror <prompt>\n       .horror cinematic <prompt>`);
+                return reply(`${prefix}ಠ_ಠ *HORROR AI*\n\nUsage: horror <prompt>\n       .horror cinematic <prompt>`);
             }
 
             let isCinematic = false;

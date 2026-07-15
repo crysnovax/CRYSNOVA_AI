@@ -40,7 +40,7 @@ module.exports = {
             const imgBuffer = await getRepliedImage();
             if (!imgBuffer) {
                 await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } }).catch(() => {});
-                return reply('✘ Reply to an image with `.collage add`');
+                return reply('✘ Reply to an image with `${prefix}collage add`');
             }
 
             // Get or create session
@@ -59,7 +59,7 @@ module.exports = {
         if (subcommand === 'push') {
             const session = collageSessions.get(sessionKey);
             if (!session || session.images.length < 2) {
-                return reply('✘ Need at least 2 images. Use `.collage add` on replied images first.');
+                return reply('✘ Need at least 2 images. Use `${prefix}collage add` on replied images first.');
             }
 
             // Optional layout argument
@@ -142,7 +142,7 @@ module.exports = {
             } catch (err) {
                 console.error('[COLLAGE PUSH ERROR]', err.message);
                 await sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } }).catch(() => {});
-                reply(`✘ Failed: ${err.message}`);
+                reply(`${prefix}✘ Failed: ${errmessage}`);
             }
             return;
         }

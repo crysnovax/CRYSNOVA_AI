@@ -5,7 +5,7 @@ module.exports = {
     alias: ['apkdl'],
     desc: 'Stable APK downloader',
     category: 'tools',
-    usage: '.apk <app name>',
+    usage: `${prefix}apk <app name>`,
 
     execute: async (sock, m, { args, reply, prefix }) => {
 
@@ -72,7 +72,7 @@ module.exports = {
 
             console.log('[APK ERROR]', err.message);
 
-            reply(`✘ APK download failed\nReason: ${err.message}`);
+            reply(`${prefix}✘ APK download failed\nReason: ${errmessage}`);
         }
     }
 };

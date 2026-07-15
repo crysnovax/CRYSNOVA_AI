@@ -15,7 +15,7 @@ module.exports = {
             const res = await fetch(apiUrl, { timeout: 15000 });
             
             if (!res.ok) {
-                return reply(`_*⚉ SMS24 API Error ${res.status}*_\n☬ Service temporarily unavailable`);
+                return reply(`${prefix}_*⚉ SMS24 API Error ${resstatus}*_\n☬ Service temporarily unavailable`);
             }
 
             const json = await res.json();

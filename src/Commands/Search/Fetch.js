@@ -50,7 +50,7 @@ module.exports = {
     name: 'fetch',
     category: 'Search',
     desc: 'Advanced web search with detailed results',
-    usage: '.get <query>',
+    usage: `${prefix}get <query>`,
 
     execute: async (sock, m, { args, reply }) => {
         const query = args.join(' ').trim();
