@@ -95,7 +95,7 @@ module.exports = {
             else if (db[group].action === 'warn') actionText = '⚠︎ WARN (3x → KICK)';
             else if (db[group].action === 'kick') actionText = 'ಠ_ಠ KICK';
             else if (db[group].action === 'mute') actionText = '🔇 MUTE';
-            return reply(`${prefix}_*⟁⃝⚠︎ Anti Spam ON*_\n_Action: ${actionText}_\n_Max ${db[group]maxMessages} msgs in ${db[group].timeWindow / 1000}s_`);
+            return reply(`*⟁⃝⚠︎ Anti Spam ON*\nAction: ${actionText}\nMax ${db[group].maxMessages} msgs in ${db[group].timeWindow / 1000}s`);
         }
         if (sub === 'off') {
             db[group].enabled = false;
@@ -145,15 +145,15 @@ module.exports = {
         }
         if (sub === 'resetwarn') {
             const mentioned = m.mentionedJid?.[0];
-            if (!mentioned) return reply(`${prefix}✐ Usage: antispam resetwarn @user`);
+            if (!mentioned) return reply(`Usage: antispam resetwarn @user`);
             const warns = loadWarns();
             const key = `${group}_${mentioned}`;
             if (warns[key]) {
                 delete warns[key];
                 saveWarns(warns);
-                return reply(`${prefix}✓ Warnings reset for @${mentionedsplit('@')[0]}`, { mentions: [mentioned] });
+                return reply(`Warnings reset for @${mentioned.split('@')[0]}`, { mentions: [mentioned] });
             }
-            return reply(`✘ User has no warnings.`);
+            return reply(`User has no warnings.`);
         }
 
         reply('ಠ_ಠ _*Usage: .antispam on | off | delete | warn | kick | mute | max <n> | time <s> | duration <s> | resetwarn @user*_');
