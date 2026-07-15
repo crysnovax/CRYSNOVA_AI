@@ -3,7 +3,7 @@ module.exports = {
     alias: ['setgrouppp', 'setppgroup'],
     desc: 'Set group profile picture (reply to image)',
     category: 'group',
-    usage: 'setppgc (reply to image)',
+    usage: `${prefix}setppgc (reply to image)`,
 
     execute: async (sock, m, { reply }) => {
 

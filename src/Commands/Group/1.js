@@ -5,7 +5,7 @@ module.exports = {
     alias: ["msgpingc"],
     desc: "Pin a message for a specific duration",
     category: "group",
-    usage: 'msgpin 24hr | 7d | 30d',
+    usage: `${prefix}msgpin 24hr | 7d | 30d`,
     groupOnly: true,
     adminOnly:  true,
 

@@ -65,7 +65,7 @@ module.exports = {
     category: 'Owner',
     ownerOnly: true,
     desc: 'Premium auto-updater with live progress bar',
-    usage: 'update',
+    usage: `${prefix}update`,
 
     execute: async (sock, m, { reply }) => {
         // Send initial message

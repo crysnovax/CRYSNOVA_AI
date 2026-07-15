@@ -6,7 +6,7 @@ module.exports = {
     alias: ['ring', 'tones'],
     desc: 'Search and send ringtone previews',
     category: 'Search',
-    usage: 'ringtone <name>',
+    usage: `${prefix}ringtone <name>`,
     reactions: { start: '🔔', success: '🎵' },
 
     execute: async (sock, m, { args, reply, quoted }) => {

@@ -29,7 +29,7 @@ module.exports = {
     alias: ['wthr', 'forecast', 'climate'],
     desc: 'Get weather forecast in premium table',
     category: 'Search',
-    usage: 'weather <city>',
+    usage: `${prefix}weather <city>`,
     reactions: { start: '⛅', success: '✨', error: '❔' },
 
     execute: async (sock, m, { args, reply, prefix }) => {

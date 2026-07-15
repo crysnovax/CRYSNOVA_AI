@@ -6,7 +6,7 @@ module.exports = {
     alias: ['ttsearch', 'tiktoks'],
     desc: 'Search TikTok and return the closest match',
     category: 'Search',
-    usage: 'tiktok <search query>',
+    usage: `${prefix}tiktok <search query>`,
     examples: ['.tiktok AI automation', '.tt Ronaldo funny'],
     reactions: { start: '📥', success: '❤️‍🩹', error: '❔' },
 

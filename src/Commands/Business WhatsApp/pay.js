@@ -39,7 +39,7 @@ module.exports = [
         desc: 'Send an invoice note (NGN) - requires image',
         category: 'Payment',
         owner: true,
-        usage: 'invoice <amount> <note> (reply to image)',
+        usage: `${prefix}invoice <amount> <note> (reply to image)`,
         examples: ['.invoice 5000 Payment for design'],
         reactions: { start: '📄', success: '🍃', error: '🥵' },
 
@@ -86,7 +86,7 @@ module.exports = [
         desc: 'Send an order message with thumbnail (reply to image)',
         category: 'Payment',
         owner: true,
-        usage: 'order <text> (reply to an image)',
+        usage: `${prefix}order <text> (reply to an image)`,
         examples: ['.order Order #1234'],
         reactions: { start: '🛍️', success: '🍃', error: '🥵' },
 
@@ -169,7 +169,7 @@ module.exports = [
         desc: 'Send a product message with customizable price (NGN)',
         category: 'Payment',
         owner: true,
-        usage: 'product <name> <price> (reply to image)',
+        usage: `${prefix}product <name> <price> (reply to image)`,
         examples: ['.product Premium Package 5000'],
         reactions: { start: '📦', success: '🍃', error: '🥵' },
 

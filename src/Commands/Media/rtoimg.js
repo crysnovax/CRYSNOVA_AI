@@ -8,7 +8,7 @@ module.exports = {
     alias: ['rtoimage', 'rtovideo', 'rtovid', 'r2img'],
     category: 'Media',
     desc: 'Convert a round sticker back to image or video',
-    usage: 'rtoimg (reply to a round sticker)',
+    usage: `${prefix}rtoimg (reply to a round sticker)`,
 
     execute: async (sock, m, { reply }) => {
         const quoted = m.quoted || m;

@@ -287,7 +287,7 @@ module.exports = [
         desc: 'Set default disappearing message timer for new chats',
         category: 'Privacy',
         owner: true,
-        usage: 'disappearing <seconds>',
+        usage: `${prefix}disappearing <seconds>`,
         reactions: { start: '⏳', success: '🍃', error: '🥵' },
 
         execute: async (sock, m, { args, reply, prefix }) => {
@@ -325,7 +325,7 @@ module.exports = [
         desc: 'View all your current privacy settings',
         category: 'Privacy',
         owner: true,
-        usage: 'myprivacy',
+        usage: `${prefix}myprivacy`,
         reactions: { start: '🔒', success: '🍃', error: '🥵' },
 
         execute: async (sock, m, { reply, prefix }) => {
@@ -439,7 +439,7 @@ module.exports = [
         desc: 'Get list of blocked users with their names',
         category: 'Moderation',
         owner: true,
-        usage: 'blocklist',
+        usage: `${prefix}blocklist`,
         reactions: { start: '📋', success: '🍃', error: '🥵' },
 
         execute: async (sock, m, { reply, prefix }) => {
@@ -481,7 +481,7 @@ module.exports = [
         desc: 'Generate a WhatsApp video call link',
         category: 'Utility',
         owner: true,
-        usage: 'videocall',
+        usage: `${prefix}videocall`,
         reactions: { start: '📹', success: '🏷️', error: '🥵' },
 
         execute: async (sock, m, { reply, prefix }) => {
@@ -511,7 +511,7 @@ module.exports = [
         alias: ['metabots', 'aibots', 'botlist'],
         desc: 'List available Meta AI bots on WhatsApp',
         category: 'Utility',
-        usage: 'mybots',
+        usage: `${prefix}mybots`,
         reactions: { start: '🤖', success: '🐾', error: '🥵' },
 
         execute: async (sock, m, { reply, prefix }) => {
@@ -546,7 +546,7 @@ module.exports = [
         desc: 'Resolve a phone number or LID to full user IDs',
         category: 'Utility',
         owner: true,
-        usage: 'finduser <number or LID>',
+        usage: `${prefix}finduser <number or LID>`,
         reactions: { start: '🔍', success: '🐾', error: '🥵' },
 
         execute: async (sock, m, { args, reply, prefix }) => {

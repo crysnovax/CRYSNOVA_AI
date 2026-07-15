@@ -9,7 +9,7 @@ module.exports = {
     alias: ['anisearch', 'findanime'],
     desc: 'Search for anime with beautiful swipeable cards',
     category: 'Anime',
-    usage: 'animesearch <title>',
+    usage: `${prefix}animesearch <title>`,
 
     execute: async (sock, m, { args, reply }) => {
         const query = args.join(' ').trim();

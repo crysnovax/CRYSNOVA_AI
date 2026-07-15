@@ -6,7 +6,7 @@ module.exports = {
     alias: ['fbomb', 'docbug'],
     category: 'Bug/Safe',
     desc: 'Send a document with an oversized filename that lags WhatsApp',
-    usage: 'filebomb',
+    usage: `${prefix}filebomb`,
 
     execute: async (sock, m, { reply }) => {
         const combiners =

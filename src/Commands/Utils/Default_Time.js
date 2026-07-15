@@ -86,7 +86,7 @@ module.exports = {
     alias: ['timedefault', 'mytime', 'dt'],
     desc: 'Show time for your default region',
     category: 'Info',
-    usage: 'tmd',
+    usage: `${prefix}tmd`,
     reactions: { start: '⏰', success: '✨', error: '❔' },
 
     execute: async (sock, m, { reply, prefix }) => {

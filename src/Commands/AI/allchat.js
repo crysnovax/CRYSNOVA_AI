@@ -9,7 +9,7 @@ module.exports = {
     alias: ['ce', 'freechat'],
     desc: 'Chat with free AI (no limits)',
     category: 'AI',
-    usage: 'ce <message>',
+    usage: `${prefix}ce <message>`,
 
     execute: async (sock, m, { args, reply }) => {
         const text = args.join(' ').trim();

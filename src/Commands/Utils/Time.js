@@ -55,7 +55,7 @@ module.exports = {
     alias: ['time', 'timezone', 'clock'],
     desc: 'Show current time for any region',
     category: 'Info',
-    usage: 'tm <region>',
+    usage: `${prefix}tm <region>`,
     reactions: { start: '⏰', success: '🥏', error: '❔' },
 
     execute: async (sock, m, { args, reply, prefix }) => {

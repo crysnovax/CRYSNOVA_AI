@@ -5,7 +5,7 @@ module.exports = {
     alias: ['apkdl'],
     desc: 'Stable APK downloader',
     category: 'tools',
-    usage: 'apk <app name>',
+    usage: `${prefix}apk <app name>`,
 
     execute: async (sock, m, { args, reply, prefix }) => {
 

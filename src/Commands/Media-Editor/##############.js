@@ -5,7 +5,7 @@ module.exports = {
     alias: [],
     desc: 'Create a digital glitch text effect',
     category: 'textmaker',
-    usage: 'glitch <text>',
+    usage: `${prefix}glitch <text>`,
     reactions: {
         start: '👾',
         success: '💾'

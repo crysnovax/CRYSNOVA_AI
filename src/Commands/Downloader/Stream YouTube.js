@@ -5,7 +5,7 @@ module.exports = {
     alias: ['streamyt', 'ytstream'],
     desc: 'Download YouTube video',
     category: 'downloader',
-    usage: 'yt <YouTube URL>',
+    usage: `${prefix}yt <YouTube URL>`,
 
     execute: async (sock, m, { args, reply }) => {
         const url = args[0]?.trim();

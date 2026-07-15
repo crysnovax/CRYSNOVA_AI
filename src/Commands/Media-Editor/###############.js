@@ -5,7 +5,7 @@ module.exports = {
     alias: [],
     desc: 'Create a neon devil wings text effect',
     category: 'textmaker',
-    usage: 'devil <text>',
+    usage: `${prefix}devil <text>`,
     reactions: {
         start: '😈',
         success: '🔥'

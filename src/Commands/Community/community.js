@@ -268,7 +268,7 @@ module.exports = [
         desc: 'Get all communities you participate in',
         category: 'Community',
         ownerOnly: true,
-        usage: 'mycommunities',
+        usage: `${prefix}mycommunities`,
         examples: ['.mycommunities'],
         reactions: { start: '🏘️', success: '🍃', error: '🥵' },
 

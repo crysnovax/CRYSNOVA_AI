@@ -3,7 +3,7 @@ module.exports = {
     alias: ['htag', 'silenttag'],
     category: 'group',
     desc: 'Tag everyone silently',
-    usage: 'hidetag <message>',
+    usage: `${prefix}hidetag <message>`,
      // ⭐ Reaction config
     reactions: {
         start: '💬',
