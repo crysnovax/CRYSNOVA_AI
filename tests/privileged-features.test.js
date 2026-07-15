@@ -212,6 +212,63 @@ test('promotion guard ignores events performed by the bot itself', async () => {
     assert.equal(sock.actions.length, 0);
 });
 
+test('anti-promote handles real Baileys object-shaped participants and LID author', async () => {
+    const groupId = 'objects@g.us';
+    guard.updateGroupConfig(groupId, { antipromote: true });
+    const sock = guardSocket();
+    await guard.handleParticipantUpdate(sock, {
+        id: groupId,
+        action: 'promote',
+        author: 'actor@lid',
+        authorPn: '15550004444@s.whatsapp.net',
+        participants: [{ phoneNumber: '15550005555@s.whatsapp.net', lid: 'target@lid' }],
+    });
+    assert.deepEqual(sock.actions.map(item => [item.users[0], item.action]), [
+        ['15550005555@s.whatsapp.net', 'demote'],
+        ['15550004444@s.whatsapp.net', 'demote'],
+    ]);
+});
+
+test('anti-demote handles object-shaped participants with lid only', async () => {
+    const groupId = 'lidonly@g.us';
+    guard.updateGroupConfig(groupId, { antidemote: true });
+    const sock = guardSocket();
+    await guard.handleParticipantUpdate(sock, {
+        id: groupId,
+        action: 'demote',
+        author: '15550004444@s.whatsapp.net',
+        participants: [{ lid: 'victim@lid' }],
+    });
+    assert.deepEqual(sock.actions.map(item => [item.users[0], item.action]), [
+        ['victim@lid', 'promote'],
+        ['15550004444@s.whatsapp.net', 'demote'],
+    ]);
+});
+
+test('promotion guard enforces even when group metadata fetch fails', async () => {
+    const groupId = 'nometa@g.us';
+    guard.updateGroupConfig(groupId, { antipromote: true });
+    const sock = guardSocket();
+    sock.groupMetadata = async () => { throw new Error('metadata unavailable'); };
+    await guard.handleParticipantUpdate(sock, {
+        id: groupId,
+        action: 'promote',
+        author: '15550004444@s.whatsapp.net',
+        participants: [{ phoneNumber: '15550005555@s.whatsapp.net' }],
+    });
+    assert.deepEqual(sock.actions.map(item => [item.users[0], item.action]), [
+        ['15550005555@s.whatsapp.net', 'demote'],
+        ['15550004444@s.whatsapp.net', 'demote'],
+    ]);
+});
+
+test('device command predicts device from message ID patterns', () => {
+    const device = require(path.join(originalCwd, 'src/Commands/Tools/device.js'));
+    assert.equal(device.detectDevice('3A123456789012345678'), 'ios');
+    assert.equal(device.detectDevice('3EB0123456789ABCDEF012'), 'web');
+    assert.equal(device.detectDevice('A1B2C3D4E5F6G7H8I9J0K'), 'android');
+});
+
 test('default creator immunity is permanent and bypasses corrections', async () => {
     const groupId = 'immune@g.us';
     guard.updateGroupConfig(groupId, { antipromote: true, antidemote: true, immune: [] });

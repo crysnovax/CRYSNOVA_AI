@@ -45,6 +45,15 @@ function updateGroupConfig(groupId, updates) {
     return getGroupConfig(groupId);
 }
 
+// Baileys emits participants either as JID strings or as parsed objects
+// ({ phoneNumber, lid, jid, id }). Normalise both shapes to a JID string.
+function extractJid(entry) {
+    if (!entry) return '';
+    if (typeof entry === 'string') return normalizeJid(entry);
+    const candidate = entry.phoneNumber || entry.jid || entry.id || entry.lid || entry.pn || '';
+    return normalizeJid(candidate);
+}
+
 async function variantsForMany(sock, jids) {
     const variants = new Set();
     for (const jid of jids.filter(Boolean)) {
@@ -113,7 +122,7 @@ async function handleParticipantUpdate(sock, event) {
     const settings = getGroupConfig(groupId);
     if ((action === 'promote' && !settings.antipromote) || (action === 'demote' && !settings.antidemote)) return;
 
-    const participants = (event.participants || []).map(normalizeJid).filter(Boolean);
+    const participants = (event.participants || []).map(extractJid).filter(Boolean);
     if (!participants.length) return;
 
     // Skip only events that are entirely the bot's own corrections.
@@ -121,9 +130,8 @@ async function handleParticipantUpdate(sock, event) {
     if (!pending.length) return;
 
     const metadata = await sock.groupMetadata(groupId).catch(() => null);
-    if (!metadata) return;
 
-    const actor = normalizeJid(event.author || event.actor || '');
+    const actor = extractJid(event.authorPn || event.author || event.actor || '');
     const botJids = await variantsForMany(sock, [sock.user?.id, sock.user?.lid].filter(Boolean));
 
     // The bot's own actions (including corrections) are never punished.
