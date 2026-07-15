@@ -5,7 +5,7 @@ module.exports = {
     alias: [],
     desc: 'Create a 1917 style text effect on an image',
     category: 'textmaker',
-    usage: `${prefix}1917 <text>`,
+    usage: '1917 <text>',
     reactions: {
         start: '🎬',
         success: '😎'
