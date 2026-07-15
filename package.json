@@ -29,7 +29,7 @@
     "adm-zip": "^0.5.16",
     "archiver": "^7.0.1",
     "axios": "^1.13.5",
-    "canvas": "^3.2.3",
+    "canvas": "npm:@napi-rs/canvas@^1.0.2",
     "chalk": "^4.1.2",
     "cheerio": "^1.2.0",
     "crypto-js": "latest",
@@ -75,6 +75,9 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.7"
+  },
+  "overrides": {
+    "libsignal": "6.0.0"
   },
   "engines": {
     "node": ">=20.0.0"
