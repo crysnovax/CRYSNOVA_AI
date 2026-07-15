@@ -1,1 +1,84 @@
-const a0_0x5c8866=a0_0x24ba;(function(_0x3c9c81,_0xeca68c){const _0x42d123=a0_0x24ba,_0x53a613=_0x3c9c81();while(!![]){try{const _0x5f25ad=parseInt(_0x42d123(0xf8))/0x1+parseInt(_0x42d123(0xdd))/0x2*(parseInt(_0x42d123(0xdf))/0x3)+parseInt(_0x42d123(0xe6))/0x4*(parseInt(_0x42d123(0xf7))/0x5)+parseInt(_0x42d123(0xe2))/0x6+-parseInt(_0x42d123(0xf0))/0x7+parseInt(_0x42d123(0xe4))/0x8+-parseInt(_0x42d123(0xe7))/0x9*(parseInt(_0x42d123(0xe8))/0xa);if(_0x5f25ad===_0xeca68c)break;else _0x53a613['push'](_0x53a613['shift']());}catch(_0x206601){_0x53a613['push'](_0x53a613['shift']());}}}(a0_0x8dc9,0xb591f));function a0_0x24ba(_0x1c1167,_0xd860d8){_0x1c1167=_0x1c1167-0xdd;const _0x8dc925=a0_0x8dc9();let _0x24ba52=_0x8dc925[_0x1c1167];return _0x24ba52;}function a0_0x8dc9(){const _0x3b8a0e=['177068PrEyLf','2CunvJq','mentionedJid','1417218RrLkMD','pushName','key','8494884iHMhcI','`ⓘ\x20Reaction\x20failed.`','4357752PgFQER','fun','362692ChLHAu','89766hHqkNf','1090BzGrbx','Someone','remoteJid','msgTarget','\x0a\x0a_⚠︎\x20GIF\x20not\x20found_','\x20anime','entries','Reaction\x20Error\x20(','8627465Rrzgyn','../Core/ⓘ.js','needTarget','msgSelf','map','message','split','25kYggHW'];a0_0x8dc9=function(){return _0x3b8a0e;};return a0_0x8dc9();}const {fetchGifUrl,reactionConfig}=require(a0_0x5c8866(0xf1));function createReactionCommand(_0x5bf6e0,_0x73777f){const _0x9e79c1=a0_0x5c8866;return{'name':_0x5bf6e0,'alias':[_0x5bf6e0],'category':_0x9e79c1(0xe5),'execute':async(_0x2298dc,_0x1a3d12,{reply:_0x3e1516})=>{const _0x194067=_0x9e79c1;try{const _0x1cf464=_0x1a3d12['message']?.['extendedTextMessage']?.['contextInfo']?.[_0x194067(0xde)]||[],_0x27d117=_0x1a3d12[_0x194067(0xe0)]||_0x194067(0xe9),_0x51b686=_0x1cf464['length']>0x0?'@'+_0x1cf464[0x0][_0x194067(0xf6)]('@')[0x0]:null;let _0x3afe24,_0x3d03ef=!![];_0x73777f[_0x194067(0xf2)]?_0x51b686?_0x3afe24=_0x73777f[_0x194067(0xeb)](_0x27d117,_0x51b686):(_0x3afe24=_0x73777f['msgNoTarget'],_0x3d03ef=![]):_0x3afe24=_0x73777f[_0x194067(0xf3)](_0x27d117);if(!_0x3d03ef)return _0x3e1516(_0x3afe24);const _0x3211df=await fetchGifUrl(_0x5bf6e0+_0x194067(0xed));if(!_0x3211df)return _0x3e1516(_0x3afe24+_0x194067(0xec));await _0x2298dc['sendMessage'](_0x1a3d12[_0x194067(0xe1)][_0x194067(0xea)],{'video':{'url':_0x3211df},'gifPlayback':!![],'caption':_0x3afe24,'mentions':_0x1cf464},{'quoted':_0x1a3d12});}catch(_0x3ee1bc){console['error'](_0x194067(0xef)+_0x5bf6e0+'):',_0x3ee1bc[_0x194067(0xf5)]),_0x3e1516(_0x194067(0xe3));}}};}const allReactions=Object[a0_0x5c8866(0xee)](reactionConfig)[a0_0x5c8866(0xf4)](([_0x4d287e,_0x2703fd])=>createReactionCommand(_0x4d287e,_0x2703fd));module['exports']=allReactions;
+const { fetchGifUrl, reactionConfig } = require('../Core/ⓘ.js');
+
+/**
+ * Resolve the reaction target from either a mention (@tag) or a
+ * replied/quoted message. Returns { jid, tag } or null when no target.
+ */
+function resolveTarget(m) {
+    // 1) Prefer an explicit @mention
+    const mentioned =
+        m.mentionedJid ||
+        m.message?.extendedTextMessage?.contextInfo?.mentionedJid ||
+        [];
+    if (Array.isArray(mentioned) && mentioned.length > 0) {
+        const jid = mentioned[0];
+        return { jid, tag: '@' + jid.split('@')[0] };
+    }
+
+    // 2) Fall back to the author of a replied/quoted message
+    const quotedJid =
+        m.quoted?.sender ||
+        m.message?.extendedTextMessage?.contextInfo?.participant ||
+        null;
+    if (quotedJid) {
+        return { jid: quotedJid, tag: '@' + quotedJid.split('@')[0] };
+    }
+
+    return null;
+}
+
+function createReactionCommand(name, config) {
+    return {
+        name,
+        alias: [name],
+        category: 'fun',
+        execute: async (sock, m, { reply }) => {
+            try {
+                const pushName = m.pushName || 'Someone';
+                const target = resolveTarget(m);
+
+                let caption;
+                let hasTarget = true;
+
+                if (config.needTarget) {
+                    if (target) {
+                        caption = config.msgTarget(pushName, target.tag);
+                    } else {
+                        caption = config.msgNoTarget;
+                        hasTarget = false;
+                    }
+                } else {
+                    caption = config.msgSelf(pushName);
+                }
+
+                if (!hasTarget) return reply(caption);
+
+                // Only mention the resolved target (works for both tag + reply)
+                const mentions = target ? [target.jid] : [];
+
+                const gifUrl = await fetchGifUrl(name + ' anime');
+                if (!gifUrl) return reply(caption + '\n\n_⚠︎ GIF not found_');
+
+                await sock.sendMessage(
+                    m.key.remoteJid,
+                    {
+                        video: { url: gifUrl },
+                        gifPlayback: true,
+                        caption,
+                        mentions
+                    },
+                    { quoted: m }
+                );
+            } catch (err) {
+                console.error('Reaction Error (' + name + '):', err.message);
+                reply('ⓘ Reaction failed.');
+            }
+        }
+    };
+}
+
+const allReactions = Object.entries(reactionConfig).map(([name, config]) =>
+    createReactionCommand(name, config)
+);
+
+module.exports = allReactions;
