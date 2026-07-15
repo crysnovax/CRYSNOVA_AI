@@ -15,7 +15,10 @@ module.exports = {
             
             try {
                 const { data } = await getTimeData(timezone);
-                currentTime = new Date(data.datetime).toLocaleTimeString('en-US', {
+                const time = new Date(data.datetime);
+                // Subtract 1 hour to correct API time offset
+                time.setHours(time.getHours() - 1);
+                currentTime = time.toLocaleTimeString('en-US', {
                     hour: 'numeric',
                     minute: '2-digit',
                     hour12: true,
