@@ -64,7 +64,7 @@ module.exports = {
     desc: 'Override bot files with latest from GitHub (preserves only sessions & .env)',
     category: 'Owner',
     owner: true,
-    usage: 'format confirm',
+    usage: `${prefix}format confirm`,
 
     execute: async (sock, m, { args, reply }) => {
         const confirmWord = args[0]?.toLowerCase();

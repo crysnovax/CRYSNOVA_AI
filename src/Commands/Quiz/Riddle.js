@@ -16,7 +16,7 @@ module.exports = {
     alias: ['riddles', 'puzzle', 'brainteaser'],
     desc: 'Get random riddles with answers',
     category: 'Quiz',
-    usage: 'riddle',
+    usage: `${prefix}riddle`,
     reactions: { start: '🤔', success: '🔖', error: '🏗️' },
 
     execute: async (sock, m, { reply }) => {

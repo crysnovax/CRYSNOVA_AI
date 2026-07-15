@@ -10,7 +10,7 @@ module.exports = {
     alias: ['tg', 'telegramsticker', 'tgs'],
     desc: 'Download 5 random Telegram stickers (images & videos) and convert to WhatsApp stickers',
     category: 'Tools',
-    usage: 'tg <Telegram sticker URL>',
+    usage: `${prefix}tg <Telegram sticker URL>`,
     examples: ['.tg https://t.me/addstickers/HoppersCartoon'],
     reactions: { start: '📦', success: '🍃', error: '🕸️' },
 

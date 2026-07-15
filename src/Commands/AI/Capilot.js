@@ -9,7 +9,7 @@ module.exports = {
     alias: ['ghost', 'aihelp'],
     desc: 'Ask GitHub Copilot style AI',
     category: 'AI',
-    usage: 'copilot <query>',
+    usage: `${prefix}copilot <query>`,
 
     execute: async (sock, m, { args, reply }) => {
         const query = args.join(' ').trim();

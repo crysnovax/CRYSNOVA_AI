@@ -6,6 +6,10 @@ const { addCommand, clearRegistry } = require('./crysCmd');
 
 const loadCommands = () => {
 
+    // Initialize global prefix before loading commands so ${prefix} in usage fields works
+    const { getVar } = require('./configManager');
+    global.prefix = getVar('PREFIX', '.');
+
     clearRegistry();
 
     const cmdPath = path.join(__dirname, '../Commands');

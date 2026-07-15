@@ -19,7 +19,7 @@ module.exports = {
     alias: ['scramble', 'unscramble', 'wordmix'],
     desc: 'Guess the original word from scrambled letters',
     category: 'Games',
-    usage: 'anagram',
+    usage: `${prefix}anagram`,
     reactions: { start: '🔤', success: '🎭', error: '🏗️' },
 
     execute: async (sock, m, { reply }) => {

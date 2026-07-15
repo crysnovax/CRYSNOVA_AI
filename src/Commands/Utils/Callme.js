@@ -3,7 +3,7 @@ module.exports = {
     alias: ['myphone', 'ringme'],
     desc: 'Share a call button with your WhatsApp number',
     category: 'Utils',
-    usage: 'callme <text>',
+    usage: `${prefix}callme <text>`,
     reactions: { start: '📞', success: '✨', error: '❔' },
 
     execute: async (sock, m, { args, reply, prefix }) => {

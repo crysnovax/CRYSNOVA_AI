@@ -5,7 +5,7 @@ module.exports = {
     alias: [],
     desc: 'Create a colorful neon light text effect',
     category: 'textmaker',
-    usage: 'neont <text>',
+    usage: `${prefix}neont <text>`,
     reactions: {
         start: '💫',
         success: '🌟'

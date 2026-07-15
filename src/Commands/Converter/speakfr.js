@@ -5,7 +5,7 @@ module.exports = [{
     alias: ['frenchtts', 'speakfr'],
     category: 'Tools',
     desc: 'Text to speech in French',
-    usage: 'ttsfr <text>',
+    usage: `${prefix}ttsfr <text>`,
     reactions: { start: '🇫🇷', success: '🎤' },
     
     execute: async (sock, m, { args, reply }) => {

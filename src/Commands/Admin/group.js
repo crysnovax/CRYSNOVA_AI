@@ -8,7 +8,7 @@ module.exports = [
         category: 'Group',
         admin: true,
         group: true,
-        usage: 'ephemeral <seconds>',
+        usage: `${prefix}ephemeral <seconds>`,
         examples: ['.ephemeral 86400', '.ephemeral 0', '.ephemeral 604800'],
         reactions: { start: '⏳', success: '🍃', error: '🥵' },
 
@@ -115,7 +115,7 @@ module.exports = [
         category: 'Group',
         admin: true,
         group: true,
-        usage: 'bottag <label>',
+        usage: `${prefix}bottag <label>`,
         examples: ['.bottag ⚉ CRYSNOVA AI', '.bottag Admin Bot'],
         reactions: { start: '🏷️', success: '🍃', error: '🥵' },
 

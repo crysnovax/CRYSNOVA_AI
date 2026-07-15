@@ -81,7 +81,7 @@ module.exports = [{
     alias: ['slinfo', 'linkinfo'],
     category: 'Tools',
     desc: 'Get info about a shortened link',
-    usage: 'shortinfo <slug>',
+    usage: `${prefix}shortinfo <slug>`,
     reactions: { start: '🔍', success: '📊' },
     
     execute: async (sock, m, { args, reply, prefix }) => {
@@ -122,7 +122,7 @@ module.exports = [{
     alias: ['sldel', 'linkdel'],
     category: 'Tools',
     desc: 'Delete a shortened link',
-    usage: 'shortdelete <slug> | <password>',
+    usage: `${prefix}shortdelete <slug> | <password>`,
     reactions: { start: '🗑️', success: '🏷️' },
     
     execute: async (sock, m, { args, reply, prefix }) => {

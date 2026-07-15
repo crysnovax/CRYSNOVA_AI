@@ -48,7 +48,7 @@ const cmds = [];
 // ==================== ACTIVATE ====================
 cmds.push({
     name: 'economy', alias: ['ecoactivate'], category: 'Economy',
-    desc: 'Activate your economy account', usage: 'economy activate <phone>',
+    desc: 'Activate your economy account', usage: `${prefix}economy activate <phone>`,
     execute: async (sock, m, { args, reply, prefix }) => {
         const sub = args[0]?.toLowerCase();
         if (sub !== 'activate') {
@@ -89,7 +89,7 @@ cmds.push({
 // ==================== BALANCE ====================
 cmds.push({
     name: 'balance', alias: ['bal', 'wallet'], category: 'Economy',
-    desc: 'Check your wallet and bank balance', usage: 'balance',
+    desc: 'Check your wallet and bank balance', usage: `${prefix}balance`,
     reactions: { start: '💰', success: '💡', error: '❔' },
     execute: async (sock, m, { reply }) => {
         const phone = myPhone(m);
@@ -123,7 +123,7 @@ cmds.push({
 // ==================== DEPOSIT ====================
 cmds.push({
     name: 'deposit', alias: ['dep'], category: 'Economy',
-    desc: 'Deposit money into your bank (safe from robbery)', usage: 'deposit <amount>',
+    desc: 'Deposit money into your bank (safe from robbery)', usage: `${prefix}deposit <amount>`,
     reactions: { start: '🏦', success: '✨', error: '❔' },
     execute: async (sock, m, { args, reply }) => {
         const phone = myPhone(m);
@@ -153,7 +153,7 @@ cmds.push({
 // ==================== WITHDRAW ====================
 cmds.push({
     name: 'withdraw', alias: ['with', 'wdraw'], category: 'Economy',
-    desc: 'Withdraw money from your bank', usage: 'withdraw <amount>',
+    desc: 'Withdraw money from your bank', usage: `${prefix}withdraw <amount>`,
     reactions: { start: '🏦', success: '✨', error: '❔' },
     execute: async (sock, m, { args, reply }) => {
         const phone = myPhone(m);
@@ -221,7 +221,7 @@ cmds.push({
 // ==================== ROB ====================
 cmds.push({
     name: 'rob', alias: ['extort', 'mug'], category: 'Economy',
-    desc: 'Attempt to rob someone (wallet only, bank is safe)', usage: 'rob <phone>',
+    desc: 'Attempt to rob someone (wallet only, bank is safe)', usage: `${prefix}rob <phone>`,
     reactions: { start: '😈', success: '✨', error: '❔' },
     execute: async (sock, m, { args, reply }) => {
         // Check incoming notifications first
@@ -269,7 +269,7 @@ cmds.push({
 // ==================== WORK ====================
 cmds.push({
     name: 'work', alias: ['job', 'earn'], category: 'Economy',
-    desc: 'Work a random job to earn coins and XP', usage: 'work',
+    desc: 'Work a random job to earn coins and XP', usage: `${prefix}work`,
     reactions: { start: '💼', success: '✨', error: '❔' },
     execute: async (sock, m, { reply }) => {
         const phone = myPhone(m);
@@ -302,7 +302,7 @@ cmds.push({
 // ==================== ECOROFILE ====================
 cmds.push({
     name: 'ecoprofile', alias: ['eprofile', 'estats'], category: 'Economy',
-    desc: 'View your full economy profile', usage: 'ecoprofile',
+    desc: 'View your full economy profile', usage: `${prefix}ecoprofile`,
     execute: async (sock, m, { reply }) => {
         const phone = myPhone(m);
         try {
@@ -338,7 +338,7 @@ cmds.push({
 // ==================== ALERTS ====================
 cmds.push({
     name: 'alerts', alias: ['notifications', 'notifs'], category: 'Economy',
-    desc: 'View your transaction alerts', usage: 'alerts',
+    desc: 'View your transaction alerts', usage: `${prefix}alerts`,
     execute: async (sock, m, { reply }) => {
         const phone = myPhone(m);
         try {
@@ -371,7 +371,7 @@ cmds.push({
 // ==================== LEADERBOARD ====================
 cmds.push({
     name: 'leaderboard', alias: ['lb', 'top', 'richlist'], category: 'Economy',
-    desc: 'View the richest players', usage: 'leaderboard',
+    desc: 'View the richest players', usage: `${prefix}leaderboard`,
     execute: async (sock, m, { reply }) => {
         try {
             const res = await eco('GET /admin/stats', '0');

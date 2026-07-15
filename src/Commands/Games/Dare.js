@@ -21,7 +21,7 @@ module.exports = {
     alias: ['dares', 'dodare'],
     desc: 'Random dare challenges',
     category: 'Games',
-    usage: 'dare',
+    usage: `${prefix}dare`,
     reactions: { start: '😈', success: '🎭', error: '🏗️' },
 
     execute: async (sock, m, { reply }) => {

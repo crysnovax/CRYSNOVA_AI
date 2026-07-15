@@ -44,7 +44,7 @@ module.exports = [
         desc: 'Set group profile picture with HD full-size upload',
         category: 'Owner',
         owner: true,
-        usage: 'setgroupicon (reply to image)',
+        usage: `${prefix}setgroupicon (reply to image)`,
         reactions: { start: '🖼️', success: '✓', error: '❌' },
 
         execute: async (sock, m, { reply, prefix }) => {
@@ -130,7 +130,7 @@ module.exports = [
         desc: 'Check WhatsApp and bot version info',
         category: 'Owner',
         owner: true,
-        usage: 'waversion',
+        usage: `${prefix}waversion`,
         reactions: { start: '📱', success: '✓', error: '❌' },
 
         execute: async (sock, m, { reply, prefix }) => {
@@ -191,7 +191,7 @@ module.exports = [
         desc: 'Leave a newsletter/channel subscription',
         category: 'Owner',
         owner: true,
-        usage: 'leavesubscription (reply in newsletter)',
+        usage: `${prefix}leavesubscription (reply in newsletter)`,
         reactions: { start: '🚪', success: '✓', error: '❌' },
 
         execute: async (sock, m, { reply, prefix }) => {
@@ -215,7 +215,7 @@ module.exports = [
         desc: 'Update newsletter/channel settings',
         category: 'Owner',
         owner: true,
-        usage: 'updatechannel <setting> <value>',
+        usage: `${prefix}updatechannel <setting> <value>`,
         reactions: { start: '⚙️', success: '✓', error: '❌' },
 
         execute: async (sock, m, { args, reply, prefix }) => {

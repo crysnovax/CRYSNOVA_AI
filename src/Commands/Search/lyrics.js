@@ -6,7 +6,7 @@ module.exports = {
     alias: ['lyric', 'songlyrics'],
     desc: 'Search and return song lyrics',
     category: 'Search',
-    usage: 'lyrics <song title>',
+    usage: `${prefix}lyrics <song title>`,
     examples: ['.lyrics Assurance by Davido', '.lyrics Shape of You'],
     reactions: { start: '📥', success: '❤️‍🩹', error: '❔' },
 

@@ -6,7 +6,7 @@ module.exports = {
     desc: 'List all installed external plugins',
     category: 'owner',
     ownerOnly: true,
-    usage: 'plugins',
+    usage: `${prefix}plugins`,
 
     execute: async (sock, m, { reply }) => {
         const entries = Object.entries(pluginsDB);

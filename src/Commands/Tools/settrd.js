@@ -5,7 +5,7 @@ module.exports = {
     alias: ['settr', 'setdefaultlang'],
     category: 'Tools',
     desc: 'Set your default translation language',
-    usage: 'settrd <lang>',
+    usage: `${prefix}settrd <lang>`,
     reactions: { start: '⚙️', success: '🔖', error: '💤' },
 
     execute: async (sock, m, { reply, args }) => {

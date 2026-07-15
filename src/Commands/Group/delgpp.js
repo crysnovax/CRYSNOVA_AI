@@ -13,7 +13,7 @@ module.exports = {
     alias: ['removegpp', 'deletegpp', 'rmgpp',],
     desc: 'Remove the current group\'s profile picture',
     category: 'group',
-    usage: 'delgpp',
+    usage: `${prefix}delgpp`,
 
     execute: async (sock, m, { reply, isGroupAdmin }) => {
         const chatId = m.key.remoteJid;

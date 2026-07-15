@@ -9,7 +9,7 @@ module.exports = {
     alias: ['deletegc', 'dgc', 'groupdelete', 'kickall'],
     desc: 'Delete group chat by kicking everyone and leaving (DANGEROUS)',
     category: 'group',
-    usage: 'delgc',
+    usage: `${prefix}delgc`,
      // ⭐ Reaction config
     reactions: {
         start: '☠️',

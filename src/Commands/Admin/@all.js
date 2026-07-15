@@ -6,7 +6,7 @@ module.exports = {
     category: 'Group',
     admin: false,
     group: true,
-    usage: 'all',
+    usage: `${prefix}all`,
 
     execute: async (sock, m, { reply }) => {
         try {
