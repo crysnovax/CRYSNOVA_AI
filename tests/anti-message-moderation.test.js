@@ -117,17 +117,17 @@ test('collects alternate, media, mention-all, and non-JID tags recursively', () 
     assert.equal(result.nonJidMentionCount, 3);
 });
 
-test('builds a deduplicated phone-only story audience and excludes self', async () => {
+test('builds a deduplicated phone-only story audience from the command store and excludes self', async () => {
+    const store = { contacts: new Map([
+        ['one', { id: '1@s.whatsapp.net' }],
+        ['duplicate', { phoneNumber: '1@s.whatsapp.net' }],
+        ['lid', { id: '2@lid' }],
+        ['self', { id: '3@s.whatsapp.net' }],
+    ]) };
     const audience = await postStory.buildStatusAudience({
         user: { id: '3@s.whatsapp.net' },
-        store: { contacts: new Map([
-            ['one', { id: '1@s.whatsapp.net' }],
-            ['duplicate', { phoneNumber: '1@s.whatsapp.net' }],
-            ['lid', { id: '2@lid' }],
-            ['self', { id: '3@s.whatsapp.net' }],
-        ]) },
         signalRepository: { lidMapping: { getPNForLID: async () => '2@s.whatsapp.net' } },
-    });
+    }, store);
     assert.deepEqual(audience.sort(), ['1@s.whatsapp.net', '2@s.whatsapp.net']);
 });
 
