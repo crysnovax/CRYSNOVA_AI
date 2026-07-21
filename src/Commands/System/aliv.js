@@ -2,7 +2,7 @@ const os = require('os');
 
 module.exports = {
     name: 'alive',
-    alias: [], // removed empty string to avoid issues
+    alias: [],
     desc: 'Display bot health and statistics',
     category: 'info',
     usage: '.botstatus',
@@ -32,6 +32,10 @@ module.exports = {
             const freeMemory = os.freemem() / (1024 * 1024 * 1024);
             const usedMemory = totalMemory - freeMemory;
 
+            // Get stats from global.crysStats (like the working example)
+            const msgCount = global.crysStats?.messages || 0;
+            const cmdCount = global.crysStats?.commands || 0;
+
             // Send status message with table
             await sock.sendMessage(message.key.remoteJid, {
                 disclaimerText: 'Bot Status',
@@ -43,10 +47,10 @@ module.exports = {
                     ['Status', '˗ˏˋ ☏ ˎˊ˗ Online'],
                     ['⩇⩇:⩇⩇', `${days}d ${hours}h ${minutes}m ${seconds}s`],
                     ['Memory', `${usedMemory.toFixed(2)} GB / ${totalMemory.toFixed(2)} GB`],
-                    ['CPU Cores', String(os.cpus().length)],               // ← converted to string
+                    ['CPU Cores', String(os.cpus().length)],
                     ['Platform', `${os.platform()} ${os.arch()}`],
-                    ['Commands', String(global.bot?.commands ?? 'N/A')],  // ← converted
-                    ['Messages', String(global.bot?.messages ?? 'N/A')]   // ← converted
+                    ['Commands', String(cmdCount)],   // ← from crysStats
+                    ['Messages', String(msgCount)]    // ← from crysStats
                 ],
                 noHeading: false,
                 footerText: '_*( ͡❛ ₃ ͡❛) CRYSN⚉VA AI V2 • Always Online*_'
