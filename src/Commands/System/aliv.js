@@ -1,1 +1,70 @@
-function a0_0x380e(_0x201b59,_0x576a68){_0x201b59=_0x201b59-0x15d;const _0x42ab3d=a0_0x42ab();let _0x380e98=_0x42ab3d[_0x201b59];return _0x380e98;}const a0_0x32677b=a0_0x380e;function a0_0x42ab(){const _0x9d2914=['message','toFixed','exports','351747rObGQu','---','platform','\x20GB','\x20GB\x20/\x20','crysStats','sendMessage','📊\x20Bot\x20Health\x20Dashboard\x20⎔','Platform','2866073YLAAQw','Metric','error','Value','254091kflKkL','messages','3718095mcutEN','bot','CPU\x20Cores','freemem','8zuLZkW','Info','chat','329750TcIJMN','Commands','key','178690ZNBVEr','Uptime','[STATUS\x20ERROR]','floor','cpus','6KTLmtB','alive','18pzRCDS','uptime','3780384xNCZxW','748aGdZtS','##\x20🤖\x20CRYSNOVA\x20AI\x20Status\x20ⓘ','Memory','length'];a0_0x42ab=function(){return _0x9d2914;};return a0_0x42ab();}(function(_0x41eace,_0x1531de){const _0xedab8a=a0_0x380e,_0x6db073=_0x41eace();while(!![]){try{const _0x3b8bdc=-parseInt(_0xedab8a(0x15f))/0x1+parseInt(_0xedab8a(0x166))/0x2*(parseInt(_0xedab8a(0x17d))/0x3)+parseInt(_0xedab8a(0x168))/0x4+parseInt(_0xedab8a(0x17f))/0x5*(parseInt(_0xedab8a(0x164))/0x6)+-parseInt(_0xedab8a(0x179))/0x7*(-parseInt(_0xedab8a(0x183))/0x8)+parseInt(_0xedab8a(0x170))/0x9+-parseInt(_0xedab8a(0x186))/0xa*(parseInt(_0xedab8a(0x169))/0xb);if(_0x3b8bdc===_0x1531de)break;else _0x6db073['push'](_0x6db073['shift']());}catch(_0x225f86){_0x6db073['push'](_0x6db073['shift']());}}}(a0_0x42ab,0x74d38));const os=require('os');module[a0_0x32677b(0x16f)]={'name':a0_0x32677b(0x165),'alias':['health',a0_0x32677b(0x180)],'desc':'Display\x20bot\x20health\x20and\x20statistics','category':a0_0x32677b(0x184),'usage':'.botstatus','reactions':{'start':'📊','success':'📅'},'execute':async(_0x20ad56,_0x7e281b,{reply:_0x11a85b})=>{const _0x2ee46e=a0_0x32677b;await _0x20ad56['sendMessage'](_0x7e281b[_0x2ee46e(0x185)],{'react':{'text':'📊','key':_0x7e281b[_0x2ee46e(0x15e)]}});try{const _0x430d4d=process[_0x2ee46e(0x167)](),_0x1c188e=Math[_0x2ee46e(0x162)](_0x430d4d/0x15180),_0x276d5c=Math[_0x2ee46e(0x162)](_0x430d4d%0x15180/0xe10),_0x343b8d=Math[_0x2ee46e(0x162)](_0x430d4d%0xe10/0x3c),_0x3ba636=Math[_0x2ee46e(0x162)](_0x430d4d%0x3c),_0x23c8dc=os['totalmem']()/0x400/0x400/0x400,_0x18a205=os[_0x2ee46e(0x182)]()/0x400/0x400/0x400,_0x114687=_0x23c8dc-_0x18a205;await _0x20ad56[_0x2ee46e(0x176)](_0x7e281b[_0x2ee46e(0x185)],{'headerText':_0x2ee46e(0x16a),'contentText':_0x2ee46e(0x171),'title':_0x2ee46e(0x177),'table':[[_0x2ee46e(0x17a),_0x2ee46e(0x17c)],['Status','🟢\x20Online'],[_0x2ee46e(0x160),_0x1c188e+'d\x20'+_0x276d5c+'h\x20'+_0x343b8d+'m\x20'+_0x3ba636+'s'],[_0x2ee46e(0x16b),_0x114687[_0x2ee46e(0x16e)](0x2)+_0x2ee46e(0x174)+_0x23c8dc[_0x2ee46e(0x16e)](0x2)+_0x2ee46e(0x173)],[_0x2ee46e(0x181),os[_0x2ee46e(0x163)]()[_0x2ee46e(0x16c)]],[_0x2ee46e(0x178),os[_0x2ee46e(0x172)]()+'\x20'+os['arch']()],[_0x2ee46e(0x15d),global[_0x2ee46e(0x175)]?.['commands']||'N/A'],['Messages',global[_0x2ee46e(0x175)]?.[_0x2ee46e(0x17e)]||'N/A']],'footerText':'_*(\u00a0͡❛\u202f₃\u00a0͡❛)\x20CRYSN⚉VA\x20AI\x20V2\x20•\x20Always\x20Online*_'},{'quoted':_0x7e281b}),await _0x20ad56[_0x2ee46e(0x176)](_0x7e281b[_0x2ee46e(0x185)],{'react':{'text':'✅','key':_0x7e281b[_0x2ee46e(0x15e)]}});}catch(_0x155389){console[_0x2ee46e(0x17b)](_0x2ee46e(0x161),_0x155389[_0x2ee46e(0x16d)]),_0x11a85b('🤖\x20*CRYSNOVA\x20AI*\x20is\x20online!\x0a⏱️\x20Uptime:\x20'+Math['floor'](process[_0x2ee46e(0x167)]()/0x3c)+'\x20minutes');}}};
+const os = require('os');
+
+module.exports = {
+    name: 'alive',
+    alias: [], // removed empty string to avoid issues
+    desc: 'Display bot health and statistics',
+    category: 'info',
+    usage: '.botstatus',
+    reactions: {
+        start: '📊',
+        success: '📅'
+    },
+    execute: async (sock, message, { reply }) => {
+        // Send initial reaction
+        await sock.sendMessage(message.key.remoteJid, {
+            react: {
+                text: '📊',
+                key: message.key
+            }
+        });
+
+        try {
+            // Calculate uptime
+            const uptime = process.uptime();
+            const days = Math.floor(uptime / 86400);
+            const hours = Math.floor((uptime % 86400) / 3600);
+            const minutes = Math.floor((uptime % 3600) / 60);
+            const seconds = Math.floor(uptime % 60);
+
+            // Memory calculations
+            const totalMemory = os.totalmem() / (1024 * 1024 * 1024);
+            const freeMemory = os.freemem() / (1024 * 1024 * 1024);
+            const usedMemory = totalMemory - freeMemory;
+
+            // Send status message with table
+            await sock.sendMessage(message.key.remoteJid, {
+                disclaimerText: 'Bot Status',
+                headerText: '📊 Bot Health Dashboard ⎔',
+                contentText: '## ☕︎ CRYSNOVA AI ˗ˏˋ ☏ ˎˊ˗',
+                title: 'Platform Info',
+                table: [
+                    ['Metric', 'Value'],
+                    ['Status', '˗ˏˋ ☏ ˎˊ˗ Online'],
+                    ['⩇⩇:⩇⩇', `${days}d ${hours}h ${minutes}m ${seconds}s`],
+                    ['Memory', `${usedMemory.toFixed(2)} GB / ${totalMemory.toFixed(2)} GB`],
+                    ['CPU Cores', String(os.cpus().length)],               // ← converted to string
+                    ['Platform', `${os.platform()} ${os.arch()}`],
+                    ['Commands', String(global.bot?.commands ?? 'N/A')],  // ← converted
+                    ['Messages', String(global.bot?.messages ?? 'N/A')]   // ← converted
+                ],
+                noHeading: false,
+                footerText: '_*( ͡❛ ₃ ͡❛) CRYSN⚉VA AI V2 • Always Online*_'
+            }, {
+                quoted: message
+            });
+
+            // Send success reaction
+            await sock.sendMessage(message.key.remoteJid, {
+                react: {
+                    text: '🫟',
+                    key: message.key
+                }
+            });
+
+        } catch (error) {
+            console.error('[STATUS ERROR]', error.message);
+            // No fallback reply as requested
+        }
+    }
+};
