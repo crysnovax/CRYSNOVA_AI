@@ -63,7 +63,7 @@
     "play-dl": "^1.9.7",
     "qrcode": "^1.5.4",
     "ruhend-scraper": "^9.0.5",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.0",
     "socket.io": "^4.7.5",
     "terser": "^5.46.1",
     "tesseract.js": "^7.0.0",
