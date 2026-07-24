@@ -8,8 +8,8 @@ module.exports = [
         desc: 'Get a user\'s status message',
         category: 'Owner',
         owner: true,
-        usage: 'getstatus <@user or phone>',
-        reactions: { start: '👁️', success: '✓', error: '❌' },
+        usage: `${prefix}getstatus <@user or phone>`,
+        reactions: { start: '🫆', success: '🍃', error: '🚧' },
 
         execute: async (sock, m, { args, reply, prefix }) => {
             let target;
@@ -22,17 +22,27 @@ module.exports = [
             }
 
             if (!target) {
-                return reply(`${prefix}⊘ *Usage:* getstatus <@user or phone>`);
+                return reply(`⊘ *Usage:* ${prefix}getstatus <@user or phone>`);
             }
 
             try {
-                const status = await sock.getUserStatus(target);
+                // fetchStatus is variadic and always returns a list, even for one target.
+                // Confirmed shape: statusList[0].status = { status, setAt } — status is
+                // null (setAt sits at epoch) when there's nothing to show, either because
+                // no About text is set, or privacy settings hide it from this bot.
+                const statusList = await sock.fetchStatus(target);
+                const info = statusList?.[0]?.status;
+
+                if (!info?.status) {
+                    return reply(`@${target.split('@')[0]}\n\nNo status set`);
+                }
+
                 return reply(
-                    `👁️ *Status for* @${target.split('@')[0]}\n\n` +
-                    `${status.status || 'No status set'}`
+                    `@${target.split('@')[0]}\n\n` +
+                    `${info.status}`
                 );
             } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
+                return reply(`⊘ Error: ${err.message}`);
             }
         }
     },
@@ -45,24 +55,26 @@ module.exports = [
         category: 'Owner',
         owner: true,
         usage: `${prefix}setgroupicon (reply to image)`,
-        reactions: { start: '🖼️', success: '✓', error: '❌' },
+        reactions: { start: '🖼️', success: '🍃', error: '🚧' },
 
-        execute: async (sock, m, { reply, prefix }) => {
+        execute: async (sock, m, { reply }) => {
             if (!m.isGroup) {
-                return reply(`${prefix}⊘ *Usage:* Only works in groups`);
+                return reply(`⊘ *Usage:* Only works in groups`);
             }
 
             if (!m.quoted?.mimetype?.startsWith('image/')) {
-                return reply(`${prefix}⊘ *Usage:* Reply to an image`);
+                return reply(`⊘ *Usage:* Reply to an image`);
             }
 
             try {
                 const image = await m.quoted.download();
-                // Use HD full-size upload flag
-                await sock.updateGroupPicture(m.chat, image, { quality: 'full' });
+                // Fork's HD/no-crop feature table confirms the flag is { hd: true }, not { quality: 'full' }.
+                // Method name updateProfilePicture is inferred (matches upstream, handles both user + group JIDs) —
+                // not directly confirmed in the docs I've read, worth a runtime check.
+                await sock.updateProfilePicture(m.chat, image, { hd: true });
                 return reply(`✓ *Group icon updated (HD)*`);
             } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
+                return reply(`⊘ Error: ${err.message}`);
             }
         }
     },
@@ -74,21 +86,21 @@ module.exports = [
         desc: 'Join a group using invite code',
         category: 'Owner',
         owner: true,
-        usage: 'joingroup <invite_code>',
-        reactions: { start: '🔗', success: '✓', error: '❌' },
+        usage: `${prefix}joingroup <invite_code>`,
+        reactions: { start: '🔗', success: '🍃', error: '🚧' },
 
         execute: async (sock, m, { args, reply, prefix }) => {
             const code = args[0];
 
             if (!code) {
-                return reply(`${prefix}⊘ *Usage:* joingroup <invite_code>`);
+                return reply(`⊘ *Usage:* ${prefix}joingroup <invite_code>`);
             }
 
             try {
                 const result = await sock.groupAcceptInviteCode(code);
                 return reply(`✓ *Joined group:* ${result}`);
             } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
+                return reply(`⊘ Error: ${err.message}`);
             }
         }
     },
@@ -100,25 +112,27 @@ module.exports = [
         desc: 'Edit a previously sent message',
         category: 'Owner',
         owner: true,
-        usage: 'editmsg <new_text> (reply to message)',
-        reactions: { start: '✏️', success: '✓', error: '❌' },
+        usage: `${prefix}editmsg <new_text> (reply to message)`,
+        reactions: { start: '✏️', success: '🍃', error: '🚧' },
 
         execute: async (sock, m, { args, reply, prefix }) => {
             const newText = args.join(' ');
 
             if (!newText) {
-                return reply(`${prefix}⊘ *Usage:* editmsg <new_text>`);
+                return reply(`⊘ *Usage:* ${prefix}editmsg <new_text>`);
             }
 
             if (!m.quoted?.key) {
-                return reply(`${prefix}⊘ *Usage:* Reply to a message to edit it`);
+                return reply(`⊘ *Usage:* Reply to a message to edit it`);
             }
 
             try {
-                await sock.editMessage(m.chat, m.quoted.key, { text: newText });
+                // Confirmed in the docs — editing goes through sendMessage + an `edit` key,
+                // there's no standalone editMessage method.
+                await sock.sendMessage(m.chat, { text: newText, edit: m.quoted.key });
                 return reply(`✓ *Message edited*`);
             } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
+                return reply(`⊘ Error: ${err.message}`);
             }
         }
     },
@@ -131,10 +145,16 @@ module.exports = [
         category: 'Owner',
         owner: true,
         usage: `${prefix}waversion`,
-        reactions: { start: '📱', success: '✓', error: '❌' },
+        reactions: { start: '🫆', success: '🫆', error: '🚧' },
 
-        execute: async (sock, m, { reply, prefix }) => {
+        execute: async (sock, m, { reply }) => {
             try {
+                // UNVERIFIED — sock.getWAVersionInfo doesn't appear in the docs sections I've read,
+                // and in mainline Baileys, version info comes from fetchLatestBaileysVersion(),
+                // a standalone import called *before* makeWASocket(), not a method on a live sock.
+                // The ?. means it won't throw, but it likely just always falls back to 'Unknown'.
+                // Left as-is — no confirmed replacement yet, run the console.log(Object.keys(sock))
+                // check from earlier to find the real name if one exists on this fork.
                 const wa = await sock.getWAVersionInfo?.();
                 const info = {
                     version: wa?.version || 'Unknown',
@@ -149,7 +169,7 @@ module.exports = [
                     `Bot Status: ${info.connected}`
                 );
             } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
+                return reply(`⊘ Error: ${err.message}`);
             }
         }
     },
@@ -161,14 +181,14 @@ module.exports = [
         desc: 'Create a new newsletter/channel',
         category: 'Owner',
         owner: true,
-        usage: 'createnewsletter <channel_name>',
-        reactions: { start: '📰', success: '✓', error: '❌' },
+        usage: `${prefix}createnewsletter <channel_name>`,
+        reactions: { start: '📰', success: '🍃', error: '🚧' },
 
         execute: async (sock, m, { args, reply, prefix }) => {
             const name = args.join(' ');
 
             if (!name) {
-                return reply(`${prefix}⊘ *Usage:* createnewsletter <name>`);
+                return reply(`⊘ *Usage:* ${prefix}createnewsletter <name>`);
             }
 
             try {
@@ -179,7 +199,7 @@ module.exports = [
                     `Name: ${name}`
                 );
             } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
+                return reply(`⊘ Error: ${err.message}`);
             }
         }
     },
@@ -192,18 +212,18 @@ module.exports = [
         category: 'Owner',
         owner: true,
         usage: `${prefix}leavesubscription (reply in newsletter)`,
-        reactions: { start: '🚪', success: '✓', error: '❌' },
+        reactions: { start: '🚪', success: '🍃', error: '🚧' },
 
-        execute: async (sock, m, { reply, prefix }) => {
+        execute: async (sock, m, { reply }) => {
             if (!m.chat.endsWith('@newsletter')) {
-                return reply(`${prefix}⊘ *Usage:* Use this command in a newsletter`);
+                return reply(`⊘ *Usage:* Use this command in a newsletter`);
             }
 
             try {
                 await sock.newsletterLeave(m.chat);
                 return reply(`✓ *Left the newsletter*`);
             } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
+                return reply(`⊘ Error: ${err.message}`);
             }
         }
     },
@@ -216,11 +236,11 @@ module.exports = [
         category: 'Owner',
         owner: true,
         usage: `${prefix}updatechannel <setting> <value>`,
-        reactions: { start: '⚙️', success: '✓', error: '❌' },
+        reactions: { start: '⚙️', success: '🍃', error: '🚧' },
 
         execute: async (sock, m, { args, reply, prefix }) => {
             if (!m.chat.endsWith('@newsletter')) {
-                return reply(`${prefix}⊘ *Usage:* Use this command in a newsletter`);
+                return reply(`⊘ *Usage:* Use this command in a newsletter`);
             }
 
             const setting = args[0]?.toLowerCase();
@@ -228,7 +248,7 @@ module.exports = [
 
             if (!setting || !value) {
                 return reply(
-                    `${prefix}⊘ *Usage:* updatechannel <setting> <value>\n\n` +
+                    `⊘ *Usage:* ${prefix}updatechannel <setting> <value>\n\n` +
                     `Settings:\n` +
                     `• name - Change channel name\n` +
                     `• description - Update description`
@@ -236,6 +256,10 @@ module.exports = [
             }
 
             try {
+                // UNVERIFIED — kept as one newsletterUpdateSettings(jid, {name, description}) call.
+                // Suspect this fork may split it into newsletterUpdateName(jid, value) and
+                // newsletterUpdateDescription(jid, value) instead, but nothing in the docs
+                // I've read confirms either shape. Check before relying on it.
                 const updates = {};
                 if (setting === 'name') updates.name = value;
                 if (setting === 'description') updates.description = value;
@@ -243,7 +267,7 @@ module.exports = [
                 await sock.newsletterUpdateSettings(m.chat, updates);
                 return reply(`✓ *${setting} updated*`);
             } catch (err) {
-                return reply(`${prefix}⊘ Error: ${err.message}`);
+                return reply(`⊘ Error: ${err.message}`);
             }
         }
     }
