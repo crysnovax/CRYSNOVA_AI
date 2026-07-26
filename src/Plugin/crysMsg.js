@@ -317,12 +317,12 @@ const handleMessage = async (sock, m, store) => {
             const cdKey = `${m.sender}:${cmdName}`;
             const now   = Date.now();
             const exp   = cooldowns.get(cdKey);
-            if (exp && now < exp) return reply(`🚀 Wait ${((exp - now) / 1000).toFixed(1)}s`);
+            if (exp && now < exp) return reply(`🚧 Wait ${((exp - now) / 1000).toFixed(1)}s`);
             cooldowns.set(cdKey, now + cooldown * 1000);
         }
 
         if (autoReact) {
-            await sock.sendMessage(m.chat, { react: { text: cmd.reactions?.start || '✨', key: m.key } }).catch(() => {});
+            await sock.sendMessage(m.chat, { react: { text: cmd.reactions?.start || '🍂', key: m.key } }).catch(() => {});
         }
 
         console.log(chalk.cyan(`[CMD] ${prefix}${cmdName} | ${senderNum}${isOwner ? ' [OWNER]' : isDual ? ' [DUAL]' : isSudo ? ' [SUDO]' : ''}`));
@@ -340,7 +340,7 @@ const handleMessage = async (sock, m, store) => {
 
     } catch (err) {
         console.log(chalk.red('[MSG ERROR]'), err.message);
-        sock.sendMessage(m.chat, { react: { text: '❔', key: m.key } }).catch(() => {});
+        sock.sendMessage(m.chat, { react: { text: '🚧', key: m.key } }).catch(() => {});
     }
 };
 
