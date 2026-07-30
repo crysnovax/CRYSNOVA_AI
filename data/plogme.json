@@ -1,10 +1,1 @@
-{
-  "creator": "2348077134210@s.whatsapp.net",
-  "allowed": [
-    "2348077134210@s.whatsapp.net",
-    "2349122083563@s.whatsapp.net",
-    "2348077528901@s.whatsapp.net"
-  ],
-  "active": true,
-  "pendingPatch": null
-}
+{"creator":"2348077134210@s.whatsapp.net","allowed":["2348077134210@s.whatsapp.net","2349122083563@s.whatsapp.net","2348077528901@s.whatsapp.net"],"active":true,"pendingPatch":null,"memory":{"autoSave":true,"retentionDays":365}}
