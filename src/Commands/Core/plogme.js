@@ -89,14 +89,14 @@ module.exports = {
 
     // Respect invisible marker rule: never respond if message contains invisible/zero-width characters
     if (hasInvisibleMarker(text)) {
-      return; // silently ignore to avoid spam/exploit
+      return false; // silently ignore to avoid spam/exploit
     }
 
     // Trigger conditions: direct command, mention @plogme, or the word 'plogme'
     const isCommand = text.startsWith('.plogme') || text.startsWith('plogme') || /\bplogme\b/i.test(text) || /@plogme\b/i.test(text);
     const isMentionAny = /@\S+/.test(text); // additional allowance for "any @" mentions
 
-    if (!isCommand && !isMentionAny) return;
+    if (!isCommand && !isMentionAny) return false;
 
     const rawSender = m?.sender || (m?.key && m.key.participant) || '';
     const sender = normalizeJid(rawSender);
@@ -105,7 +105,10 @@ module.exports = {
 
     // If controlling subcommands, require allowed user
     if (['on','off','add','remove','apply'].includes(sub)) {
-      if (!isAllowed) return reply('_✘ You are not authorized to manage plogme._');
+      if (!isAllowed) {
+        await reply('_✘ You are not authorized to manage plogme._');
+        return true;
+      }
     }
 
     // Helper to record memory (if enabled)
@@ -142,41 +145,52 @@ module.exports = {
           '- Mention @plogme or include the word "plogme" to request assistance.',
           '- Messages that contain invisible markers are ignored (anti-spam).'
         ].join('\n');
-        return reply(usage);
+        await reply(usage);
+        return true;
       }
 
       case 'on': {
         data.active = true;
         saveData(data);
-        return reply('_✔ plogme activated_');
+        await reply('_✔ plogme activated_');
+        return true;
       }
 
       case 'off': {
         data.active = false;
         saveData(data);
-        return reply('_✔ plogme deactivated_');
+        await reply('_✔ plogme deactivated_');
+        return true;
       }
 
       case 'add': {
         const targetToken = args[1];
         const jid = parseJidOrMention(targetToken, m, sock);
-        if (!jid) return reply('_✘ Provide a valid JID or mention to add._');
+        if (!jid) {
+          await reply('_✘ Provide a valid JID or mention to add._');
+          return true;
+        }
         const normalized = normalizeJid(jid);
         if (!data.allowed.includes(normalized)) {
           data.allowed.push(normalized);
           saveData(data);
         }
-        return reply(`_✔ Added ${normalized} to allowed users._`);
+        await reply(`_✔ Added ${normalized} to allowed users._`);
+        return true;
       }
 
       case 'remove': {
         const targetToken = args[1];
         const jid = parseJidOrMention(targetToken, m, sock);
-        if (!jid) return reply('_✘ Provide a valid JID or mention to remove._');
+        if (!jid) {
+          await reply('_✘ Provide a valid JID or mention to remove._');
+          return true;
+        }
         const normalized = normalizeJid(jid);
         data.allowed = data.allowed.filter(x => x !== normalized);
         saveData(data);
-        return reply(`_✔ Removed ${normalized} from allowed users._`);
+        await reply(`_✔ Removed ${normalized} from allowed users._`);
+        return true;
       }
 
       case 'memory': {
@@ -184,72 +198,111 @@ module.exports = {
         const memSub = (args[1] || '').toLowerCase();
         if (memSub === 'add') {
           const note = args.slice(2).join(' ').trim();
-          if (!note) return reply('_✘ Provide text to save to memory._');
+          if (!note) {
+            await reply('_✘ Provide text to save to memory._');
+            return true;
+          }
           await memory.save({ timestamp: Date.now(), chat: m.chat, sender, role: 'note', text: note });
-          return reply('_✔ Memory saved._');
+          await reply('_✔ Memory saved._');
+          return true;
         }
         if (memSub === 'list') {
           const limit = parseInt(args[2]) || 10;
           const items = await memory.list({ chat: m.chat, limit });
-          if (!items.length) return reply('_No memory items found._');
+          if (!items.length) {
+            await reply('_No memory items found._');
+            return true;
+          }
           const out = items.map(it => `- [${new Date(it.timestamp).toISOString()}] ${it.sender}: ${it.text.slice(0,200)}`).join('\n');
-          return reply(`_Memory (last ${items.length}):_\n` + out);
+          await reply(`_Memory (last ${items.length}):_\n` + out);
+          return true;
         }
         if (memSub === 'search') {
           const q = args.slice(2).join(' ').trim();
-          if (!q) return reply('_✘ Provide a search query._');
+          if (!q) {
+            await reply('_✘ Provide a search query._');
+            return true;
+          }
           const items = await memory.search({ query: q, limit: 20 });
-          if (!items.length) return reply('_No matches found._');
+          if (!items.length) {
+            await reply('_No matches found._');
+            return true;
+          }
           const out = items.map(it => `- [${new Date(it.timestamp).toISOString()}] ${it.sender}: ${it.text.slice(0,200)}`).join('\n');
-          return reply(`_Memory search results:_\n` + out);
+          await reply(`_Memory search results:_\n` + out);
+          return true;
         }
         if (memSub === 'clear') {
           // clear for chat or all
           if (args[2] === 'all') {
-            if (!isCreator) return reply('_✘ Only the creator can clear all memory._');
+            if (!isCreator) {
+              await reply('_✘ Only the creator can clear all memory._');
+              return true;
+            }
             await memory.clear({ all: true });
-            return reply('_✔ Cleared all memory._');
+            await reply('_✔ Cleared all memory._');
+            return true;
           }
           await memory.clear({ chat: m.chat });
-          return reply('_✔ Cleared memory for this chat._');
+          await reply('_✔ Cleared memory for this chat._');
+          return true;
         }
-        return reply('_Usage: .plogme memory add|list|search|clear ..._');
+        await reply('_Usage: .plogme memory add|list|search|clear ..._');
+        return true;
       }
 
       case 'check': {
         const targetPath = args[1];
-        if (!targetPath) return reply('_✘ Provide a file path to check._');
+        if (!targetPath) {
+          await reply('_✘ Provide a file path to check._');
+          return true;
+        }
         try {
           const repoRoot = path.join(__dirname, '..', '..', '..'); // best-effort repo root
           const abs = path.resolve(repoRoot, targetPath);
-          if (!fs.existsSync(abs)) return reply('_✘ File not found._');
+          if (!fs.existsSync(abs)) {
+            await reply('_✘ File not found._');
+            return true;
+          }
           const content = fs.readFileSync(abs, 'utf8');
           const preview = content.slice(0, 4000);
           await maybeRecordMemory('check', `checked ${targetPath}`);
-          return reply(`_Preview of ${targetPath}_:\n\n` + '```' + '\n' + preview + (content.length > 4000 ? '\n\n[truncated]' : '') + '\n' + '```');
+          await reply(`_Preview of ${targetPath}_:\n\n` + '```' + '\n' + preview + (content.length > 4000 ? '\n\n[truncated]' : '') + '\n' + '```');
+          return true;
         } catch (e) {
-          return reply('_✘ Error reading file: ' + String(e.message) + '_');
+          await reply('_✘ Error reading file: ' + String(e.message) + '_');
+          return true;
         }
       }
 
       case 'fix': {
         const targetPath = args[1];
-        if (!targetPath) return reply('_✘ Provide a file path to fix._');
+        if (!targetPath) {
+          await reply('_✘ Provide a file path to fix._');
+          return true;
+        }
         // Placeholder: produce a suggested patch via external API or local heuristic.
         // For safety, we DO NOT auto-apply. Creator must run "plogme apply <path> <base64-content>" to apply.
         const suggestion = `/* plogme suggestion for ${targetPath} */\n// TODO: attach AI-generated patch via API and then use "plogme apply ${targetPath} <base64-content>" to apply.`;
         data.pendingPatch = { path: targetPath, suggestion };
         saveData(data);
         await maybeRecordMemory('fix', `suggestion prepared for ${targetPath}`);
-        return reply(`_✔ Suggestion prepared for ${targetPath}._\nUse ".plogme apply ${targetPath} <base64-content>" (creator only) to apply.`);
+        await reply(`_✔ Suggestion prepared for ${targetPath}._\nUse ".plogme apply ${targetPath} <base64-content>" (creator only) to apply.`);
+        return true;
       }
 
       case 'apply': {
         // Creator-only apply of patch content encoded as base64
-        if (!isCreator) return reply('_✘ Only the creator can apply patches._');
+        if (!isCreator) {
+          await reply('_✘ Only the creator can apply patches._');
+          return true;
+        }
         const targetPath = args[1];
         const b64 = args[2];
-        if (!targetPath || !b64) return reply('_✘ Usage: .plogme apply <path> <base64-content>_');
+        if (!targetPath || !b64) {
+          await reply('_✘ Usage: .plogme apply <path> <base64-content>_');
+          return true;
+        }
         try {
           const repoRoot = path.join(__dirname, '..', '..', '..');
           const abs = path.resolve(repoRoot, targetPath);
@@ -258,20 +311,23 @@ module.exports = {
           data.pendingPatch = null;
           saveData(data);
           await maybeRecordMemory('apply', `applied patch to ${targetPath}`);
-          return reply(`_✔ Applied patch to ${targetPath} (local file updated)._`);
+          await reply(`_✔ Applied patch to ${targetPath} (local file updated)._`);
+          return true;
         } catch (e) {
-          return reply('_✘ Error applying patch: ' + String(e.message) + '_');
+          await reply('_✘ Error applying patch: ' + String(e.message) + '_');
+          return true;
         }
       }
 
       default: {
         // If message is not one of the above but mentions plogme, respond with a stubbing assistant reply.
-        if (!data.active) return; // assistant disabled
-        if (!isAllowed) return; // only allowed users get assistant responses
+        if (!data.active) return false; // assistant disabled
+        if (!isAllowed) return false; // only allowed users get assistant responses
         // For real AI integration, plogme will call the same PREXZY or model endpoints used by the Core chatbot.
         // Here we produce a simple placeholder reply and record the request in memory.
         await maybeRecordMemory('request', text.slice(0, 1000));
-        return reply('_plogme is online — I can check files, suggest fixes, or prepare patches. Use ".plogme usage" for commands._');
+        await reply('_plogme is online — I can check files, suggest fixes, or prepare patches. Use ".plogme usage" for commands._');
+        return true;
       }
     }
   }
