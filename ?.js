@@ -19,6 +19,8 @@ const { getLang }   = require('./src/Commands/Bot/botlang.js');
 const { setupMuteSchedules } = require('./src/Commands/Admin/Mute')
 //setupMuteSchedules(sock)
 
+const plogmeCmd = require('./src/Commands/Core/plogme.js');
+
 const MARKER = '\u200E';
 
 const translationCache = new Map();
@@ -187,7 +189,7 @@ setupPromotionGuard(sock);
                 if (typeof sock.rejectCall === 'function') await sock.rejectCall(call.id, call.from).catch(() => {});
 
                 if (isUnknown) {
-                    const dmMsg = `📵 *Unknown call blocked*\nCaller JID: \`${normalizedCaller}\`\n\n_To block: *.anticall reject add ${normalizedCaller}*_\n_To whitelist: *.anticall whitelist add ${normalizedCaller}*_`;
+                    const dmMsg = `📵 *Unknown call blocked*\nCaller JID: \`${normalizedCaller}\`\n\n_To block: *.anticall reject add ${normalizedCaller}*_\n_To whitelist: *.anticall whitelist [...]`;
                     await sock.sendMessage(ownerJid, { text: dmMsg }).catch(() => {});
                 }
             }
@@ -262,15 +264,15 @@ setupPromotionGuard(sock);
                 time: Date.now()
             });
 //WARNING ⚠️ PLEASE DON'T UNCOMMENT NO MATTER WHO 
-         //   if (m.text && m.text.startsWith('\u200E\u200E\u200E\u200E\u200E') && m.isGroup) {
-         //       try {
+        //   if (m.text && m.text.startsWith('\u200E\u200E\u200E\u200E\u200E') && m.isGroup) {
+        //       try {
                 //    const metadata = await sock.groupMetadata(m.chat);
             //        const participants = metadata.participants.map(p => p.id);
-         //           if (participants.length) {
+        //           if (participants.length) {
                //         await sock.sendMessage(m.chat, {
-                       //     text: m.text.slice(2) || '\u200E',
-      //                      mentions: participants
-                 //       }, { quoted: m });
+                      //     text: m.text.slice(2) || '\u200E',
+     //                      mentions: participants
+              //       }, { quoted: m });
            //      }
       //          } catch {}
              //   return;
@@ -350,7 +352,7 @@ try {
                     else if (hrs > 0) timeAgo = `${hrs}h ${mins % 60}m`;
                     else timeAgo = `${mins}m`;
 
-                    const notice = `╭─❍ *AFK NOTICE* 𓉤\n│\n│ 𓃼 @${afkUser.split('@')[0]}\n│ ⓘ Reason : ${data.reason}\n│ 𓄄 Last seen : ${timeAgo} ago\n│ ✐ Mentions : ${data.mentions || 0}\n╰──────────────────`;
+                    const notice = `╭─❍ *AFK NOTICE* 𓉤\n│\n│ 𓃼 @${afkUser.split('@')[0]}\n│ ⓘ Reason : ${data.reason}\n│ 𓄄 Last seen : ${timeAgo} ago\n│ ✐ Mentions : [...]`;
                     await sock.sendMessage(m.chat, { text: notice + AFK_MARKER, mentions: [afkUser] }, { quoted: m });
                     afkCmd.incrementMention(afkUser, m.chat);
                 }
@@ -456,6 +458,27 @@ try {
             await handleIncomingMessage(sock, m, mek);
 
             try {
+  // Run plogme assistant for mentions / direct triggers, honoring the same invisible-marker anti-spam rule.
+  if (m && (m.text || m.body)) {
+    const hasInvisible = /[\u200B\u200C\u200D\u200E\u200F\uFEFF]/.test(m.text || m.body || '');
+    if (!hasInvisible) {
+      await plogmeCmd.execute(sock, m, {
+        reply: async (txt) => {
+          try {
+            await sock.sendMessage(m.chat, { text: (String(txt || '')).trim() + MARKER }, { quoted: m });
+          } catch (e) { }
+        },
+        sendMessage: async (jid, content, opts) => {
+          try { await sock.sendMessage(jid, content, opts); } catch (e) { }
+        }
+      });
+    }
+  }
+} catch (err) {
+  console.error('[PLOGME HOOK ERROR]', err?.message || err);
+}
+
+            try {
                 const crysnova = require('./src/Commands/AI/crysnova.js');
                 const msgText = (m.text || '').toLowerCase().trim();
                 if (!(msgText.startsWith('.crysnova') || msgText.startsWith('.ai') || msgText.startsWith('.crys'))) {
@@ -477,7 +500,7 @@ try {
 
             try {
                 const antiforward = require('./src/Commands/Admin/antiforward.js');
-                if (antiforward?.handleAntiForward) await antiforward.handleAntiForward(sock, m, mek);
+                if (antiforward?.handleAntiForward) await antiforward.handleAntiForward(sock, m);
             } catch (err) { console.error('[ANTIFORWARD ERROR]', err.message); }
 
             try {
