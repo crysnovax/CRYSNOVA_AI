@@ -103,10 +103,22 @@ module.exports = {
     const isCreator = sender === normalizeJid(data.creator);
     const isAllowed = (Array.isArray(data.allowed) && data.allowed.includes(sender)) || isCreator;
 
+    // helper to send replies with status icons
+    const sendReply = async (msg, status = 'info') => {
+      // map statuses: ok -> ✓, error -> ✘, info -> ⓘ
+      const prefix = status === 'ok' ? '✓ ' : status === 'error' ? '✘ ' : 'ⓘ ';
+      // reply provided by caller should append MARKER already; we just prefix
+      try {
+        await reply(prefix + String(msg || ''));
+      } catch (e) {
+        try { await sendMessage(m.chat, { text: prefix + String(msg || '') }); } catch (e2) {}
+      }
+    };
+
     // If controlling subcommands, require allowed user
     if (['on','off','add','remove','apply'].includes(sub)) {
       if (!isAllowed) {
-        await reply('_✘ You are not authorized to manage plogme._');
+        await sendReply('_You are not authorized to manage plogme._', 'error');
         return true;
       }
     }
@@ -145,21 +157,21 @@ module.exports = {
           '- Mention @plogme or include the word "plogme" to request assistance.',
           '- Messages that contain invisible markers are ignored (anti-spam).'
         ].join('\n');
-        await reply(usage);
+        await sendReply(usage, 'info');
         return true;
       }
 
       case 'on': {
         data.active = true;
         saveData(data);
-        await reply('_✔ plogme activated_');
+        await sendReply('_plogme activated_', 'ok');
         return true;
       }
 
       case 'off': {
         data.active = false;
         saveData(data);
-        await reply('_✔ plogme deactivated_');
+        await sendReply('_plogme deactivated_', 'ok');
         return true;
       }
 
@@ -167,7 +179,7 @@ module.exports = {
         const targetToken = args[1];
         const jid = parseJidOrMention(targetToken, m, sock);
         if (!jid) {
-          await reply('_✘ Provide a valid JID or mention to add._');
+          await sendReply('_Provide a valid JID or mention to add._', 'error');
           return true;
         }
         const normalized = normalizeJid(jid);
@@ -175,7 +187,7 @@ module.exports = {
           data.allowed.push(normalized);
           saveData(data);
         }
-        await reply(`_✔ Added ${normalized} to allowed users._`);
+        await sendReply(`_Added ${normalized} to allowed users._`, 'ok');
         return true;
       }
 
@@ -183,13 +195,13 @@ module.exports = {
         const targetToken = args[1];
         const jid = parseJidOrMention(targetToken, m, sock);
         if (!jid) {
-          await reply('_✘ Provide a valid JID or mention to remove._');
+          await sendReply('_Provide a valid JID or mention to remove._', 'error');
           return true;
         }
         const normalized = normalizeJid(jid);
         data.allowed = data.allowed.filter(x => x !== normalized);
         saveData(data);
-        await reply(`_✔ Removed ${normalized} from allowed users._`);
+        await sendReply(`_Removed ${normalized} from allowed users._`, 'ok');
         return true;
       }
 
@@ -199,78 +211,78 @@ module.exports = {
         if (memSub === 'add') {
           const note = args.slice(2).join(' ').trim();
           if (!note) {
-            await reply('_✘ Provide text to save to memory._');
+            await sendReply('_Provide text to save to memory._', 'error');
             return true;
           }
           await memory.save({ timestamp: Date.now(), chat: m.chat, sender, role: 'note', text: note });
-          await reply('_✔ Memory saved._');
+          await sendReply('_Memory saved._', 'ok');
           return true;
         }
         if (memSub === 'list') {
           const limit = parseInt(args[2]) || 10;
           const items = await memory.list({ chat: m.chat, limit });
           if (!items.length) {
-            await reply('_No memory items found._');
+            await sendReply('_No memory items found._', 'info');
             return true;
           }
           const out = items.map(it => `- [${new Date(it.timestamp).toISOString()}] ${it.sender}: ${it.text.slice(0,200)}`).join('\n');
-          await reply(`_Memory (last ${items.length}):_\n` + out);
+          await sendReply(`_Memory (last ${items.length}):_\n` + out, 'info');
           return true;
         }
         if (memSub === 'search') {
           const q = args.slice(2).join(' ').trim();
           if (!q) {
-            await reply('_✘ Provide a search query._');
+            await sendReply('_Provide a search query._', 'error');
             return true;
           }
           const items = await memory.search({ query: q, limit: 20 });
           if (!items.length) {
-            await reply('_No matches found._');
+            await sendReply('_No matches found._', 'info');
             return true;
           }
           const out = items.map(it => `- [${new Date(it.timestamp).toISOString()}] ${it.sender}: ${it.text.slice(0,200)}`).join('\n');
-          await reply(`_Memory search results:_\n` + out);
+          await sendReply(`_Memory search results:_\n` + out, 'info');
           return true;
         }
         if (memSub === 'clear') {
           // clear for chat or all
           if (args[2] === 'all') {
             if (!isCreator) {
-              await reply('_✘ Only the creator can clear all memory._');
+              await sendReply('_Only the creator can clear all memory._', 'error');
               return true;
             }
             await memory.clear({ all: true });
-            await reply('_✔ Cleared all memory._');
+            await sendReply('_Cleared all memory._', 'ok');
             return true;
           }
           await memory.clear({ chat: m.chat });
-          await reply('_✔ Cleared memory for this chat._');
+          await sendReply('_Cleared memory for this chat._', 'ok');
           return true;
         }
-        await reply('_Usage: .plogme memory add|list|search|clear ..._');
+        await sendReply('_Usage: .plogme memory add|list|search|clear ..._', 'info');
         return true;
       }
 
       case 'check': {
         const targetPath = args[1];
         if (!targetPath) {
-          await reply('_✘ Provide a file path to check._');
+          await sendReply('_Provide a file path to check._', 'error');
           return true;
         }
         try {
           const repoRoot = path.join(__dirname, '..', '..', '..'); // best-effort repo root
           const abs = path.resolve(repoRoot, targetPath);
           if (!fs.existsSync(abs)) {
-            await reply('_✘ File not found._');
+            await sendReply('_File not found._', 'error');
             return true;
           }
           const content = fs.readFileSync(abs, 'utf8');
           const preview = content.slice(0, 4000);
           await maybeRecordMemory('check', `checked ${targetPath}`);
-          await reply(`_Preview of ${targetPath}_:\n\n` + '```' + '\n' + preview + (content.length > 4000 ? '\n\n[truncated]' : '') + '\n' + '```');
+          await sendReply(`_Preview of ${targetPath}_:\n\n` + '```' + '\n' + preview + (content.length > 4000 ? '\n\n[truncated]' : '') + '\n' + '```', 'info');
           return true;
         } catch (e) {
-          await reply('_✘ Error reading file: ' + String(e.message) + '_');
+          await sendReply('_Error reading file: ' + String(e.message) + '_', 'error');
           return true;
         }
       }
@@ -278,7 +290,7 @@ module.exports = {
       case 'fix': {
         const targetPath = args[1];
         if (!targetPath) {
-          await reply('_✘ Provide a file path to fix._');
+          await sendReply('_Provide a file path to fix._', 'error');
           return true;
         }
         // Placeholder: produce a suggested patch via external API or local heuristic.
@@ -287,20 +299,20 @@ module.exports = {
         data.pendingPatch = { path: targetPath, suggestion };
         saveData(data);
         await maybeRecordMemory('fix', `suggestion prepared for ${targetPath}`);
-        await reply(`_✔ Suggestion prepared for ${targetPath}._\nUse ".plogme apply ${targetPath} <base64-content>" (creator only) to apply.`);
+        await sendReply(`_Suggestion prepared for ${targetPath}._\nUse ".plogme apply ${targetPath} <base64-content>" (creator only) to apply.`, 'ok');
         return true;
       }
 
       case 'apply': {
         // Creator-only apply of patch content encoded as base64
         if (!isCreator) {
-          await reply('_✘ Only the creator can apply patches._');
+          await sendReply('_Only the creator can apply patches._', 'error');
           return true;
         }
         const targetPath = args[1];
         const b64 = args[2];
         if (!targetPath || !b64) {
-          await reply('_✘ Usage: .plogme apply <path> <base64-content>_');
+          await sendReply('_Usage: .plogme apply <path> <base64-content>_', 'error');
           return true;
         }
         try {
@@ -311,10 +323,10 @@ module.exports = {
           data.pendingPatch = null;
           saveData(data);
           await maybeRecordMemory('apply', `applied patch to ${targetPath}`);
-          await reply(`_✔ Applied patch to ${targetPath} (local file updated)._`);
+          await sendReply(`_Applied patch to ${targetPath} (local file updated)._`, 'ok');
           return true;
         } catch (e) {
-          await reply('_✘ Error applying patch: ' + String(e.message) + '_');
+          await sendReply('_Error applying patch: ' + String(e.message) + '_', 'error');
           return true;
         }
       }
@@ -326,7 +338,7 @@ module.exports = {
         // For real AI integration, plogme will call the same PREXZY or model endpoints used by the Core chatbot.
         // Here we produce a simple placeholder reply and record the request in memory.
         await maybeRecordMemory('request', text.slice(0, 1000));
-        await reply('_plogme is online — I can check files, suggest fixes, or prepare patches. Use ".plogme usage" for commands._');
+        await sendReply('_plogme is online — I can check files, suggest fixes, or prepare patches. Use ".plogme usage" for commands._', 'info');
         return true;
       }
     }
