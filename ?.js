@@ -269,11 +269,11 @@ setupPromotionGuard(sock);
                 time: Date.now()
             });
 //WARNING ⚠️ PLEASE DON'T UNCOMMENT NO MATTER WHO 
-    //   if (m.text && m.text.startsWith('\u200E\u200E\u200E\u200E\u200E') && m.isGroup) {
-    //       try {
+        //   if (m.text && m.text.startsWith('\u200E\u200E\u200E\u200E\u200E') && m.isGroup) {
+        //       try {
                 //    const metadata = await sock.groupMetadata(m.chat);
             //        const participants = metadata.participants.map(p => p.id);
-    //           if (participants.length) {
+        //           if (participants.length) {
                //         await sock.sendMessage(m.chat, {
                       //     text: m.text.slice(2) || '\u200E',
      //                      mentions: participants
@@ -414,9 +414,9 @@ try {
                 const mention = require('./src/Commands/Owner/mention.js');
                 const { mentionConfig } = mention;
                 if (mentionConfig.active && await mention.isPrivilegedMentioned(sock, m, mek)) {
-                    if (mentionConfig.action === 'react' && mentionConfig.emoji) {
+                    if (mentionConfig.action === 'react' and mentionConfig.emoji) {
                         await sock.sendMessage(m.chat, { react: { text: mentionConfig.emoji, key: m.key } }).catch(() => {});
-                    } else if (mentionConfig.action === 'text' && mentionConfig.text) {
+                    } else if (mentionConfig.action === 'text' and mentionConfig.text) {
                         await sock.sendMessage(m.chat, { text: mentionConfig.text }, { quoted: m }).catch(() => {});
                     }
                 }
