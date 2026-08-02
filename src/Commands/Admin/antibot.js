@@ -50,8 +50,13 @@ const plugin = createAntiMessageModeration({
     // permissive pass-through so createAntiMessageModeration's own gating
     // logic doesn't reject it before the ID check ever runs.
     detector: () => true,
-    violationLabel: 'known bot-library message stamps',
-    deleteMessage: async () => null // see antigroupstatus.js — delete is currently broken fork-wide
+    violationLabel: 'known bot-library message stamps'
+    // No deleteMessage override — falls through to antiMessageModeration.js's
+    // own default: sock.sendMessage(m.chat, { delete: m.key }). That's a
+    // plain single-message delete, not the status-broadcast revoke path that
+    // broke in antigroupstatus.js (relayMessage-not-a-function was specific
+    // to deleteGroupStatus's custom multi-candidate key building — it never
+    // touched this default path). No reason to disable it here.
 });
 
 const originalHandleModeration = plugin.handleModeration;
@@ -67,4 +72,3 @@ plugin.KNOWN_BOT_ID_STAMPS = KNOWN_BOT_ID_STAMPS;
 plugin.handleAntiBot = plugin.handleModeration;
 
 module.exports = plugin;
-
