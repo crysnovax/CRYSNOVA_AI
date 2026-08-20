@@ -1,6 +1,7 @@
 // crysMsg.js
 const { getCommand } = require('./crysCmd');
 const { getVar }     = require('./configManager');
+const { normalizeDeployButton, normalizeDeployButtonMessage } = require('./deployButtonRouter');
 const chalk = require('chalk');
 const fs    = require('fs');
 const path  = require('path');
@@ -187,7 +188,11 @@ const handleMessage = async (sock, m, store) => {
         const isDual = isOwner || isDualUser(sender, store) ||
                        (altNum && isDualUser(altJid, store));
 
-        const body = m.text || '';
+        const rawBody = m.text || '';
+        // Gen4 RichMenu taps may arrive as visible labels or callback IDs.
+        // Normalize only supported deployment values; all other CRYSNOVA_AI
+        // messages retain their original body unchanged.
+        const body = normalizeDeployButton(rawBody) || normalizeDeployButtonMessage(m.message) || rawBody;
 
         // ── RAW EVAL TRIGGERS: $ (JS) and \ (Shell) — owner/dual only ──
         if (isOwner || isDual) {
