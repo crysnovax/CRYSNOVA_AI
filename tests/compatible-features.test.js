@@ -41,6 +41,24 @@ test('CRYSNOVA_AI deploy step sends one quoted rich response without another men
     assert.match(messages[0][1].richResponse[1].table[1].items[1], /discord\.com/);
 });
 
+test('ported low-risk CODY commands keep isolated CRYSNOVA command contracts', async () => {
+    const saveall = require('../src/Commands/Group/saveall');
+    const unsaveall = require('../src/Commands/Group/unsaveall');
+    const nosound = require('../src/Commands/Media-Editor/nosound');
+    const bancheck = require('../src/Commands/Owner/bancheck');
+    assert.equal(saveall.name, 'saveall');
+    assert.equal(saveall.groupOnly, true);
+    assert.equal(unsaveall.name, 'unsaveall');
+    assert.equal(unsaveall.groupOnly, true);
+    assert.equal(nosound.name, 'nosound');
+    assert.equal(bancheck.name, 'bancheck');
+    assert.equal(bancheck.ownerOnly, true);
+    const replies = [];
+    await bancheck.execute({}, {}, { args: [], reply: value => replies.push(value) });
+    assert.equal(replies.length, 1);
+    assert.match(replies[0], /number|usage/i);
+});
+
 test('Baileys decrypted poll.vote contract contains selected and unselected options', () => {
     const event = {
         pollCreationMessageKey: { remoteJid: '123@s.whatsapp.net', id: 'poll-1' },
