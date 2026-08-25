@@ -154,6 +154,7 @@ const clientstart = async () => {
     // Terminal pairing mode — collect number now, pair after connection opens
     let needsPairing = false;
     let pairingNumber = null;
+    let pairingRequested = false;
     if (getConfig().status.terminal && !sock.authState.creds.registered) {
         await new Promise(r => setTimeout(r, 800));
         console.log(chalk.yellow('┏━〔 ✦ CRYSNOVA AI 〕━'));
@@ -197,19 +198,20 @@ const clientstart = async () => {
 
     // ─── Event: connection.update ──────────────────────────────────
     sock.ev.on('connection.update', async (update) => {
-        const { connection, lastDisconnect } = update;
+        const { connection, lastDisconnect, qr } = update;
+
+        if (qr) sock.pairingReady = true;
+        if (connection === 'connecting' && !sock.pairingReady) sock.pairingReady = false;
 
         if (connection === 'connecting') {
             sock.connectionOpen = false;
             console.log(chalk.red('🔄 Connecting...'));
         }
 
-        if (connection === 'open') {
-            sock.connectionOpen = true;
-
-            // Terminal pairing — request code AFTER connection is open
-            if (needsPairing && pairingNumber) {
-                needsPairing = false;
+        // WhatsApp accepts pairing requests only after QR/hello readiness. A
+        // request made immediately after socket creation can fail with 428/405.
+        if ((qr || connection === 'open') && needsPairing && pairingNumber && !pairingRequested) {
+            pairingRequested = true;
                 for (let attempt = 1; attempt <= 3; attempt++) {
                     try {
                         console.log(chalk.yellow('\n⏳ Requesting pairing code... (attempt ' + attempt + '/3)'));
@@ -232,11 +234,16 @@ const clientstart = async () => {
                         if (attempt < 3) {
                             console.log(chalk.yellow('Retrying in 3s...'));
                             await new Promise(r => setTimeout(r, 3000));
+                        } else {
+                            pairingRequested = false;
                         }
                     }
                 }
-                return;
-            }
+            if (connection !== 'open') return;
+        }
+
+        if (connection === 'open') {
+            sock.connectionOpen = true;
 
             console.log(chalk.bold.green.bold('║     ✅ ZEE BOT - PAIDED           ║'));
             console.log(chalk.yellow('📱 Number: ' + sock.user?.id?.split(':')[0]));
@@ -287,6 +294,7 @@ const clientstart = async () => {
 
         if (connection === 'close') {
             sock.connectionOpen = false;
+            sock.pairingReady = false;
             const statusCode = lastDisconnect?.error?.output?.statusCode;
             console.log(chalk.magenta('❌ Connection closed:'), statusCode);
             global.botInstances.delete(botInstanceId);
@@ -404,13 +412,13 @@ app.post('/api/request-pairing', async (req, res) => {
             return res.json({ success: false, message: 'Bot is already connected to a WhatsApp account.' });
         }
 
-        // Wait for socket connection to open (max 30s)
-        if (!sock.connectionOpen) {
+        // Pairing codes require QR/hello readiness, not authenticated open.
+        if (!sock.pairingReady) {
             await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => reject(new Error('Connection timeout waiting for socket')), 30000);
+                const timeout = setTimeout(() => reject(new Error('Connection timeout waiting for pairing readiness')), 30000);
                 const check = setInterval(() => {
-                    if (sock.connectionOpen) { clearInterval(check); clearTimeout(timeout); resolve(); }
-                }, 500);
+                    if (sock.pairingReady) { clearInterval(check); clearTimeout(timeout); resolve(); }
+                }, 250);
             });
         }
 
