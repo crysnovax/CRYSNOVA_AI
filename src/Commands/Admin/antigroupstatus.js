@@ -110,19 +110,6 @@ async function deleteGroupStatus(sock, m, mek, context = {}) {
     throw new Error(`WhatsApp rejected ${failures.length} group-status revoke attempt(s)`);
 }
 
-// ─── TEMPORARY: delete is broken (relayMessage is not a function, root cause
-// still under investigation as of Aug 2026 — see @crysnovax/baileys version
-// mismatch).
-//
-// IMPORTANT: antiMessageModeration.js calls deleteMessage() UNCONDITIONALLY
-// for every action (delete, warn, AND kick) before checking config.action at
-// all — deleting the offending message is step one regardless of what
-// happens to the sender afterward. So gating on config.action does nothing;
-// every action reaches the broken call. The only real fix is to stop
-// deleteMessage itself from calling the broken path, below.
-//
-// Remove this override once deleteGroupStatus is confirmed working again —
-// nothing else in this file needs to change to re-enable it.
 const plugin = createAntiMessageModeration({
     command: 'antigroupstatus',
     aliases: ['antigs', 'ags'],
@@ -132,11 +119,7 @@ const plugin = createAntiMessageModeration({
     warningDatabaseName: 'antigroupstatus_warns.json',
     detector: isGroupStatusMessage,
     violationLabel: 'group-status posts',
-    deleteMessage: async () => {
-        // No-op: pretend the delete succeeded so warn/kick still proceed
-        // normally. The actual group-status message is left in place.
-        return null;
-    }
+    deleteMessage: deleteGroupStatus
 });
 
 plugin.handleAntiGroupStatus = plugin.handleModeration;
