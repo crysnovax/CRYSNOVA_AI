@@ -1,2 +1,469 @@
-const a0_0x2f68dd=a0_0x39c7;(function(_0x39b0e8,_0xf5481){const _0x29ba26=a0_0x39c7,_0x5d6c20=_0x39b0e8();while(!![]){try{const _0x1b4bc9=-parseInt(_0x29ba26(0x10d))/0x1+parseInt(_0x29ba26(0x17c))/0x2*(parseInt(_0x29ba26(0xe7))/0x3)+parseInt(_0x29ba26(0x15d))/0x4*(-parseInt(_0x29ba26(0x163))/0x5)+parseInt(_0x29ba26(0x160))/0x6*(-parseInt(_0x29ba26(0x106))/0x7)+parseInt(_0x29ba26(0x172))/0x8*(parseInt(_0x29ba26(0x10e))/0x9)+-parseInt(_0x29ba26(0x107))/0xa+parseInt(_0x29ba26(0x18d))/0xb;if(_0x1b4bc9===_0xf5481)break;else _0x5d6c20['push'](_0x5d6c20['shift']());}catch(_0x4310d1){_0x5d6c20['push'](_0x5d6c20['shift']());}}}(a0_0x60db,0x6a69b),require(a0_0x2f68dd(0xec))[a0_0x2f68dd(0x124)]());const express=require(a0_0x2f68dd(0x14f)),http=require(a0_0x2f68dd(0x139)),socketIo=require(a0_0x2f68dd(0xc9)),path=require(a0_0x2f68dd(0x158)),readline=require(a0_0x2f68dd(0x18c)),fs=require('fs'),chalk=require(a0_0x2f68dd(0x12e)),pino=require(a0_0x2f68dd(0xd8)),{Boom}=require(a0_0x2f68dd(0x165)),{default:makeWASocket,Browsers,useMultiFileAuthState,DisconnectReason,fetchLatestBaileysVersion,jidDecode,downloadContentFromMessage,makeCacheableSignalKeyStore}=require(a0_0x2f68dd(0x18e)),{smsg}=require('./library/serialize'),{konek}=require('./library/connection/connection'),{loadCommands}=require(a0_0x2f68dd(0x109)),{handleMessage}=require(a0_0x2f68dd(0x142)),{crysStatistic}=require(a0_0x2f68dd(0x16c)),setupMessageHandler=require(a0_0x2f68dd(0xe9)),app=express(),port=process.env.PORT||0xbb9,server=http['createServer'](app),io=socketIo(server);function a0_0x60db(){const _0x571913=['mkdirSync','┏━〔\x20✦\x20𝗖𝗥𝗬𝗦𝗡𝗢𝗩𝗔\x20𝗔𝗜\x20〕━\x0a','./src/Plugin/crysMsg','terminal','./database/antilink.json','includes','exit','\x20\x20\x20\x20\x20\x20𝗖𝗥𝗬𝗦𝗡𝗢𝗩𝗔\x20𝗔𝗜\x20Engine\x20+\x20𝚉̷𝙴̷𝙴̷\x20̷𝙱̷𝙾̷𝚃̷\x20Core\x0a','║\x20\x204.\x20Enter\x20the\x20code\x20above\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20║','`×͜×\x20BOT\x20IS\x20LIVE!\x20✧`','\x20\x20\x20\x20\x20\x20Powered\x20by\x20𝗖𝗥𝗬𝗦𝗡𝗢𝗩𝗔\x20𝗔𝗜\x20V2\x20Technology','test','write\x20ECONNRESET','Public/index.html','decrypt\x20error','express','creds','split','prefix','\x20left\x20*','🔄\x20Connecting...','clear','random','loggedOut','path','cyan','message','stats','some','4eHQJTZ','ECONNREFUSED','utf8','1039536DQAWBd','gray','key','1656785idjsuv','status','@hapi/boom','🔄\x20Reconnecting\x20in\x203\x20seconds...','set','disconnect','decodeJid','https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax','requestPairingCode','./src/Plugin/crysStatistic','━━━━━━━━━━━━━━━━━━━━━','Bad\x20MAC','❏┃\x20Members:\x20','╚════════════════════════════════════════╝\x0a','𝓬𝓻𝔂𝓼𝓷𝓸𝓿𝓪𝔁\x20𝓿𝓮𝓻𝓲𝓯𝓲𝓮𝓭\x0a','679928VNzOZe','urlencoded','name','onlineUsers','remoteJid','crysStats','join','Welcome\x20to\x20the\x20group!','Public','👋\x20@','8mpmHsz','groupMetadata','Session\x20closed','Unhandled\x20Rejection:','\x0a⏳\x20Requesting\x20pairing\x20code...','yellow','statusCode','messages.upsert','║\x20\x20\x20\x20\x20\x20\x20✅\x20𝐙𝐄𝐄\x20𝐁𝐎𝐓\x20-\x20𝐏𝐀𝐈𝐑𝐄𝐃\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20║','database/groupEvents.json','❏▸\x20⟁⃝𓋎\x20User⇆\x20','toString','Socket\x20connection\x20timeout','🚫\x20Logged\x20out.\x20Delete\x20session\x20folder\x20and\x20restart.','goodbye','successfully\x20connected\x20to\x20bot','readline','9350858ndFsZo','@crysnovax/baileys','group','socket.io','bold','error','action','mtype','Firefox','writeFileSync','./database/runtime-config.json','❏▸⁠\x20彡\x20Prefix⇆\x20[\x20','thumbUrl','\x0a╔════════════════════════════════════════╗','Goodbye!','botInstances','windows','length','pino','║\x20\x20𝐘𝐨𝐮𝐫\x20𝐏𝐚𝐢𝐫𝐢𝐧𝐠\x20𝐂𝐨𝐝𝐞:\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20║','\x0a\x20\x20\x20\x20╔═══════════════════════════════════╗\x0a\x20\x20\x20\x20║\x20\x20████████╗███████╗███████╗\x20\x20\x20\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20\x20\x20\x20\x20╚══╝██╔════╝██╔════╝\x20\x20\x20\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20\x20\x20\x20\x20███╗█████╗\x20\x20█████╗\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20██\x20\x20\x20██╔╝██╔══╝\x20\x20██╔══╝\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20╚██████╔╝███████╗███████╗\x20\x20\x20\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20╚═════╝\x20╚══════╝╚══════╝\x20\x20\x20\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20\x20██████╗\x20\x20██████╗\x20████████╗\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20\x20██╔══██╗██╔═══██╗╚══██╔══╝\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20\x20██████╔╝██║\x20\x20\x20██║\x20\x20\x20██║\x20\x20\x20\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20\x20██╔══██╗██║\x20\x20\x20██║\x20\x20\x20██║\x20\x20\x20\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20\x20██████╔╝╚██████╔╝\x20\x20\x20██║\x20\x20\x20\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20\x20╚═════╝\x20\x20╚═════╝\x20\x20\x20\x20╚═╝\x20\x20\x20\x20\x20\x20\x20\x20║\x0a\x20\x20\x20\x20╚═══════════════════════════════════╝\x0a','question','𝗖𝗥𝗬𝗦𝗡𝗢𝗩𝗔\x20𝗔𝗜','bot-status','loadMessage','stdout','unhandledRejection','❏▸\x20℘\x20Owner⇆\x20₵ⱤɎ₴₦☠︎︎V₳\x0a\x0a','❏┃\x20Welcome\x20to\x20*','session','branding','settings','public','445551peHcLe','║\x20\x202.\x20Go\x20to\x20Settings\x20>\x20Linked\x20Devices\x20\x20\x20║','./?','silent','listen','dotenv','notify','from','💫\x20GROUP:\x20','existsSync','delete','✅\x20Dashboard:\x20http://localhost:','./database/groupEvents.json','title','json','亗\x20*','connect\x20ETIMEDOUT','output','connecting','close','𝓬𝓻𝔂𝓼𝓷𝓸𝓿𝓪𝔁\x20𝓿𝓮𝓻𝓲𝓯𝓲𝓮𝓭','user','add','messages','store','║\x20\x20\x20\x20\x20\x20\x20\x20\x20','afk','creds.update','replace','mimetype','Value\x20not\x20found','7LsTNsh','41130dkbiWj','welcome','./src/Plugin/crysLoadCmd','floor','image','\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20║','584544edmXNh','9aGLjkN','apply','connection','Socket\x20closed','use','trim','sendFile','resolve','server','emit','open','120363402922206865@newsletter','white','now','registered','╠════════════════════════════════════════╣','║\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20║','Connection\x20Closed','presences','get','❌\x20Connection\x20closed:','❏▸\x20ⓘ\x20Version⇆\x20𝚉̷𝙴̷𝙴̷\x20̷𝙱̷𝙾̷𝚃̷\x0a','config','network\x20timeout','red','❏┃\x20','log','string','macOS','profilePictureUrl','*!\x0a','subject','chalk','./settings/config','❏┃\x20Hello\x20@','green','✅\x20Using\x20fixed\x20channel\x20image\x20URL','participants','sendText','read\x20ECONNRESET','presence.update','cwd','parse','http','msg','contacts.update','sendMessage','bind','\x20\x20\x20\x20\x20\x20©\x202026\x20𝚉̷𝙴̷𝙴̷\x20̷𝙱̷𝙾̷𝚃̷\x20|\x20by\x20CRYSNOVA\x0a','https://files.catbox.moe/z2rqc1.jpg'];a0_0x60db=function(){return _0x571913;};return a0_0x60db();}app[a0_0x2f68dd(0x112)](express[a0_0x2f68dd(0xf5)]()),app[a0_0x2f68dd(0x112)](express[a0_0x2f68dd(0x173)]({'extended':!![]})),app['use'](express['static'](path[a0_0x2f68dd(0x178)](__dirname,a0_0x2f68dd(0x17a)))),app[a0_0x2f68dd(0x121)]('/',(_0x54ee74,_0xb0b4e)=>_0xb0b4e[a0_0x2f68dd(0x114)](path[a0_0x2f68dd(0x178)](__dirname,a0_0x2f68dd(0x14d)))),global[a0_0x2f68dd(0x177)]={'messages':0x0,'commands':0x0,'startTime':Date[a0_0x2f68dd(0x11b)](),'uptime':0x0},global[a0_0x2f68dd(0xd5)]=global['botInstances']||new Map(),global[a0_0x2f68dd(0x175)]=global[a0_0x2f68dd(0x175)]||new Set();if(!global[a0_0x2f68dd(0x101)])global[a0_0x2f68dd(0x101)]=new Map();const ignoredErrors=[a0_0x2f68dd(0x188),'EKEYTYPE','item-not-found','rate-overlimit',a0_0x2f68dd(0x11f),'Timed\x20Out',a0_0x2f68dd(0x105),a0_0x2f68dd(0x16e),a0_0x2f68dd(0x14e),a0_0x2f68dd(0x111),a0_0x2f68dd(0x17e),'Connection\x20terminated',a0_0x2f68dd(0x135),a0_0x2f68dd(0x14c),a0_0x2f68dd(0x15e),a0_0x2f68dd(0xf7),a0_0x2f68dd(0x125)],showBanner=()=>{const _0xc844d1=a0_0x2f68dd;console[_0xc844d1(0x155)](),console[_0xc844d1(0x128)](chalk[_0xc844d1(0x126)](_0xc844d1(0xda))),console[_0xc844d1(0x128)](chalk['cyan']('\x0a\x20\x20\x20\x20╔═══════════════════════════════════╗\x0a\x20\x20\x20\x20║\x20\x20\x20██████╗██████╗\x20██╗\x20\x20\x20██╗███████╗\x20║\x0a\x20\x20\x20\x20║\x20\x20██╔════╝██╔══██╗╚██╗\x20██╔╝██╔════╝\x20║\x0a\x20\x20\x20\x20║\x20\x20██║\x20\x20\x20\x20\x20██████╔╝\x20╚████╔╝\x20███████╗\x20║\x0a\x20\x20\x20\x20║\x20\x20██║\x20\x20\x20\x20\x20██╔══██╗\x20\x20╚██╔╝\x20\x20╚════██║\x20║\x0a\x20\x20\x20\x20║\x20\x20╚██████╗██║\x20\x20██║\x20\x20\x20██║\x20\x20\x20███████║\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20╚═════╝╚═╝\x20\x20╚═╝\x20\x20\x20╚═╝\x20\x20\x20╚══════╝\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20███╗\x20\x20\x20██╗\x20██████╗\x20██╗\x20\x20\x20██╗\x20█████╗\x20\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20████╗\x20\x20██║██╔═══██╗██║\x20\x20\x20██║██╔══██╗\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20██╔██╗\x20██║██║\x20\x20\x20██║██║\x20\x20\x20██║███████║\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20██║╚██╗██║██║\x20\x20\x20██║╚██╗\x20██╔╝██╔══██║\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20██║\x20╚████║╚██████╔╝\x20╚████╔╝\x20██║\x20\x20██║\x20║\x0a\x20\x20\x20\x20║\x20\x20\x20╚═╝\x20\x20╚═══╝\x20╚═════╝\x20\x20\x20╚═══╝\x20\x20╚═╝\x20\x20╚═╝\x20║\x0a\x20\x20\x20\x20╚═══════════════════════════════════╝\x0a\x20\x20\x20\x20')),console['log'](chalk['yellow']['bold'](_0xc844d1(0x14a))),console[_0xc844d1(0x128)](chalk[_0xc844d1(0x131)][_0xc844d1(0xca)]('\x20\x20\x20\x20\x20\x20Professional\x20WhatsApp\x20Bot\x20v2.0.0')),console['log'](chalk[_0xc844d1(0x159)][_0xc844d1(0xca)](_0xc844d1(0x147))),console[_0xc844d1(0x128)](chalk[_0xc844d1(0x161)](_0xc844d1(0x13e)));},question=_0x378f98=>{const _0x34c367=a0_0x2f68dd,_0x429cb0=readline['createInterface']({'input':process['stdin'],'output':process[_0x34c367(0xdf)]});return new Promise(_0x1f7e35=>{const _0x53b012=_0x34c367;_0x429cb0[_0x53b012(0xdb)](chalk['yellow'](_0x378f98),_0x2b59d2=>{const _0x19dafa=_0x53b012;_0x1f7e35(_0x2b59d2),_0x429cb0[_0x19dafa(0xfa)]();});});},clientstart=async()=>{const _0x2115f2=a0_0x2f68dd,_0x36275f=()=>require(_0x2115f2(0x12f));showBanner();const _0x2f609f=[Browsers[_0x2115f2(0x12a)]('Safari'),Browsers[_0x2115f2(0x12a)]('Chrome'),Browsers[_0x2115f2(0xd6)](_0x2115f2(0xce)),Browsers['ubuntu']('Chrome')],_0x2ff662=_0x2f609f[Math[_0x2115f2(0x10a)](Math[_0x2115f2(0x156)]()*_0x2f609f[_0x2115f2(0xd7)])],_0x1ad94e={'messages':new Map(),'contacts':new Map(),'groupMetadata':new Map(),'presences':{},'loadMessage':async(_0x26f2f9,_0x1b17bc)=>_0x1ad94e['messages'][_0x2115f2(0x121)](_0x26f2f9+':'+_0x1b17bc)||null,'bind':_0x5c96b5=>{const _0x921f5d=_0x2115f2;_0x5c96b5['on'](_0x921f5d(0x183),({messages:_0x892bd4})=>{const _0x2d2b08=_0x921f5d;for(const _0x314fa9 of _0x892bd4){_0x314fa9[_0x2d2b08(0x162)]?.[_0x2d2b08(0x176)]&&_0x314fa9[_0x2d2b08(0x162)]?.['id']&&_0x1ad94e[_0x2d2b08(0xfe)]['set'](_0x314fa9[_0x2d2b08(0x162)][_0x2d2b08(0x176)]+':'+_0x314fa9[_0x2d2b08(0x162)]['id'],_0x314fa9);}}),_0x5c96b5['on'](_0x921f5d(0x136),_0x11722a=>{const _0x1d4c87=_0x921f5d;if(_0x11722a['id'])_0x1ad94e[_0x1d4c87(0x120)][_0x11722a['id']]=_0x11722a;});}},{state:_0x5c55db,saveCreds:_0x189e7b}=await useMultiFileAuthState('./'+_0x36275f()[_0x2115f2(0xe3)]),{version:_0x57cc5a}=await fetchLatestBaileysVersion(),_0x44f4d8=makeWASocket({'logger':pino({'level':_0x2115f2(0xea)}),'printQRInTerminal':!_0x36275f()['status']['terminal'],'auth':_0x5c55db,'version':_0x57cc5a,'browser':_0x2ff662,'connectTimeoutMs':0xea60,'defaultQueryTimeoutMs':undefined,'keepAliveIntervalMs':0x2710,'retryRequestDelayMs':0x7d0,'maxMsgRetryCount':0x5,'fireInitQueries':!![],'syncFullHistory':![],'markOnlineOnConnect':![],'getMessage':async _0x238b81=>_0x1ad94e[_0x2115f2(0xde)](_0x238b81[_0x2115f2(0x176)],_0x238b81['id'])});if(_0x36275f()[_0x2115f2(0x164)][_0x2115f2(0x143)]&&!_0x44f4d8['authState'][_0x2115f2(0x150)][_0x2115f2(0x11c)]){await new Promise(_0x1cca30=>setTimeout(_0x1cca30,0x320)),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x159)](_0x2115f2(0xd3))),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x159)]('║\x20\x20\x20\x20\x20𝐙𝐄𝐄\x20𝐁𝐎𝐓\x20-\x20𝐏𝐀𝐈𝐑𝐈𝐍𝐆\x20𝐌𝐎𝐃𝐄\x20\x20\x20\x20\x20║')),console['log'](chalk[_0x2115f2(0x159)](_0x2115f2(0x170)));const _0x5bdd24=await question('𝐄𝐧𝐭𝐞𝐫\x20𝐲𝐨𝐮𝐫\x20𝐖𝐡𝐚𝐭𝐬𝐀𝐩𝐩\x20𝐧𝐮𝐦𝐛𝐞𝐫\x20(𝐰𝐢𝐭𝐡𝐨𝐮𝐭\x20+):\x0a𝐍𝐮𝐦𝐛𝐞𝐫\x20→\x20'),_0x4660d9=_0x5bdd24[_0x2115f2(0x103)](/[^0-9]/g,'')[_0x2115f2(0x113)]();console[_0x2115f2(0x128)](chalk[_0x2115f2(0x181)](_0x2115f2(0x180)));const _0x3df854=await _0x44f4d8[_0x2115f2(0x16b)](_0x4660d9,'CRYSNOVA');console[_0x2115f2(0x128)](chalk['green']('\x0a╔════════════════════════════════════════╗')),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x131)](_0x2115f2(0x184))),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x131)](_0x2115f2(0x11d))),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x11a)](_0x2115f2(0xd9))),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x131)](_0x2115f2(0x11e))),console[_0x2115f2(0x128)](chalk[_0x2115f2(0xca)][_0x2115f2(0x181)](_0x2115f2(0x100)+_0x3df854+_0x2115f2(0x10c))),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x131)](_0x2115f2(0x11e))),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x131)](_0x2115f2(0x11d))),console['log'](chalk[_0x2115f2(0x11a)]('║\x20\x20𝐇𝐨𝐰\x20𝐭𝐨\x20𝐏𝐚𝐢𝐫:\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20║')),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x159)]('║\x20\x201.\x20Open\x20WhatsApp\x20on\x20your\x20phone\x20\x20\x20\x20\x20\x20\x20║')),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x159)](_0x2115f2(0xe8))),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x159)]('║\x20\x203.\x20Tap\x20\x22Link\x20a\x20Device\x22\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20║')),console['log'](chalk[_0x2115f2(0x159)](_0x2115f2(0x148))),console[_0x2115f2(0x128)](chalk[_0x2115f2(0x131)](_0x2115f2(0x170)));}_0x1ad94e[_0x2115f2(0x13d)](_0x44f4d8['ev']),_0x44f4d8[_0x2115f2(0xff)]=_0x1ad94e;const _0x126594=_0x44f4d8[_0x2115f2(0xfc)]?.['id']?.[_0x2115f2(0x151)](':')[0x0]||Date['now']()[_0x2115f2(0x187)]();return global['botInstances'][_0x2115f2(0x167)](_0x126594,_0x44f4d8),_0x44f4d8[_0x2115f2(0x169)]=_0x4ca54c=>{const _0x38d3ac=_0x2115f2;if(!_0x4ca54c)return _0x4ca54c;if(/:\d+@/gi[_0x38d3ac(0x14b)](_0x4ca54c)){const _0x41f62e=jidDecode(_0x4ca54c)||{};return _0x41f62e[_0x38d3ac(0xfc)]&&_0x41f62e[_0x38d3ac(0x116)]?_0x41f62e[_0x38d3ac(0xfc)]+'@'+_0x41f62e[_0x38d3ac(0x116)]:_0x4ca54c;}return _0x4ca54c;},_0x44f4d8['public']=_0x36275f()[_0x2115f2(0x164)][_0x2115f2(0xe6)],_0x44f4d8['downloadMediaMessage']=async _0x2e5039=>{const _0x141cfe=_0x2115f2;let _0x3563a6=(_0x2e5039[_0x141cfe(0x13a)]||_0x2e5039)?.[_0x141cfe(0x104)]||'',_0x234df1=_0x2e5039[_0x141cfe(0xcd)]?_0x2e5039[_0x141cfe(0xcd)][_0x141cfe(0x103)](/Message/gi,''):_0x3563a6[_0x141cfe(0x151)]('/')[0x0];const _0x5ab5e8=await downloadContentFromMessage(_0x2e5039,_0x234df1);let _0x29d6a2=Buffer[_0x141cfe(0xee)]([]);for await(const _0x540d41 of _0x5ab5e8)_0x29d6a2=Buffer['concat']([_0x29d6a2,_0x540d41]);return _0x29d6a2;},_0x44f4d8[_0x2115f2(0x134)]=async(_0x413920,_0x2eb308,_0x1b1c35='',_0x327ae0={})=>_0x44f4d8[_0x2115f2(0x13c)](_0x413920,{'text':_0x2eb308,..._0x327ae0},{'quoted':_0x1b1c35}),_0x44f4d8['ev']['on'](_0x2115f2(0x102),_0x189e7b),_0x44f4d8['ev']['on']('connection.update',async _0x5f282a=>{const _0x3915da=_0x2115f2,{connection:_0x63c37f,lastDisconnect:_0x29b4d7}=_0x5f282a;if(_0x63c37f===_0x3915da(0xf9))console[_0x3915da(0x128)](chalk[_0x3915da(0x181)](_0x3915da(0x154)));if(_0x63c37f===_0x3915da(0x118)){console[_0x3915da(0x128)](chalk['bold'][_0x3915da(0x131)](_0x3915da(0x18b))),console[_0x3915da(0x128)](chalk[_0x3915da(0x159)]('📱\x20Number:\x20'+_0x44f4d8['user']?.['id']?.[_0x3915da(0x151)](':')[0x0])),console[_0x3915da(0x128)](chalk[_0x3915da(0x159)]('🌐\x20Dashboard:\x20http://localhost:'+port+'\x0a')),io[_0x3915da(0x117)](_0x3915da(0xdd),{'status':'connected','number':_0x44f4d8['user']?.['id']?.[_0x3915da(0x151)](':')[0x0],'name':_0x44f4d8[_0x3915da(0xfc)]?.[_0x3915da(0x174)]});const _0x1b2b8b=_0x36275f(),_0x151ca7=_0x44f4d8[_0x3915da(0xfc)]['id'][_0x3915da(0x151)](':')[0x0]+'@s.whatsapp.net';const SUCCESS_MEDIA_URL='https://cdn.crysnovax.link/files/1783469167623-6d58c43c-68b4-41ce-87ab-c0da1f615b28.mp4',isGif=/\.(mp4|gif|webm|mov)$/i.test(SUCCESS_MEDIA_URL),newsletterJid=_0x3915da(0x119);try{console[_0x3915da(0x128)](chalk[_0x3915da(0x159)]('✅\x20Using\x20fixed\x20hardcoded\x20success\x20media'));const successPayload={'caption':_0x3915da(0xf6)+(_0x1b2b8b[_0x3915da(0xe5)]?.[_0x3915da(0xf4)]||_0x3915da(0xdc))+'*\x20is\x20Online!\x0a\x0a'+(_0x3915da(0x186)+(_0x44f4d8['user'][_0x3915da(0x174)]||'Unknown')+'\x0a')+(_0x3915da(0xd1)+(_0x1b2b8b['settings']?.[_0x3915da(0x152)]||'.')+'\x20]\x0a')+('❏▸\x20⎔\x20Mode⇆\x20'+(_0x1b2b8b[_0x3915da(0x164)]?.[_0x3915da(0xe6)]?'Public':'Private')+'\x0a')+_0x3915da(0x123)+_0x3915da(0xe1)+(_0x3915da(0xef)+(_0x1b2b8b[_0x3915da(0xe4)]?.[_0x3915da(0xc8)]||_0x3915da(0x16a))+'\x0a\x0a')+_0x3915da(0x149),'contextInfo':{'forwardingScore':0x1,'isForwarded':!![],'participant':newsletterJid,'remoteJid':newsletterJid,'quotedMessage':{'conversation':'⧇⧇:⧇⧇\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20☕︎'},'forwardedNewsletterMessageInfo':{'newsletterJid':newsletterJid,'newsletterName':'⧇⧇:⧇⧇\x20☻\x20\x20\x20\x20\x20\x20\x20⸹\x20\x20\x20\x20\x20\x20\x20\x20\x20CRYSNOVA\x20AI\x20☕︎','serverMessageId':0x1}}};if(isGif){successPayload['video']={'url':SUCCESS_MEDIA_URL},successPayload['gifPlayback']=!![];}else{successPayload['image']={'url':SUCCESS_MEDIA_URL};}await _0x44f4d8[_0x3915da(0x13c)](_0x151ca7,successPayload),console[_0x3915da(0x128)](chalk[_0x3915da(0x131)]('✅\x20Connected\x20message\x20sent!'));}catch(_0x48e9e0){console[_0x3915da(0x128)](chalk[_0x3915da(0x181)]('[Connected\x20msg\x20failed]'),_0x48e9e0[_0x3915da(0x15a)]);}}if(_0x63c37f===_0x3915da(0xfa)){const _0xec9765=_0x29b4d7?.[_0x3915da(0xcb)]?.[_0x3915da(0xf8)]?.[_0x3915da(0x182)];console[_0x3915da(0x128)](chalk[_0x3915da(0x126)](_0x3915da(0x122)),_0xec9765),global[_0x3915da(0xd5)][_0x3915da(0xf1)](_0x126594);_0xec9765===DisconnectReason[_0x3915da(0x157)]?(console[_0x3915da(0x128)](chalk[_0x3915da(0x126)](_0x3915da(0x189))),process[_0x3915da(0x146)](0x1)):(console[_0x3915da(0x128)](chalk[_0x3915da(0x181)](_0x3915da(0x166))),setTimeout(clientstart,0xbb8));try{konek({'sock':_0x44f4d8,'update':_0x5f282a,'clientstart':clientstart,'DisconnectReason':DisconnectReason,'Boom':Boom});}catch{}}}),setupMessageHandler(_0x44f4d8,_0x1ad94e,handleMessage,smsg,io,_0x36275f),_0x44f4d8['ev']['on']('group-participants.update',async _0x2f6ec2=>{const _0x2f6889=_0x2115f2;try{const _0xc898fc=path[_0x2f6889(0x178)](process[_0x2f6889(0x137)](),_0x2f6889(0x185));if(!fs['existsSync'](_0xc898fc))return;const _0x47fdd7=JSON[_0x2f6889(0x138)](fs['readFileSync'](_0xc898fc,_0x2f6889(0x15f)));if(!_0x47fdd7[_0x2f6ec2['id']]?.['enabled'])return;const _0x556110=await _0x44f4d8[_0x2f6889(0x17d)](_0x2f6ec2['id']),_0x2c4207=_0x556110[_0x2f6889(0x133)]['length'],_0x247921=_0x556110[_0x2f6889(0x12d)];for(const _0x4b4cb5 of _0x2f6ec2['participants']){const _0x3124c9=typeof _0x4b4cb5===_0x2f6889(0x129)?_0x4b4cb5:_0x4b4cb5['id'];if(_0x2f6ec2[_0x2f6889(0xcc)]===_0x2f6889(0xfd)){let _0x65d276;try{_0x65d276=await _0x44f4d8[_0x2f6889(0x12b)](_0x3124c9,_0x2f6889(0x10b));}catch{_0x65d276='https://cdn.crysnovax.link/files/1782163404491-f8a40261-8b0f-4726-89db-2da753df47e4.jpeg';}await _0x44f4d8[_0x2f6889(0x13c)](_0x2f6ec2['id'],{'image':{'url':_0x65d276},'caption':_0x2f6889(0x141)+(_0x2f6889(0xe2)+_0x247921+_0x2f6889(0x12c))+(_0x2f6889(0x130)+_0x3124c9[_0x2f6889(0x151)]('@')[0x0]+'!\x0a')+(_0x2f6889(0x16f)+_0x2c4207+'\x0a')+(_0x2f6889(0x127)+(_0x47fdd7[_0x2f6ec2['id']][_0x2f6889(0x108)]||_0x2f6889(0x179))+'\x0a\x0a')+_0x2f6889(0x171)+_0x2f6889(0x16d),'mentions':[_0x3124c9]});}_0x2f6ec2['action']==='remove'&&await _0x44f4d8[_0x2f6889(0x13c)](_0x2f6ec2['id'],{'text':_0x2f6889(0x17b)+_0x3124c9[_0x2f6889(0x151)]('@')[0x0]+_0x2f6889(0x153)+_0x247921+'*\x0a'+('❏┃\x20'+(_0x47fdd7[_0x2f6ec2['id']][_0x2f6889(0x18a)]||_0x2f6889(0xd4))+'\x0a')+(_0x2f6889(0x16f)+_0x2c4207+'\x0a')+_0x2f6889(0x16d),'mentions':[_0x3124c9]});}}catch(_0x4f079e){if(!ignoredErrors[_0x2f6889(0x15c)](_0x6d649c=>_0x4f079e[_0x2f6889(0x15a)]?.[_0x2f6889(0x145)](_0x6d649c)))console[_0x2f6889(0x128)]('[Group\x20Events\x20Error]',_0x4f079e[_0x2f6889(0x15a)]);}}),_0x44f4d8['ev']['on'](_0x2115f2(0x13b),_0x44b2ef=>{const _0x5df07b=_0x2115f2;for(const _0x72a0d0 of _0x44b2ef){_0x1ad94e['contacts'][_0x5df07b(0x167)](_0x72a0d0['id'],{'id':_0x72a0d0['id'],'name':_0x72a0d0[_0x5df07b(0xed)]||_0x72a0d0[_0x5df07b(0x174)]||null});}}),_0x44f4d8;};function a0_0x39c7(_0x64d42,_0x2f8623){_0x64d42=_0x64d42-0xc8;const _0x60dbe8=a0_0x60db();let _0x39c740=_0x60dbe8[_0x64d42];return _0x39c740;}process['on'](a0_0x2f68dd(0xe0),_0x7be737=>{const _0xc05b76=a0_0x2f68dd;if(ignoredErrors[_0xc05b76(0x15c)](_0x4d4a1e=>String(_0x7be737)[_0xc05b76(0x145)](_0x4d4a1e)))return;console[_0xc05b76(0x128)](_0xc05b76(0x17f),_0x7be737);});const origErr=console['error'];console['error']=function(_0x168750,..._0x4713d5){const _0x3ce8b0=a0_0x2f68dd;if(typeof _0x168750==='string'&&ignoredErrors[_0x3ce8b0(0x15c)](_0x2a949c=>_0x168750[_0x3ce8b0(0x145)](_0x2a949c)))return;origErr[_0x3ce8b0(0x10f)](console,[_0x168750,..._0x4713d5]);},((async()=>{const _0x3a6dc4=a0_0x2f68dd;try{if(!fs[_0x3a6dc4(0xf0)]('./database'))fs[_0x3a6dc4(0x140)]('./database',{'recursive':!![]});if(!fs[_0x3a6dc4(0xf0)]('./sessions'))fs[_0x3a6dc4(0x140)]('./sessions',{'recursive':!![]});if(!fs[_0x3a6dc4(0xf0)](_0x3a6dc4(0xf3)))fs[_0x3a6dc4(0xcf)](_0x3a6dc4(0xf3),'{}');if(!fs['existsSync'](_0x3a6dc4(0x144)))fs[_0x3a6dc4(0xcf)](_0x3a6dc4(0x144),'{}');if(!fs[_0x3a6dc4(0xf0)]('./database/runtime-config.json'))fs['writeFileSync'](_0x3a6dc4(0xd0),'{}');loadCommands(),server[_0x3a6dc4(0xeb)](port,()=>{const _0x46cfd1=_0x3a6dc4;console[_0x46cfd1(0x128)](chalk[_0x46cfd1(0x131)](_0x46cfd1(0xf2)+port));}),crysStatistic(app,io),io['on'](_0x3a6dc4(0x110),_0x974e79=>{const _0x4b3f4c=_0x3a6dc4;console[_0x4b3f4c(0x128)](chalk[_0x4b3f4c(0x159)]('👤\x20Dashboard\x20connected')),_0x974e79[_0x4b3f4c(0x117)](_0x4b3f4c(0x15b),global[_0x4b3f4c(0x177)]),_0x974e79['on'](_0x4b3f4c(0x168),()=>console[_0x4b3f4c(0x128)](chalk[_0x4b3f4c(0x181)]('👤\x20Dashboard\x20disconnected')));}),await clientstart();}catch(_0x3168af){console[_0x3a6dc4(0xcb)](chalk[_0x3a6dc4(0x126)]('Startup\x20error:'),_0x3168af),process[_0x3a6dc4(0x146)](0x1);}})());let file=require[a0_0x2f68dd(0x115)](__filename);require('fs')['watchFile'](file,()=>{delete require['cache'][file],require(file);});
+// © 2026 CRYSNOVA AI – ZEE BOT Core
+// Clean rewrite: deobfuscated with web pairing API routes
 
+require('dotenv').config();
+
+const express   = require('express');
+const http      = require('http');
+const socketIo  = require('socket.io');
+const path      = require('path');
+const readline  = require('readline');
+const fs        = require('fs');
+const chalk     = require('chalk');
+const pino      = require('pino');
+const { Boom }  = require('@hapi/boom');
+const {
+    default: makeWASocket,
+    Browsers,
+    useMultiFileAuthState,
+    DisconnectReason,
+    fetchLatestBaileysVersion,
+    jidDecode,
+    downloadContentFromMessage,
+    makeCacheableSignalKeyStore,
+} = require('@crysnovax/baileys');
+
+const { smsg }                   = require('./library/serialize');
+const { konek }                  = require('./library/connection/connection');
+const { loadCommands }           = require('./src/Plugin/crysLoadCmd');
+const { handleMessage }          = require('./src/Plugin/crysMsg');
+const { crysStatistic }          = require('./src/Plugin/crysStatistic');
+const setupMessageHandler        = require('./src/Plugin/crysMsg');
+
+// ─── Express + Socket.IO ───────────────────────────────────────────
+const app    = express();
+const port   = process.env.PORT || 3000;
+const server = http.createServer(app);
+const io     = socketIo(server);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'Public')));
+app.get('/', (_req, res) => res.sendFile(path.join(__dirname, 'Public', 'index.html')));
+
+// ─── Globals ───────────────────────────────────────────────────────
+global.stats      = { messages: 0, commands: 0, startTime: Date.now(), uptime: 0 };
+global.botInstances  = global.botInstances  || new Map();
+global.onlineUsers   = global.onlineUsers   || new Set();
+if (!global.crysStats) global.crysStats = new Map();
+
+// ─── Ignored errors (suppress noisy logs) ──────────────────────────
+const ignoredErrors = [
+    'ECONNRESET', 'EKEYTYPE', 'item-not-found', 'rate-overlimit',
+    'Bad MAC', 'Timed Out', 'decrypt error', 'Socket connection timeout',
+    'network timeout', 'Connection Closed', 'read ECONNRESET',
+    'write ECONNRESET', 'connect ETIMEDOUT', 'Connection terminated',
+    'ECONNREFUSED', 'Session closed', 'Socket closed', 'Connection Closed',
+    'test',
+];
+
+// ─── Banner ────────────────────────────────────────────────────────
+const showBanner = () => {
+    console.clear();
+    console.log(chalk.magenta('┏━〔 ✦ CRYSNOVA AI 〕━'));
+    console.log(chalk.cyan(`
+╔═══════════════════════════════════╗
+║  ███████╗██████╗  ██╗   ██╗███████╗ ║
+║  ██╔════╝██╔══██╗╚██╗ ██╔╝██╔════╝ ║
+║  ██║     ██║  ██║ ╚████╔╝ ███████╗ ║
+║  ██║     ██║  ██║  ╚██╔╝  ╚════██║ ║
+║  ╚██████╗██████╔╝   ██║   ███████║ ║
+║   ╚═════╝╚═════╝    ╚═╝   ╚══════╝ ║
+║  ██████╗  ███████╗████████╗         ║
+║  ██╔══██╗██╔═══██╗╚══██╔══╝         ║
+║  ██████╔╝██║   ██║   ██║            ║
+║  ██╔══██╗██║   ██║   ██║            ║
+║  ██████╔╝╚██████╔╝   ██║            ║
+║   ╚═══╝   ╚═════╝    ╚═╝            ║
+╚═══════════════════════════════════╝`));
+    console.log(chalk.yellow.bold('┏━〔 ✦ CRYSNOVA AI Engine + ZEE BOT Core 〕━'));
+    console.log(chalk.white.bold('      Professional WhatsApp Bot v2.0.0'));
+    console.log(chalk.green.bold('      Powered by CRYSNOVA AI V2 Technology'));
+    console.log(chalk.magenta('© 2026 ZEE BOT | by CRYSNOVA'));
+};
+
+// ─── Readline helper ───────────────────────────────────────────────
+const question = (prompt) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    return new Promise((resolve) => {
+        rl.question(chalk.yellow(prompt), (answer) => { resolve(answer); rl.close(); });
+    });
+};
+
+// ─── Bot startup ───────────────────────────────────────────────────
+const clientstart = async () => {
+    const getConfig = () => require('./settings/config');
+    showBanner();
+
+    // Random browser fingerprint
+    const browsers = [
+        Browsers.macOS('Safari'),
+        Browsers.macOS('Chrome'),
+        Browsers.windows('Firefox'),
+        Browsers.ubuntu('Chrome'),
+    ];
+    const browser = browsers[Math.floor(Math.random() * browsers.length)];
+
+    // In-memory message/contact store
+    const store = {
+        messages: new Map(),
+        contacts: new Map(),
+        groupMetadata: new Map(),
+        presences: {},
+        loadMessage: async (jid, id) => store.messages.get(jid + ':' + id) || null,
+        bind: (ev) => {
+            ev.on('messages.upsert', ({ messages }) => {
+                for (const msg of messages) {
+                    if (msg.key?.remoteJid && msg.key?.id) {
+                        store.messages.set(msg.key.remoteJid + ':' + msg.key.id, msg);
+                    }
+                }
+            });
+            ev.on('contacts.update', (updates) => {
+                for (const u of updates) { if (u.id) store.contacts[u.id] = u; }
+            });
+        },
+    };
+
+    // Auth state
+    const { state, saveCreds } = await useMultiFileAuthState('./' + getConfig().session);
+    const { version } = await fetchLatestBaileysVersion();
+
+    // Create socket
+    const sock = makeWASocket({
+        logger: pino({ level: 'silent' }),
+        printQRInTerminal: !getConfig().status.terminal,
+        auth: state,
+        version,
+        browser,
+        connectTimeoutMs: 60000,
+        defaultQueryTimeoutMs: undefined,
+        keepAliveIntervalMs: 10000,
+        retryRequestDelayMs: 2000,
+        maxMsgRetryCount: 5,
+        fireInitQueries: true,
+        syncFullHistory: false,
+        markOnlineOnConnect: false,
+        getMessage: async (key) => store.loadMessage(key.remoteJid, key.id),
+    });
+
+    // Store socket globally for API routes
+    global.sock = sock;
+    global.io   = io;
+
+    // Terminal pairing mode (only when no creds + terminal mode)
+    if (getConfig().status.terminal && !sock.authState.creds.registered) {
+        await new Promise(r => setTimeout(r, 800));
+        console.log(chalk.yellow('┏━〔 ✦ CRYSNOVA AI 〕━'));
+        console.log(chalk.yellow('║     ZEE BOT - PAIRING MODE     ║'));
+        console.log(chalk.yellow('⏳ Requesting pairing code...'));
+        const number = await question('Enter your WhatsApp number (without +):\nNumber → ');
+        const cleanNumber = number.replace(/[^0-9]/g, '').trim();
+        console.log(chalk.red('⏳ Requesting pairing code...'));
+        const code = await sock.requestPairingCode(cleanNumber, 'CRYSNOVA');
+
+        console.log(chalk.green('\n╔════════════════════════════════════════╗'));
+        console.log(chalk.bold.green('║     ✅ ZEE BOT - PAIDED           ║'));
+        console.log(chalk.bold.green('╚════════════════════════════════════════╝'));
+        console.log(chalk.yellow('║  Your Pairing Code:                    ║'));
+        console.log(chalk.red.bold('  ' + code + '\n'));
+        console.log(chalk.green('║  How to Pair:                          ║'));
+        console.log(chalk.yellow('║  1. Open WhatsApp on your phone        ║'));
+        console.log(chalk.yellow('║  2. Go to Settings > Linked Devices    ║'));
+        console.log(chalk.yellow('║  3. Tap "Link a Device"               ║'));
+        console.log(chalk.yellow('║  4. Enter the code above               ║'));
+        console.log(chalk.green('╚════════════════════════════════════════╝\n'));
+    }
+
+    // Bind store
+    store.bind(sock.ev);
+    sock.store = store;
+
+    const botInstanceId = sock.user?.id?.split(':')[0] || Date.now().toString();
+    global.botInstances.set(botInstanceId, sock);
+
+    // decodeJid helper
+    sock.decodeJid = (jid) => {
+        if (!jid) return jid;
+        if (/:\d+@/gi.test(jid)) {
+            const decoded = jidDecode(jid) || {};
+            return decoded.user && decoded.server ? decoded.user + '@' + decoded.server : jid;
+        }
+        return jid;
+    };
+
+    sock.public  = getConfig().status.public;
+    sock.downloadMediaMessage = async (msg) => {
+        let mimeType = (msg.message || msg)?.mimetype || '';
+        let mediaType = msg.mtype ? msg.mtype.replace(/Message/gi, '') : mimeType.split('/')[0];
+        const stream = await downloadContentFromMessage(msg, mediaType);
+        let buffer = Buffer.concat([]);
+        for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+        return buffer;
+    };
+    sock.sendText = async (jid, text, quoted = '', options = {}) =>
+        sock.sendMessage(jid, { text, ...options }, { quoted });
+
+    // ─── Event: creds.update ───────────────────────────────────────
+    sock.ev.on('creds.update', saveCreds);
+
+    // ─── Event: connection.update ──────────────────────────────────
+    sock.ev.on('connection.update', async (update) => {
+        const { connection, lastDisconnect } = update;
+
+        if (connection === 'connecting') {
+            console.log(chalk.red('🔄 Connecting...'));
+        }
+
+        if (connection === 'open') {
+            console.log(chalk.bold.green.bold('║     ✅ ZEE BOT - PAIDED           ║'));
+            console.log(chalk.yellow('📱 Number: ' + sock.user?.id?.split(':')[0]));
+            console.log(chalk.yellow('🌐 Dashboard: http://localhost:' + port + '\n'));
+            io.emit('bot-status', {
+                status: 'connected',
+                number: sock.user?.id?.split(':')[0],
+                name: sock.user?.name,
+            });
+
+            // Send connected message
+            const config = getConfig();
+            const ownerJid = sock.user.id.split(':')[0] + '@s.whatsapp.net';
+            const SUCCESS_MEDIA_URL = config.settings?.thumbUrl || 'https://cdn.crysnovax.link/files/1783469167623-6d58c43c-68b4-41ce-87ab-c0da1f615b28.mp4';
+            const isGif = /\.(mp4|gif|webm|mov)$/i.test(SUCCESS_MEDIA_URL);
+            const newsletterJid = '120363402922206865@newsletter';
+
+            try {
+                const successPayload = {
+                    caption: '┏━〔 ✦ ' + (config.settings?.title || 'CRYSNOVA AI') + '* is Online!\n\n' +
+                        '❏▸ ℘ Owner ⇆ ' + (sock.user.name || 'Unknown') + '\n' +
+                        '❏▸⁠ 彡 Prefix ⇆ [ ' + (config.settings?.prefix || '.') + ' ]\n' +
+                        '❏▸ ⎔ Mode ⇆ ' + (config.status?.public ? 'Public' : 'Private') + '\n' +
+                        '❏▸ ↻ Version ⇆ ZEE BOT\n' +
+                        '━━━━━━━━━━━━━━━━━━━━━\n' +
+                        (config.branding?.footer || '© 2026 ZEE BOT | by CRYSNOVA') + '\n',
+                    contextInfo: {
+                        forwardingScore: 1,
+                        isForwarded: true,
+                        participant: newsletterJid,
+                        remoteJid: newsletterJid,
+                        quotedMessage: { conversation: '⧇⧇:⧇祺                    ☕︎' },
+                        forwardedNewsletterMessageInfo: {
+                            newsletterJid,
+                            newsletterName: '⧇祺        ⸹          CRYSNOVA AI ☕︎',
+                            serverMessageId: 1,
+                        },
+                    },
+                };
+                if (isGif) { successPayload.video = { url: SUCCESS_MEDIA_URL }; successPayload.gifPlayback = true; }
+                else { successPayload.image = { url: SUCCESS_MEDIA_URL }; }
+                await sock.sendMessage(ownerJid, successPayload);
+                console.log(chalk.green('✅ Connected message sent!'));
+            } catch (e) {
+                console.log(chalk.red('[Connected msg failed]'), e.message);
+            }
+        }
+
+        if (connection === 'close') {
+            const statusCode = lastDisconnect?.error?.output?.statusCode;
+            console.log(chalk.magenta('❌ Connection closed:'), statusCode);
+            global.botInstances.delete(botInstanceId);
+
+            if (statusCode === DisconnectReason.loggedOut) {
+                console.log(chalk.magenta('🚫 Logged out. Delete session folder and restart.'));
+                process.exit(1);
+            }
+            console.log(chalk.red('🔄 Reconnecting in 3 seconds...'));
+            setTimeout(clientstart, 3000);
+
+            try {
+                konek({ sock, update, clientstart, DisconnectReason, Boom });
+            } catch {}
+        }
+    });
+
+    // ─── Message handler ───────────────────────────────────────────
+    setupMessageHandler(sock, store, handleMessage, smsg, io, getConfig);
+
+    // ─── Group participant events ──────────────────────────────────
+    sock.ev.on('group-participants.update', async (update) => {
+        try {
+            const groupEventsPath = path.join(process.cwd(), 'database/groupEvents.json');
+            if (!fs.existsSync(groupEventsPath)) return;
+            const groupEvents = JSON.parse(fs.readFileSync(groupEventsPath, 'utf8'));
+            if (!groupEvents[update.id]?.enabled) return;
+
+            const metadata = await sock.groupMetadata(update.id);
+            const memberCount = metadata.participants.length;
+            const groupName = metadata.subject;
+
+            for (const participant of update.participants) {
+                const jid = typeof participant === 'string' ? participant : participant.id;
+
+                if (update.action === 'add') {
+                    let ppUrl;
+                    try { ppUrl = await sock.profilePictureUrl(jid, 'image'); }
+                    catch { ppUrl = 'https://cdn.crysnovax.link/files/1782163404491-f8a40261-8b0f-4726-89db-2da753df47e4.jpeg'; }
+
+                    await sock.sendMessage(update.id, {
+                        image: { url: ppUrl },
+                        caption: '💫 GROUP: ' + groupName +
+                            '\n❏┃ Members: ' + memberCount + '\n' +
+                            '👋 @' + jid.split('@')[0] + '!\n' +
+                            '❏┃ Welcome to *' + groupName + '!\n' +
+                            '❏┃ ' + (groupEvents[update.id]?.welcome || 'Welcome to the group!') + '\n\n' +
+                            '━━━━━━━━━━━━━━━━━━━━━\n' +
+                            '© 2026 ZEE BOT | by CRYSNOVA',
+                        mentions: [jid],
+                    });
+                }
+
+                if (update.action === 'remove') {
+                    await sock.sendMessage(update.id, {
+                        text: '亗 *' + jid.split('@')[0] + ' left *' + groupName + '*\n' +
+                            '❏┃ ' + (groupEvents[update.id]?.goodbye || 'Goodbye!') + '\n' +
+                            '❏┃ Members: ' + memberCount + '\n' +
+                            '━━━━━━━━━━━━━━━━━━━━━\n' +
+                            '© 2026 ZEE BOT | by CRYSNOVA',
+                        mentions: [jid],
+                    });
+                }
+            }
+        } catch (err) {
+            if (!ignoredErrors.some((e) => err.message?.includes(e)))
+                console.log('[Group Events Error]', err.message);
+        }
+    });
+
+    // ─── Contacts update ───────────────────────────────────────────
+    sock.ev.on('contacts.update', (updates) => {
+        for (const u of updates) {
+            store.contacts[u.id] = { id: u.id, name: u.notify || u.name || null };
+        }
+    });
+
+    return sock;
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// WEB PAIRING API ROUTES  (fixes 405 errors from dashboard)
+// ═══════════════════════════════════════════════════════════════════
+
+// GET /api/status — return bot connection status
+app.get('/api/status', (_req, res) => {
+    const sock = global.sock;
+    if (sock && sock.user) {
+        return res.json({
+            connected: true,
+            number: sock.user.id?.split(':')[0] || null,
+            name: sock.user.name || null,
+        });
+    }
+    res.json({ connected: false });
+});
+
+// POST /api/request-pairing — generate pairing code via web dashboard
+app.post('/api/request-pairing', async (req, res) => {
+    try {
+        const { phone } = req.body;
+        if (!phone || phone.length < 10) {
+            return res.json({ success: false, message: 'Invalid phone number. Must be at least 10 digits.' });
+        }
+
+        const cleanNumber = phone.replace(/[^0-9]/g, '').trim();
+        const sock = global.sock;
+        const sockIo = global.io || io;
+
+        if (!sock) {
+            return res.json({ success: false, message: 'Bot is not started yet. Please wait...' });
+        }
+
+        if (sock.user) {
+            return res.json({ success: false, message: 'Bot is already connected to a WhatsApp account.' });
+        }
+
+        console.log(chalk.yellow('\n⏳ Requesting pairing code for: ' + cleanNumber));
+
+        // Request pairing code from WhatsApp
+        const code = await sock.requestPairingCode(cleanNumber, 'CRYSNOVA');
+
+        console.log(chalk.green('✅ Pairing code generated: ' + code));
+
+        // Emit code via Socket.IO
+        sockIo.emit('pairing-code', { code, expiresIn: 300 });
+        sockIo.emit('pairing-status', {
+            status: 'Code Generated',
+            message: 'Enter this code on WhatsApp within 5 minutes',
+        });
+
+        // Return via REST API as well
+        return res.json({
+            success: true,
+            code,
+            message: 'Code generated! You have 5 minutes to pair.',
+            expiresIn: 300,
+        });
+    } catch (error) {
+        console.error(chalk.red('[Pairing Error]'), error.message);
+
+        if (global.io) {
+            global.io.emit('pairing-failed', { message: error.message || 'Failed to generate pairing code' });
+        }
+
+        return res.json({
+            success: false,
+            message: error.message || 'Failed to generate pairing code. Please try again.',
+        });
+    }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// MAIN STARTUP
+// ═══════════════════════════════════════════════════════════════════
+(async () => {
+    try {
+        // Ensure directories exist
+        if (!fs.existsSync('./database'))    fs.mkdirSync('./database', { recursive: true });
+        if (!fs.existsSync('./sessions'))    fs.mkdirSync('./sessions', { recursive: true });
+        if (!fs.existsSync('./database/antilink.json'))  fs.writeFileSync('./database/antilink.json', '{}');
+        if (!fs.existsSync('./database/groupEvents.json')) fs.writeFileSync('./database/groupEvents.json', '{}');
+        if (!fs.existsSync('./database/runtime-config.json')) fs.writeFileSync('./database/runtime-config.json', '{}');
+
+        loadCommands();
+
+        server.listen(port, () => {
+            console.log(chalk.green('✅ Dashboard: http://localhost:' + port));
+        });
+
+        crysStatistic(app, io);
+
+        io.on('connection', (socket) => {
+            console.log(chalk.yellow('👤 Dashboard connected'));
+            socket.emit('bot-status', global.stats);
+            socket.on('disconnect', () => console.log(chalk.red('👤 Dashboard disconnected')));
+        });
+
+        await clientstart();
+    } catch (err) {
+        console.error(chalk.magenta('Startup error:'), err);
+        process.exit(1);
+    }
+})();
+
+// ─── Unhandled rejections ──────────────────────────────────────────
+process.on('unhandledRejection', (err) => {
+    if (ignoredErrors.some((e) => String(err).includes(e))) return;
+    console.log('Unhandled Rejection:', err);
+});
+
+const origErr = console.error;
+console.error = function (...args) {
+    if (typeof args[0] === 'string' && ignoredErrors.some((e) => args[0].includes(e))) return;
+    origErr.apply(console, args);
+};
+
+// ─── Hot reload ────────────────────────────────────────────────────
+let file = require.resolve(__filename);
+require('fs').watchFile(file, () => {
+    delete require.cache[file];
+    require(file);
+});
