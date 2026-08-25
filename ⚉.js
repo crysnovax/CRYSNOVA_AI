@@ -206,27 +206,36 @@ const clientstart = async () => {
 
         if (connection === 'open') {
             sock.connectionOpen = true;
+
             // Terminal pairing — request code AFTER connection is open
             if (needsPairing && pairingNumber) {
                 needsPairing = false;
-                try {
-                    console.log(chalk.yellow('\n⏳ Requesting pairing code...'));
-                    const code = await sock.requestPairingCode(pairingNumber, 'CRYSNOVA');
+                for (let attempt = 1; attempt <= 3; attempt++) {
+                    try {
+                        console.log(chalk.yellow('\n⏳ Requesting pairing code... (attempt ' + attempt + '/3)'));
+                        const code = await sock.requestPairingCode(pairingNumber, 'CRYSNOVA');
 
-                    console.log(chalk.green('\n╔════════════════════════════════════════╗'));
-                    console.log(chalk.bold.green('║     ✅ ZEE BOT - PAIRED              ║'));
-                    console.log(chalk.bold.green('╚════════════════════════════════════════╝'));
-                    console.log(chalk.yellow('║  Your Pairing Code:                    ║'));
-                    console.log(chalk.red.bold('  ' + code + '\n'));
-                    console.log(chalk.green('║  How to Pair:                          ║'));
-                    console.log(chalk.yellow('║  1. Open WhatsApp on your phone        ║'));
-                    console.log(chalk.yellow('║  2. Go to Settings > Linked Devices    ║'));
-                    console.log(chalk.yellow('║  3. Tap "Link a Device"               ║'));
-                    console.log(chalk.yellow('║  4. Enter the code above               ║'));
-                    console.log(chalk.green('╚════════════════════════════════════════╝\n'));
-                } catch (pairErr) {
-                    console.error(chalk.red('[Pairing Error]'), pairErr.message);
+                        console.log(chalk.green('\n╔════════════════════════════════════════╗'));
+                        console.log(chalk.bold.green('║     ✅ ZEE BOT - PAIRED              ║'));
+                        console.log(chalk.bold.green('╚════════════════════════════════════════╝'));
+                        console.log(chalk.yellow('║  Your Pairing Code:                    ║'));
+                        console.log(chalk.red.bold('  ' + code + '\n'));
+                        console.log(chalk.green('║  How to Pair:                          ║'));
+                        console.log(chalk.yellow('║  1. Open WhatsApp on your phone        ║'));
+                        console.log(chalk.yellow('║  2. Go to Settings > Linked Devices    ║'));
+                        console.log(chalk.yellow('║  3. Tap "Link a Device"               ║'));
+                        console.log(chalk.yellow('║  4. Enter the code above               ║'));
+                        console.log(chalk.green('╚════════════════════════════════════════╝\n'));
+                        break;
+                    } catch (pairErr) {
+                        console.error(chalk.red('[Pairing attempt ' + attempt + ' failed]'), pairErr.message);
+                        if (attempt < 3) {
+                            console.log(chalk.yellow('Retrying in 3s...'));
+                            await new Promise(r => setTimeout(r, 3000));
+                        }
+                    }
                 }
+                return;
             }
 
             console.log(chalk.bold.green.bold('║     ✅ ZEE BOT - PAIDED           ║'));
