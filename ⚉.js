@@ -28,7 +28,6 @@ const { konek }                  = require('./library/connection/connection');
 const { loadCommands }           = require('./src/Plugin/crysLoadCmd');
 const { handleMessage }          = require('./src/Plugin/crysMsg');
 const { crysStatistic }          = require('./src/Plugin/crysStatistic');
-const setupMessageHandler        = require('./src/Plugin/crysMsg');
 
 // ─── Express + Socket.IO ───────────────────────────────────────────
 const app    = express();
@@ -57,29 +56,27 @@ const ignoredErrors = [
     'test',
 ];
 
-// ─── Banner ────────────────────────────────────────────────────────
+// ─── Console UI ─────────────────────────────────────────────────────
+const timestamp = () => new Date().toISOString().slice(11, 19);
+const writeLog = (level, message, ...args) => {
+    const palette = { INFO: chalk.cyan, OK: chalk.green, WARN: chalk.yellow, ERROR: chalk.red, SYSTEM: chalk.magenta };
+    const color = palette[level] || chalk.white;
+    console.log(`${chalk.gray(timestamp())} ${color(String(level).padEnd(6))} ${chalk.gray('›')} ${message}`, ...args);
+};
+
 const showBanner = () => {
-    console.clear();
-    console.log(chalk.magenta('┏━〔 ✦ CRYSNOVA AI 〕━'));
-    console.log(chalk.cyan(`
-╔═══════════════════════════════════╗
-║  ███████╗██████╗  ██╗   ██╗███████╗ ║
-║  ██╔════╝██╔══██╗╚██╗ ██╔╝██╔════╝ ║
-║  ██║     ██║  ██║ ╚████╔╝ ███████╗ ║
-║  ██║     ██║  ██║  ╚██╔╝  ╚════██║ ║
-║  ╚██████╗██████╔╝   ██║   ███████║ ║
-║   ╚═════╝╚═════╝    ╚═╝   ╚══════╝ ║
-║  ██████╗  ███████╗████████╗         ║
-║  ██╔══██╗██╔═══██╗╚══██╔══╝         ║
-║  ██████╔╝██║   ██║   ██║            ║
-║  ██╔══██╗██║   ██║   ██║            ║
-║  ██████╔╝╚██████╔╝   ██║            ║
-║   ╚═══╝   ╚═════╝    ╚═╝            ║
-╚═══════════════════════════════════╝`));
-    console.log(chalk.yellow.bold('┏━〔 ✦ CRYSNOVA AI Engine + ZEE BOT Core 〕━'));
-    console.log(chalk.white.bold('      Professional WhatsApp Bot v2.0.0'));
-    console.log(chalk.green.bold('      Powered by CRYSNOVA AI V2 Technology'));
-    console.log(chalk.magenta('© 2026 ZEE BOT | by CRYSNOVA'));
+    console.log('');
+    console.log(chalk.cyan('╭────────────────────────────────────────────────────────────╮'));
+    console.log(chalk.cyan('│') + chalk.bold.white('   ██████╗██████╗ ██╗   ██╗███████╗███╗   ██╗ ██████╗  ') + chalk.cyan('│'));
+    console.log(chalk.cyan('│') + chalk.bold.white('  ██╔════╝██╔══██╗╚██╗ ██╔╝██╔════╝████╗  ██║██╔═══██╗ ') + chalk.cyan('│'));
+    console.log(chalk.cyan('│') + chalk.bold.white('  ██║     ██████╔╝ ╚████╔╝ █████╗  ██╔██╗ ██║██║   ██║ ') + chalk.cyan('│'));
+    console.log(chalk.cyan('│') + chalk.bold.white('  ██║     ██╔══██╗  ╚██╔╝  ██╔══╝  ██║╚██╗██║██║   ██║ ') + chalk.cyan('│'));
+    console.log(chalk.cyan('│') + chalk.bold.white('  ╚██████╗██║  ██║   ██║   ███████╗██║ ╚████║╚██████╔╝ ') + chalk.cyan('│'));
+    console.log(chalk.cyan('│') + chalk.bold.white('   ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═══╝ ╚═════╝  ') + chalk.cyan('│'));
+    console.log(chalk.cyan('│') + chalk.bold.white('                    C R Y S N O V A   A I                 ') + chalk.cyan('│'));
+    console.log(chalk.cyan('╰────────────────────────────────────────────────────────────╯'));
+    writeLog('SYSTEM', 'CRYSNOVA AI engine starting · WhatsApp multi-device runtime');
+    writeLog('INFO', 'Runtime: %s · Transport: @crysnovax/baileys', process.version);
 };
 
 // ─── Readline helper ───────────────────────────────────────────────
@@ -151,14 +148,13 @@ const clientstart = async () => {
     global.sock = sock;
     global.io   = io;
 
-    // Terminal pairing mode — collect number now, pair after connection opens
+    // Pair-code mode — collect the digits-only number before requesting a code
     let needsPairing = false;
     let pairingNumber = null;
     let pairingRequested = false;
     if (getConfig().status.terminal && !sock.authState.creds.registered) {
         await new Promise(r => setTimeout(r, 800));
-        console.log(chalk.yellow('┏━〔 ✦ CRYSNOVA AI 〕━'));
-        console.log(chalk.yellow('║     ZEE BOT - PAIRING MODE     ║'));
+        writeLog('SYSTEM', 'PAIR-CODE MODE · CRYSNOVA AI');
         const number = await question('Enter your WhatsApp number (without +):\nNumber → ');
         pairingNumber = number.replace(/[^0-9]/g, '').trim();
         needsPairing = true;
@@ -205,34 +201,25 @@ const clientstart = async () => {
 
         if (connection === 'connecting') {
             sock.connectionOpen = false;
-            console.log(chalk.red('🔄 Connecting...'));
+            writeLog('INFO', 'Connecting to WhatsApp transport...');
         }
 
-        // WhatsApp accepts pairing requests only after QR/hello readiness. A
-        // request made immediately after socket creation can fail with 428/405.
+        // WhatsApp accepts pair-code requests only after its internal handshake
+        // is ready. Calling immediately can fail with 428/405. No QR is shown.
         if ((qr || connection === 'open') && needsPairing && pairingNumber && !pairingRequested) {
             pairingRequested = true;
                 for (let attempt = 1; attempt <= 3; attempt++) {
                     try {
-                        console.log(chalk.yellow('\n⏳ Requesting pairing code... (attempt ' + attempt + '/3)'));
+                        writeLog('INFO', 'Requesting pair code for %s · attempt %d/3', pairingNumber, attempt);
                         const code = await sock.requestPairingCode(pairingNumber, 'CRYSNOVA');
 
-                        console.log(chalk.green('\n╔════════════════════════════════════════╗'));
-                        console.log(chalk.bold.green('║     ✅ ZEE BOT - PAIRED              ║'));
-                        console.log(chalk.bold.green('╚════════════════════════════════════════╝'));
-                        console.log(chalk.yellow('║  Your Pairing Code:                    ║'));
-                        console.log(chalk.red.bold('  ' + code + '\n'));
-                        console.log(chalk.green('║  How to Pair:                          ║'));
-                        console.log(chalk.yellow('║  1. Open WhatsApp on your phone        ║'));
-                        console.log(chalk.yellow('║  2. Go to Settings > Linked Devices    ║'));
-                        console.log(chalk.yellow('║  3. Tap "Link a Device"               ║'));
-                        console.log(chalk.yellow('║  4. Enter the code above               ║'));
-                        console.log(chalk.green('╚════════════════════════════════════════╝\n'));
+                        writeLog('OK', 'Pair code generated successfully: %s', code);
+                        writeLog('INFO', 'WhatsApp → Settings → Linked Devices → Link a Device → Enter code');
                         break;
                     } catch (pairErr) {
-                        console.error(chalk.red('[Pairing attempt ' + attempt + ' failed]'), pairErr.message);
+                        writeLog('WARN', 'Pair-code attempt %d failed: %s', attempt, pairErr.message);
                         if (attempt < 3) {
-                            console.log(chalk.yellow('Retrying in 3s...'));
+                            writeLog('INFO', 'Retrying pair-code request in 3 seconds...');
                             await new Promise(r => setTimeout(r, 3000));
                         } else {
                             pairingRequested = false;
@@ -245,9 +232,8 @@ const clientstart = async () => {
         if (connection === 'open') {
             sock.connectionOpen = true;
 
-            console.log(chalk.bold.green.bold('║     ✅ ZEE BOT - PAIDED           ║'));
-            console.log(chalk.yellow('📱 Number: ' + sock.user?.id?.split(':')[0]));
-            console.log(chalk.yellow('🌐 Dashboard: http://localhost:' + port + '\n'));
+            writeLog('OK', 'WhatsApp session connected · account %s', sock.user?.id?.split(':')[0]);
+            writeLog('INFO', 'Dashboard available at http://localhost:%s', port);
             io.emit('bot-status', {
                 status: 'connected',
                 number: sock.user?.id?.split(':')[0],
@@ -296,14 +282,14 @@ const clientstart = async () => {
             sock.connectionOpen = false;
             sock.pairingReady = false;
             const statusCode = lastDisconnect?.error?.output?.statusCode;
-            console.log(chalk.magenta('❌ Connection closed:'), statusCode);
+            writeLog('WARN', 'WhatsApp connection closed · status %s', statusCode || 'unknown');
             global.botInstances.delete(botInstanceId);
 
             if (statusCode === DisconnectReason.loggedOut) {
                 console.log(chalk.magenta('🚫 Logged out. Delete session folder and restart.'));
                 process.exit(1);
             }
-            console.log(chalk.red('🔄 Reconnecting in 3 seconds...'));
+            writeLog('INFO', 'Reconnecting in 3 seconds...');
             setTimeout(clientstart, 3000);
 
             try {
@@ -313,7 +299,15 @@ const clientstart = async () => {
     });
 
     // ─── Message handler ───────────────────────────────────────────
-    setupMessageHandler(sock, store, handleMessage, smsg, io, getConfig);
+    sock.ev.on('messages.upsert', async ({ messages }) => {
+        for (const message of messages || []) {
+            try {
+                await handleMessage(sock, message, store);
+            } catch (error) {
+                console.error(chalk.red('[MESSAGE HANDLER ERROR]'), error.message);
+            }
+        }
+    });
 
     // ─── Group participant events ──────────────────────────────────
     sock.ev.on('group-participants.update', async (update) => {
@@ -412,7 +406,7 @@ app.post('/api/request-pairing', async (req, res) => {
             return res.json({ success: false, message: 'Bot is already connected to a WhatsApp account.' });
         }
 
-        // Pairing codes require QR/hello readiness, not authenticated open.
+        // Pair codes require the internal handshake to be ready, not authenticated open.
         if (!sock.pairingReady) {
             await new Promise((resolve, reject) => {
                 const timeout = setTimeout(() => reject(new Error('Connection timeout waiting for pairing readiness')), 30000);
@@ -472,20 +466,20 @@ app.post('/api/request-pairing', async (req, res) => {
         loadCommands();
 
         server.listen(port, () => {
-            console.log(chalk.green('✅ Dashboard: http://localhost:' + port));
+            writeLog('OK', 'Dashboard listening on http://localhost:%s', port);
         });
 
         crysStatistic(app, io);
 
         io.on('connection', (socket) => {
-            console.log(chalk.yellow('👤 Dashboard connected'));
+            writeLog('INFO', 'Dashboard client connected');
             socket.emit('bot-status', global.stats);
-            socket.on('disconnect', () => console.log(chalk.red('👤 Dashboard disconnected')));
+            socket.on('disconnect', () => writeLog('INFO', 'Dashboard client disconnected'));
         });
 
         await clientstart();
     } catch (err) {
-        console.error(chalk.magenta('Startup error:'), err);
+        writeLog('ERROR', 'Startup failed: %s', err?.stack || err?.message || err);
         process.exit(1);
     }
 })();
