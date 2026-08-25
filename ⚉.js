@@ -151,28 +151,16 @@ const clientstart = async () => {
     global.sock = sock;
     global.io   = io;
 
-    // Terminal pairing mode (only when no creds + terminal mode)
+    // Terminal pairing mode — collect number now, pair after connection opens
+    let needsPairing = false;
+    let pairingNumber = null;
     if (getConfig().status.terminal && !sock.authState.creds.registered) {
         await new Promise(r => setTimeout(r, 800));
         console.log(chalk.yellow('┏━〔 ✦ CRYSNOVA AI 〕━'));
         console.log(chalk.yellow('║     ZEE BOT - PAIRING MODE     ║'));
-        console.log(chalk.yellow('⏳ Requesting pairing code...'));
         const number = await question('Enter your WhatsApp number (without +):\nNumber → ');
-        const cleanNumber = number.replace(/[^0-9]/g, '').trim();
-        console.log(chalk.red('⏳ Requesting pairing code...'));
-        const code = await sock.requestPairingCode(cleanNumber, 'CRYSNOVA');
-
-        console.log(chalk.green('\n╔════════════════════════════════════════╗'));
-        console.log(chalk.bold.green('║     ✅ ZEE BOT - PAIDED           ║'));
-        console.log(chalk.bold.green('╚════════════════════════════════════════╝'));
-        console.log(chalk.yellow('║  Your Pairing Code:                    ║'));
-        console.log(chalk.red.bold('  ' + code + '\n'));
-        console.log(chalk.green('║  How to Pair:                          ║'));
-        console.log(chalk.yellow('║  1. Open WhatsApp on your phone        ║'));
-        console.log(chalk.yellow('║  2. Go to Settings > Linked Devices    ║'));
-        console.log(chalk.yellow('║  3. Tap "Link a Device"               ║'));
-        console.log(chalk.yellow('║  4. Enter the code above               ║'));
-        console.log(chalk.green('╚════════════════════════════════════════╝\n'));
+        pairingNumber = number.replace(/[^0-9]/g, '').trim();
+        needsPairing = true;
     }
 
     // Bind store
@@ -212,10 +200,35 @@ const clientstart = async () => {
         const { connection, lastDisconnect } = update;
 
         if (connection === 'connecting') {
+            sock.connectionOpen = false;
             console.log(chalk.red('🔄 Connecting...'));
         }
 
         if (connection === 'open') {
+            sock.connectionOpen = true;
+            // Terminal pairing — request code AFTER connection is open
+            if (needsPairing && pairingNumber) {
+                needsPairing = false;
+                try {
+                    console.log(chalk.yellow('\n⏳ Requesting pairing code...'));
+                    const code = await sock.requestPairingCode(pairingNumber, 'CRYSNOVA');
+
+                    console.log(chalk.green('\n╔════════════════════════════════════════╗'));
+                    console.log(chalk.bold.green('║     ✅ ZEE BOT - PAIRED              ║'));
+                    console.log(chalk.bold.green('╚════════════════════════════════════════╝'));
+                    console.log(chalk.yellow('║  Your Pairing Code:                    ║'));
+                    console.log(chalk.red.bold('  ' + code + '\n'));
+                    console.log(chalk.green('║  How to Pair:                          ║'));
+                    console.log(chalk.yellow('║  1. Open WhatsApp on your phone        ║'));
+                    console.log(chalk.yellow('║  2. Go to Settings > Linked Devices    ║'));
+                    console.log(chalk.yellow('║  3. Tap "Link a Device"               ║'));
+                    console.log(chalk.yellow('║  4. Enter the code above               ║'));
+                    console.log(chalk.green('╚════════════════════════════════════════╝\n'));
+                } catch (pairErr) {
+                    console.error(chalk.red('[Pairing Error]'), pairErr.message);
+                }
+            }
+
             console.log(chalk.bold.green.bold('║     ✅ ZEE BOT - PAIDED           ║'));
             console.log(chalk.yellow('📱 Number: ' + sock.user?.id?.split(':')[0]));
             console.log(chalk.yellow('🌐 Dashboard: http://localhost:' + port + '\n'));
@@ -264,6 +277,7 @@ const clientstart = async () => {
         }
 
         if (connection === 'close') {
+            sock.connectionOpen = false;
             const statusCode = lastDisconnect?.error?.output?.statusCode;
             console.log(chalk.magenta('❌ Connection closed:'), statusCode);
             global.botInstances.delete(botInstanceId);
@@ -379,6 +393,16 @@ app.post('/api/request-pairing', async (req, res) => {
 
         if (sock.user) {
             return res.json({ success: false, message: 'Bot is already connected to a WhatsApp account.' });
+        }
+
+        // Wait for socket connection to open (max 30s)
+        if (!sock.connectionOpen) {
+            await new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => reject(new Error('Connection timeout waiting for socket')), 30000);
+                const check = setInterval(() => {
+                    if (sock.connectionOpen) { clearInterval(check); clearTimeout(timeout); resolve(); }
+                }, 500);
+            });
         }
 
         console.log(chalk.yellow('\n⏳ Requesting pairing code for: ' + cleanNumber));
