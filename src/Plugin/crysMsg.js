@@ -152,7 +152,7 @@ const handleMessage = async (sock, m, store) => {
         const cfg    = config();
 
         // ── PREFIX — supports null/empty for no-prefix mode ──
-        let prefix = cfg.settings?.prefix ?? getVar('PREFIX', '/');
+        let prefix = getVar('PREFIX', cfg.settings?.prefix ?? '.');
         if (prefix === 'null' || prefix === '') prefix = '';
 
         const autoReact    = getVar('AUTO_REACT', true);
