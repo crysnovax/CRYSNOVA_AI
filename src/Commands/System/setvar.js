@@ -59,6 +59,34 @@ function writeEnv(map) {
     fs.writeFileSync(ENV_PATH, out.join('\n'));
 }
 
+function applyLiveConfig(config, key, value) {
+    if (config && typeof config === 'object') {
+        const paths = {
+            PREFIX: ['settings', 'prefix'],
+            BOT_NAME: ['settings', 'title'],
+            PUBLIC_MODE: ['status', 'public'],
+            TERMINAL_MODE: ['status', 'terminal'],
+            REACT_STATUS: ['status', 'reactsw'],
+            AUTO_READ: ['mode', 'autoRead'],
+            AUTO_TYPING: ['mode', 'autoTyping'],
+            AUTO_RECORDING: ['mode', 'autoRecording'],
+            ALWAYS_ONLINE: ['mode', 'alwaysOnline'],
+            SELF_BOT: ['mode', 'selfBot'],
+            OWNER_NAME: ['settings', 'ownerName'],
+            OWNER_JID: ['settings', 'ownerJid'],
+        };
+        const targetPath = paths[key];
+        if (targetPath) {
+            let target = config;
+            for (let i = 0; i < targetPath.length - 1; i++) target = target?.[targetPath[i]];
+            if (target) target[targetPath[targetPath.length - 1]] = value;
+        }
+        if (key === 'BOT_NAME') config.settings.packname = value;
+    }
+    // Several dependencies read process.env directly, so update this process too.
+    process.env[key] = String(value);
+}
+
 module.exports = {
     name: 'setvar',
     alias: ['sv'],
@@ -67,7 +95,7 @@ module.exports = {
     ownerOnly: true,
     reactions: { start: '⚙️', success: '👾' },
 
-    execute: async (sock, m, { args, reply }) => {
+    execute: async (sock, m, { args, reply, config }) => {
         if (!args[0]) return reply(
             `Usage: .setvar KEY=value\n\nExamples:\n` +
             `• .setvar PREFIX=.\n` +
@@ -91,8 +119,9 @@ module.exports = {
 
         if (!key || value === '') return reply('_*⚉ Usage:*_ `.setvar KEY=value`');
 
-        // 1. Save to runtime (immediate effect, no restart needed)
-        setVar(key, value);
+        // 1. Apply to the running bot immediately, then persist it.
+        const liveValue = setVar(key, value);
+        applyLiveConfig(config, key, liveValue);
 
         // 2. Save to .env (persists across restarts)
         try {

@@ -126,7 +126,8 @@ const clientstart = async () => {
     // Create socket
     const sock = makeWASocket({
         logger: pino({
-            level: process.env.LOG_LEVEL || 'info',
+            // Keep Baileys transport JSON out of hosted consoles by default; set LOG_LEVEL=info for protocol diagnostics.
+            level: process.env.LOG_LEVEL || 'silent',
             timestamp: pino.stdTimeFunctions.isoTime,
         }),
         printQRInTerminal: !getConfig().status.terminal,

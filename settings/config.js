@@ -171,7 +171,7 @@ const config = {
                 return (userPrefix === 'null' || userPrefix === '') ? '' : userPrefix;
             }
 
-            return '/';
+            return '.';
         })(),
 
         description: 'Professional WhatsApp Bot — ZEE BOT powered by CRYSNOVA AI V2',
