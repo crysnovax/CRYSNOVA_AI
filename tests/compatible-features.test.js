@@ -5,7 +5,7 @@ const { normalizeDeployButton, normalizeDeployButtonMessage } = require('../src/
 const deploy = require('../src/Commands/System/deploy');
 
 test('CRYSNOVA_AI loads the published Baileys GenAI surface', () => {
-    assert.equal(require('@crysnovax/baileys/package.json').version, '2.7.15');
+    assert.equal(require('@crysnovax/baileys/package.json').version, '2.7.18');
     assert.equal(typeof baileys.prepareRichMenuMessage, 'function');
     assert.equal(typeof baileys.generateTableContent, 'function');
     assert.equal(typeof baileys.generateCodeBlockContent, 'function');

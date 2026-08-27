@@ -148,16 +148,16 @@ const handleMessage = async (sock, m, store) => {
         if (!m || !m.message) return;
         if (m.key?.remoteJid === 'status@broadcast') return;
 
+        const config = () => require('../../settings/config');
+        const cfg    = config();
+
         // ── PREFIX — supports null/empty for no-prefix mode ──
-        let prefix = getVar('PREFIX', '.');
+        let prefix = cfg.settings?.prefix ?? getVar('PREFIX', '/');
         if (prefix === 'null' || prefix === '') prefix = '';
 
         const autoReact    = getVar('AUTO_REACT', true);
         const privateReact = getVar('PRIVATE_REACT', true);
         const cooldown     = getVar('COOLDOWN', 3);
-
-        const config = () => require('../../settings/config');
-        const cfg    = config();
 
         let sender    = m.sender || m.key?.participant || m.key?.remoteJid;
         let senderNum = extractPhoneNumber(sender, store);
