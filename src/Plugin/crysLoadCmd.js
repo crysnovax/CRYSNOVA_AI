@@ -8,7 +8,7 @@ const loadCommands = () => {
 
     // Initialize global prefix before loading commands so ${prefix} in usage fields works
     const { getVar } = require('./configManager');
-    global.prefix = require('../../settings/config').settings?.prefix ?? getVar('PREFIX', '/');
+    global.prefix = getVar('PREFIX', '.');
 
     clearRegistry();
 
