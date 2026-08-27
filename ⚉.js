@@ -58,24 +58,21 @@ const ignoredErrors = [
 
 // ─── Console UI ─────────────────────────────────────────────────────
 const timestamp = () => new Date().toISOString().slice(11, 19);
+const rawConsoleLog = console.log.bind(console);
+const rawConsoleError = console.error.bind(console);
 const writeLog = (level, message, ...args) => {
     const palette = { INFO: chalk.cyan, OK: chalk.green, WARN: chalk.yellow, ERROR: chalk.red, SYSTEM: chalk.magenta };
     const color = palette[level] || chalk.white;
-    console.log(`${chalk.gray(timestamp())} ${color(String(level).padEnd(6))} ${chalk.gray('›')} ${message}`, ...args);
+    rawConsoleLog(`${chalk.gray(timestamp())} ${color(String(level).padEnd(6))} ${chalk.gray('›')} ${message}`, ...args);
 };
 
-const showBanner = () => {
-    console.log('');
-    console.log(chalk.cyan('╭────────────────────────────────────────────────────────────╮'));
-    console.log(chalk.cyan('│') + chalk.bold.white('   ██████╗██████╗ ██╗   ██╗███████╗███╗   ██╗ ██████╗  ') + chalk.cyan('│'));
-    console.log(chalk.cyan('│') + chalk.bold.white('  ██╔════╝██╔══██╗╚██╗ ██╔╝██╔════╝████╗  ██║██╔═══██╗ ') + chalk.cyan('│'));
-    console.log(chalk.cyan('│') + chalk.bold.white('  ██║     ██████╔╝ ╚████╔╝ █████╗  ██╔██╗ ██║██║   ██║ ') + chalk.cyan('│'));
-    console.log(chalk.cyan('│') + chalk.bold.white('  ██║     ██╔══██╗  ╚██╔╝  ██╔══╝  ██║╚██╗██║██║   ██║ ') + chalk.cyan('│'));
-    console.log(chalk.cyan('│') + chalk.bold.white('  ╚██████╗██║  ██║   ██║   ███████╗██║ ╚████║╚██████╔╝ ') + chalk.cyan('│'));
-    console.log(chalk.cyan('│') + chalk.bold.white('   ╚═════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═══╝ ╚═════╝  ') + chalk.cyan('│'));
-    console.log(chalk.cyan('│') + chalk.bold.white('                    C R Y S N O V A   A I                 ') + chalk.cyan('│'));
-    console.log(chalk.cyan('╰────────────────────────────────────────────────────────────╯'));
-    writeLog('SYSTEM', 'CRYSNOVA AI engine starting · WhatsApp multi-device runtime');
+// Keep third-party and session messages on the same timestamped console stream.
+console.log = (message, ...args) => rawConsoleLog(`${chalk.gray(timestamp())} ${message ?? ''}`, ...args);
+console.warn = (message, ...args) => rawConsoleLog(`${chalk.gray(timestamp())} ${chalk.yellow(message ?? '')}`, ...args);
+console.error = (message, ...args) => rawConsoleError(`${chalk.gray(timestamp())} ${chalk.red(message ?? '')}`, ...args);
+
+const logStartup = () => {
+    writeLog('SYSTEM', 'WhatsApp multi-device runtime starting');
     writeLog('INFO', 'Runtime: %s · Transport: @crysnovax/baileys', process.version);
 };
 
@@ -90,7 +87,7 @@ const question = (prompt) => {
 // ─── Bot startup ───────────────────────────────────────────────────
 const clientstart = async () => {
     const getConfig = () => require('./settings/config');
-    showBanner();
+    logStartup();
 
     // Random browser fingerprint
     const browsers = [
@@ -128,7 +125,10 @@ const clientstart = async () => {
 
     // Create socket
     const sock = makeWASocket({
-        logger: pino({ level: 'silent' }),
+        logger: pino({
+            level: process.env.LOG_LEVEL || 'info',
+            timestamp: pino.stdTimeFunctions.isoTime,
+        }),
         printQRInTerminal: !getConfig().status.terminal,
         auth: state,
         version,
@@ -249,13 +249,14 @@ const clientstart = async () => {
 
             try {
                 const successPayload = {
-                    caption: '┏━〔 ✦ ' + (config.settings?.title || 'CRYSNOVA AI') + '* is Online!\n\n' +
-                        '❏▸ ℘ Owner ⇆ ' + (sock.user.name || 'Unknown') + '\n' +
-                        '❏▸⁠ 彡 Prefix ⇆ [ ' + (config.settings?.prefix || '.') + ' ]\n' +
-                        '❏▸ ⎔ Mode ⇆ ' + (config.status?.public ? 'Public' : 'Private') + '\n' +
-                        '❏▸ ↻ Version ⇆ ZEE BOT\n' +
-                        '━━━━━━━━━━━━━━━━━━━━━\n' +
-                        (config.branding?.footer || '© 2026 ZEE BOT | by CRYSNOVA') + '\n',
+                    caption: '亗 *CRYSNOVA AI* is Online!\n\n' +
+                        '❏▸ ⟁⃝𓋎 User⇆ 𝗰𝗿𝘆𝘀𝗻ᝪ𝘃𝗮メ\n' +
+                        '❏▸ 彡 Prefix⇆ [ / ]\n' +
+                        '❏▸ ⎔ Mode⇆ Private\n' +
+                        '❏▸ ⓘ Version⇆ 𝚉̷𝙴̷ ̷𝙱̷𝙾̷𝚃̷\n' +
+                        '❏▸ ℘ Owner⇆ ₵ⱤɎ₴₦☠︎︎V₳\n\n' +
+                        '💫 GROUP: https://sl.crysnovax.link/WHATSAPP\n\n' +
+                        '`×͜× BOT IS LIVE! ✧`\n',
                     contextInfo: {
                         forwardingScore: 1,
                         isForwarded: true,
@@ -302,7 +303,8 @@ const clientstart = async () => {
     sock.ev.on('messages.upsert', async ({ messages }) => {
         for (const message of messages || []) {
             try {
-                await handleMessage(sock, message, store);
+                const serialized = await smsg(sock, message, store);
+                await handleMessage(sock, serialized, store);
             } catch (error) {
                 console.error(chalk.red('[MESSAGE HANDLER ERROR]'), error.message);
             }

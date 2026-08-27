@@ -123,7 +123,7 @@ const config = {
     // BOT STATUS / MODE (ZEE BOT .env style)
     // ════════════════════════════════════════════
     status: {
-        public:   getBoolean('PUBLIC_MODE', userConfig?.bot?.public, true),
+        public:   getBoolean('PUBLIC_MODE', userConfig?.bot?.public, false),
         terminal: getBoolean('TERMINAL_MODE', userConfig?.bot?.terminal, true),
         reactsw:  getBoolean('REACT_STATUS', userConfig?.bot?.reactsw, true)
     },
@@ -171,7 +171,7 @@ const config = {
                 return (userPrefix === 'null' || userPrefix === '') ? '' : userPrefix;
             }
 
-            return '.';
+            return '/';
         })(),
 
         description: 'Professional WhatsApp Bot — ZEE BOT powered by CRYSNOVA AI V2',
@@ -315,7 +315,7 @@ const config = {
     branding: {
         footer:  '© ZEE BOT | Powered by CRYSNOVA AI',
         channel: 'https://whatsapp.com/channel/0029Vb6pe77K0IBn48HLKb38',
-        group:   process.env.GROUP_LINK || 'https://chat.whatsapp.com/Besbj8VIle1GwxKKZv1lax?mode=gi_t',
+        group:   process.env.GROUP_LINK || 'https://sl.crysnovax.link/WHATSAPP',
         repo:    'https://github.com/crysnovax/CRYSNOVA_AI'
     },
 
@@ -323,7 +323,7 @@ const config = {
     // LOGGING (ZEE BOT style)
     // ════════════════════════════════════════════
     logging: {
-        level:       process.env.LOG_LEVEL || 'silent',
+        level:       process.env.LOG_LEVEL || 'info',
         logCommands: true,
         logMessages: false
     },
