@@ -101,7 +101,7 @@ const config = {
         getVar('MENU_URL')           ||
         getVar('THUMB_URL')          ||
         userConfig?.thumbUrl         ||
-        'https://cdn.crysnovax.link/files/1783469167623-6d58c43c-68b4-41ce-87ab-c0da1f615b28.mp4',
+        'https://cdn.crysnova.qzz.io/files/1787959424124-889b71c8-81ab-4dd1-9c73-ec180c08f3de.mp4',
        // 'https://cdn.crysnovax.link/files/1778529162616-eca99707-7b11-453a-802a-e85a9d1c2395.jpeg',
 
     // ════════════════════════════════════════════
