@@ -117,7 +117,7 @@ const deploy = {
         const action = String(args?.[0] || 'menu').toLowerCase();
         try {
             if (action === 'menu' || action === 'start') {
-                if (typeof sock.richMenu !== 'function') return reply('CRYSNOVA AI RichMenu requires @crysnovax/baileys 2.7.12 or newer.');
+                if (typeof sock.richMenu !== 'function') return reply('CRYSNOVA AI RichMenu requires plogme 2.7.12 or newer.');
                 await sock.richMenu(message.chat, buildMenu(), quoted(message));
                 return;
             }

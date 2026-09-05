@@ -1,7 +1,7 @@
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
-const { prepareWAMessageMedia, generateMessageIDV2, buildLinkPreview } = require('@crysnovax/baileys');
+const { prepareWAMessageMedia, generateMessageIDV2, buildLinkPreview } = require('plogme');
 
 // ── Status ID Store ───────────────────────────────────────────
 const DB_PATH = path.join(__dirname, '../../../database/gstatus-ids.json');
