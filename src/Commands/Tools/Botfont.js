@@ -307,7 +307,7 @@ module.exports = {
                 const current = botFontSettings[chatId];
                 if (current) {
                     const font = fonts[current];
-                    return reply(`${prefix}⚉ Current bot font: *${font?name || 'None'}*\n\nUse \`${prefix}botfont <name or number>\` to change\nUse \`${prefix}botfont off\` to disable`);
+                    return reply(`${prefix}⚉ Current bot font: *${font?.name || 'None'}*\n\nUse \`${prefix}botfont <name or number>\` to change\nUse \`${prefix}botfont off\` to disable`);
                 }
                 return reply(`⚉ No bot font set\n\nUse \`${prefix}botfont <name or number>\` to set one`);
             }

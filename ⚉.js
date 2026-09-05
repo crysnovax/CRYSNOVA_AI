@@ -21,7 +21,7 @@ const {
     jidDecode,
     downloadContentFromMessage,
     makeCacheableSignalKeyStore,
-} = require('@crysnovax/baileys');
+} = require('plogme');
 
 const { smsg }                   = require('./library/serialize');
 const { konek }                  = require('./library/connection/connection');
@@ -73,7 +73,7 @@ console.error = (message, ...args) => rawConsoleError(`${chalk.gray(timestamp())
 
 const logStartup = () => {
     writeLog('SYSTEM', 'WhatsApp multi-device runtime starting');
-    writeLog('INFO', 'Runtime: %s · Transport: @crysnovax/baileys', process.version);
+    writeLog('INFO', 'Runtime: %s · Transport: plogme', process.version);
 };
 
 // ─── Readline helper ───────────────────────────────────────────────

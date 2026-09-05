@@ -1,10 +1,14 @@
 services:
   - type: web
     name: crysnova-ai
+    repo: https://github.com/crysnovax/CRYSNOVA_AI
+    branch: main
     runtime: node
     plan: free
-    buildCommand: npm install
+    rootDir: .
+    buildCommand: npm ci --omit=dev
     startCommand: npm start
+    autoDeploy: true
     envVars:
       - key: NODE_VERSION
         value: 20.19.0

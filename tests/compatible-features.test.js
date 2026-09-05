@@ -1,11 +1,11 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const baileys = require('@crysnovax/baileys');
+const baileys = require('plogme');
 const { normalizeDeployButton, normalizeDeployButtonMessage } = require('../src/Plugin/deployButtonRouter');
 const deploy = require('../src/Commands/System/deploy');
 
 test('CRYSNOVA_AI loads the published Baileys GenAI surface', () => {
-    assert.equal(require('@crysnovax/baileys/package.json').version, '2.7.18');
+    assert.equal(require('plogme/package.json').version, '1.0.0');
     assert.equal(typeof baileys.prepareRichMenuMessage, 'function');
     assert.equal(typeof baileys.generateTableContent, 'function');
     assert.equal(typeof baileys.generateCodeBlockContent, 'function');

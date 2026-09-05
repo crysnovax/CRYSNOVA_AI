@@ -449,3 +449,5 @@ module.exports = [
                 return reply(`${prefix}⊘ *Error:* ${err.message}`);
             }
 }
+    }
+];
