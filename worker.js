@@ -16,11 +16,33 @@
  *   The worker forwards the request to api.github.com with the GITHUB_TOKEN binding.
  */
 
+// Simple in-memory rate limiter (per IP, resets when Worker restarts)
+const rateLimitMap = new Map();
+const RATE_LIMIT_MAX = 60;      // max requests per window per IP
+const RATE_LIMIT_WINDOW = 60000; // 1 minute in ms
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip) || { count: 0, start: now };
+  if (now - entry.start > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(ip, { count: 1, start: now });
+    return false;
+  }
+  entry.count++;
+  rateLimitMap.set(ip, entry);
+  return entry.count > RATE_LIMIT_MAX;
+}
+
 addEventListener('fetch', event => {
   event.respondWith(handle(event.request));
 });
 
 async function handle(request) {
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  if (isRateLimited(ip)) {
+    return new Response('Too Many Requests', { status: 429, headers: { 'Retry-After': '60' } });
+  }
+
   const url = new URL(request.url);
 
   // Only accept paths under /github/
