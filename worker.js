@@ -30,6 +30,12 @@ async function handle(request) {
 
   // Build target GitHub URL (strip /github prefix)
   const githubPath = url.pathname.replace(/^\/github/, '');
+
+  // Restrict to allowed GitHub API paths and prevent path traversal
+  if (!githubPath.startsWith('/repos/') || githubPath.includes('..')) {
+    return new Response('Forbidden', { status: 403 });
+  }
+
   const target = `https://api.github.com${githubPath}${url.search}`;
 
   // IMPORTANT: set your token in the Cloudflare Worker secrets as GITHUB_TOKEN
