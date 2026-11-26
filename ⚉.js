@@ -123,7 +123,21 @@ const clientstart = async () => {
     const { state, saveCreds } = await useMultiFileAuthState('./' + getConfig().session);
     const { version } = await fetchLatestBaileysVersion();
 
-    // Create socket
+    // Collect terminal input before opening the socket so the first connection
+    // update cannot arrive while readline is blocking event-listener setup.
+    let needsPairing = false;
+    let pairingNumber = null;
+    let pairingRequested = false;
+    if (getConfig().status.terminal && !state.creds.registered && process.stdin.isTTY) {
+        writeLog('SYSTEM', 'PAIR-CODE MODE · CRYSNOVA AI');
+        const number = await question('Enter your WhatsApp number (without +):\nNumber → ');
+        pairingNumber = number.replace(/[^0-9]/g, '').trim();
+        needsPairing = true;
+    } else if (!state.creds.registered && !process.stdin.isTTY) {
+        writeLog('INFO', 'Non-interactive runtime detected · request a pairing code from the dashboard');
+    }
+
+    // Create socket only after interactive input is complete.
     const sock = makeWASocket({
         logger: pino({
             // Keep Baileys transport JSON out of hosted consoles by default; set LOG_LEVEL=info for protocol diagnostics.
@@ -148,20 +162,6 @@ const clientstart = async () => {
     // Store socket globally for API routes
     global.sock = sock;
     global.io   = io;
-
-    // Pair-code mode — collect the digits-only number before requesting a code
-    let needsPairing = false;
-    let pairingNumber = null;
-    let pairingRequested = false;
-    if (getConfig().status.terminal && !sock.authState.creds.registered && process.stdin.isTTY) {
-        await new Promise(r => setTimeout(r, 800));
-        writeLog('SYSTEM', 'PAIR-CODE MODE · CRYSNOVA AI');
-        const number = await question('Enter your WhatsApp number (without +):\nNumber → ');
-        pairingNumber = number.replace(/[^0-9]/g, '').trim();
-        needsPairing = true;
-    } else if (!sock.authState.creds.registered && !process.stdin.isTTY) {
-        writeLog('INFO', 'Non-interactive runtime detected · request a pairing code from the dashboard');
-    }
 
     // Bind store
     store.bind(sock.ev);
