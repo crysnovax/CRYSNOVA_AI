@@ -45,7 +45,7 @@
     "gradient-string": "^3.0.0",
     "groq-sdk": "^1.5.0",
     "human-readable": "^0.2.1",
-    "jimp": "^1.6.0",
+    "jimp": "^1.7.0",
     "js-confuser": "^2.1.3",
     "jsqr": "^1.4.0",
     "mathjs": "^15.2.0",
