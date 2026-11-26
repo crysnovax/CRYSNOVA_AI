@@ -153,12 +153,14 @@ const clientstart = async () => {
     let needsPairing = false;
     let pairingNumber = null;
     let pairingRequested = false;
-    if (getConfig().status.terminal && !sock.authState.creds.registered) {
+    if (getConfig().status.terminal && !sock.authState.creds.registered && process.stdin.isTTY) {
         await new Promise(r => setTimeout(r, 800));
         writeLog('SYSTEM', 'PAIR-CODE MODE · CRYSNOVA AI');
         const number = await question('Enter your WhatsApp number (without +):\nNumber → ');
         pairingNumber = number.replace(/[^0-9]/g, '').trim();
         needsPairing = true;
+    } else if (!sock.authState.creds.registered && !process.stdin.isTTY) {
+        writeLog('INFO', 'Non-interactive runtime detected · request a pairing code from the dashboard');
     }
 
     // Bind store
