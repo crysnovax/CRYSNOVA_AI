@@ -14,15 +14,14 @@ const pino      = require('pino');
 const { Boom }  = require('@hapi/boom');
 const {
     default: makeWASocket,
-    Browsers,
     useMultiFileAuthState,
     DisconnectReason,
-    fetchLatestBaileysVersion,
     jidDecode,
     downloadContentFromMessage,
     makeCacheableSignalKeyStore,
 } = require('plogme');
 
+const { normalizePairingNumber, requestPairingCode } = require('./library/pairing');
 const { smsg }                   = require('./library/serialize');
 const { konek }                  = require('./library/connection/connection');
 const { loadCommands }           = require('./src/Plugin/crysLoadCmd');
@@ -84,19 +83,26 @@ const question = (prompt) => {
     });
 };
 
+let pendingPairingNumber = null;
+
+async function requestAndLogPairingCode(sock, number, source) {
+    const phoneNumber = normalizePairingNumber(number);
+    writeLog('INFO', 'Requesting pairing code for %s via %s', phoneNumber, source);
+    try {
+        const { code } = await requestPairingCode(sock, phoneNumber);
+        writeLog('OK', 'Pairing code generated successfully: %s', code);
+        return code;
+    } catch (error) {
+        const statusCode = error?.output?.statusCode ?? error?.statusCode ?? 'unknown';
+        writeLog('ERROR', 'Pairing code request failed with status %s: %s', statusCode, error?.message || error);
+        throw error;
+    }
+}
+
 // ─── Bot startup ───────────────────────────────────────────────────
 const clientstart = async () => {
     const getConfig = () => require('./settings/config');
     logStartup();
-
-    // Random browser fingerprint
-    const browsers = [
-        Browsers.macOS('Safari'),
-        Browsers.macOS('Chrome'),
-        Browsers.windows('Firefox'),
-        Browsers.ubuntu('Chrome'),
-    ];
-    const browser = browsers[Math.floor(Math.random() * browsers.length)];
 
     // In-memory message/contact store
     const store = {
@@ -121,23 +127,19 @@ const clientstart = async () => {
 
     // Auth state
     const { state, saveCreds } = await useMultiFileAuthState('./' + getConfig().session);
-    const { version } = await fetchLatestBaileysVersion();
 
-    // Collect terminal input before opening the socket so the first connection
-    // update cannot arrive while readline is blocking event-listener setup.
-    let needsPairing = false;
-    let pairingNumber = null;
-    let pairingRequested = false;
-    if (getConfig().status.terminal && !state.creds.registered && process.stdin.isTTY) {
+    // Collect terminal input before opening the socket. Retain it across
+    // reconnects so a transient WhatsApp handshake failure does not prompt again.
+    let pairingNumber = !state.creds.registered ? pendingPairingNumber : null;
+    if (getConfig().status.terminal && !state.creds.registered && process.stdin.isTTY && !pairingNumber) {
         writeLog('SYSTEM', 'PAIR-CODE MODE · CRYSNOVA AI');
-        const number = await question('Enter your WhatsApp number (without +):\nNumber → ');
-        pairingNumber = number.replace(/[^0-9]/g, '').trim();
-        needsPairing = true;
+        pairingNumber = normalizePairingNumber(await question('Enter your WhatsApp number (without +):\nNumber → '));
+        pendingPairingNumber = pairingNumber;
     } else if (!state.creds.registered && !process.stdin.isTTY) {
         writeLog('INFO', 'Non-interactive runtime detected · request a pairing code from the dashboard');
     }
 
-    // Create socket only after interactive input is complete.
+    // Create the socket with Plogme defaults, as in its documented quick start.
     const sock = makeWASocket({
         logger: pino({
             // Keep Baileys transport JSON out of hosted consoles by default; set LOG_LEVEL=info for protocol diagnostics.
@@ -146,8 +148,6 @@ const clientstart = async () => {
         }),
         printQRInTerminal: !getConfig().status.terminal,
         auth: state,
-        version,
-        browser,
         connectTimeoutMs: 60000,
         defaultQueryTimeoutMs: undefined,
         keepAliveIntervalMs: 10000,
@@ -197,43 +197,16 @@ const clientstart = async () => {
 
     // ─── Event: connection.update ──────────────────────────────────
     sock.ev.on('connection.update', async (update) => {
-        const { connection, lastDisconnect, qr } = update;
-
-        if (qr) sock.pairingReady = true;
-        if (connection === 'connecting' && !sock.pairingReady) sock.pairingReady = false;
+        const { connection, lastDisconnect } = update;
 
         if (connection === 'connecting') {
             sock.connectionOpen = false;
             writeLog('INFO', 'Connecting to WhatsApp transport...');
         }
 
-        // WhatsApp accepts pair-code requests only after its internal handshake
-        // is ready. Calling immediately can fail with 428/405. No QR is shown.
-        if ((qr || connection === 'open') && needsPairing && pairingNumber && !pairingRequested) {
-            pairingRequested = true;
-                for (let attempt = 1; attempt <= 3; attempt++) {
-                    try {
-                        writeLog('INFO', 'Requesting pair code for %s · attempt %d/3', pairingNumber, attempt);
-                        const code = await sock.requestPairingCode(pairingNumber, 'CRYSNOVA');
-
-                        writeLog('OK', 'Pair code generated successfully: %s', code);
-                        writeLog('INFO', 'WhatsApp → Settings → Linked Devices → Link a Device → Enter code');
-                        break;
-                    } catch (pairErr) {
-                        writeLog('WARN', 'Pair-code attempt %d failed: %s', attempt, pairErr.message);
-                        if (attempt < 3) {
-                            writeLog('INFO', 'Retrying pair-code request in 3 seconds...');
-                            await new Promise(r => setTimeout(r, 3000));
-                        } else {
-                            pairingRequested = false;
-                        }
-                    }
-                }
-            if (connection !== 'open') return;
-        }
-
         if (connection === 'open') {
             sock.connectionOpen = true;
+            pendingPairingNumber = null;
 
             writeLog('OK', 'WhatsApp session connected · account %s', sock.user?.id?.split(':')[0]);
             writeLog('INFO', 'Dashboard available at http://localhost:%s', port);
@@ -284,9 +257,9 @@ const clientstart = async () => {
 
         if (connection === 'close') {
             sock.connectionOpen = false;
-            sock.pairingReady = false;
             const statusCode = lastDisconnect?.error?.output?.statusCode;
-            writeLog('WARN', 'WhatsApp connection closed · status %s', statusCode || 'unknown');
+            const disconnectMessage = lastDisconnect?.error?.message || 'no error message';
+            writeLog('WARN', 'WhatsApp connection closed · status %s · %s', statusCode || 'unknown', disconnectMessage);
             global.botInstances.delete(botInstanceId);
 
             if (statusCode === DisconnectReason.loggedOut) {
@@ -301,6 +274,20 @@ const clientstart = async () => {
             } catch {}
         }
     });
+
+    if (pairingNumber) {
+        requestAndLogPairingCode(sock, pairingNumber, 'terminal')
+            .then(code => {
+                io.emit('pairing-code', { code, expiresIn: 300 });
+                io.emit('pairing-status', {
+                    status: 'Code Generated',
+                    message: 'Enter this code on WhatsApp within 5 minutes',
+                });
+            })
+            .catch(error => {
+                io.emit('pairing-failed', { message: error.message || 'Failed to generate pairing code.' });
+            });
+    }
 
     // ─── Message handler ───────────────────────────────────────────
     sock.ev.on('messages.upsert', async ({ messages }) => {
@@ -394,12 +381,7 @@ app.get('/api/status', (_req, res) => {
 // POST /api/request-pairing — generate pairing code via web dashboard
 app.post('/api/request-pairing', async (req, res) => {
     try {
-        const { phone } = req.body;
-        if (!phone || phone.length < 10) {
-            return res.json({ success: false, message: 'Invalid phone number. Must be at least 10 digits.' });
-        }
-
-        const cleanNumber = phone.replace(/[^0-9]/g, '').trim();
+        const cleanNumber = normalizePairingNumber(req.body?.phone);
         const sock = global.sock;
         const sockIo = global.io || io;
 
@@ -411,22 +393,8 @@ app.post('/api/request-pairing', async (req, res) => {
             return res.json({ success: false, message: 'Bot is already connected to a WhatsApp account.' });
         }
 
-        // Pair codes require the internal handshake to be ready, not authenticated open.
-        if (!sock.pairingReady) {
-            await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => reject(new Error('Connection timeout waiting for pairing readiness')), 30000);
-                const check = setInterval(() => {
-                    if (sock.pairingReady) { clearInterval(check); clearTimeout(timeout); resolve(); }
-                }, 250);
-            });
-        }
-
-        console.log(chalk.yellow('\n⏳ Requesting pairing code for: ' + cleanNumber));
-
-        // Request pairing code from WhatsApp
-        const code = await sock.requestPairingCode(cleanNumber, 'CRYSNOVA');
-
-        console.log(chalk.green('✅ Pairing code generated: ' + code));
+        pendingPairingNumber = cleanNumber;
+        const code = await requestAndLogPairingCode(sock, cleanNumber, 'dashboard');
 
         // Emit code via Socket.IO
         sockIo.emit('pairing-code', { code, expiresIn: 300 });
@@ -443,13 +411,15 @@ app.post('/api/request-pairing', async (req, res) => {
             expiresIn: 300,
         });
     } catch (error) {
-        console.error(chalk.red('[Pairing Error]'), error.message);
+        const statusCode = error?.output?.statusCode ?? error?.statusCode ?? 'unknown';
+        writeLog('ERROR', 'Dashboard pairing request failed with status %s: %s', statusCode, error?.message || error);
 
         if (global.io) {
             global.io.emit('pairing-failed', { message: error.message || 'Failed to generate pairing code' });
         }
 
-        return res.json({
+        const responseStatus = error?.message?.startsWith('Phone number must') ? 400 : 502;
+        return res.status(responseStatus).json({
             success: false,
             message: error.message || 'Failed to generate pairing code. Please try again.',
         });
