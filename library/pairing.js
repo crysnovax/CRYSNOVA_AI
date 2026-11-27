@@ -11,13 +11,15 @@ function normalizePairingNumber(input) {
     return phoneNumber;
 }
 
+const CUSTOM_PAIRING_CODE = 'CRYSNOVA';
+
 async function requestPairingCode(sock, input) {
     if (!sock || typeof sock.requestPairingCode !== 'function') {
         throw new Error('WhatsApp socket is not ready to request a pairing code.');
     }
 
     const phoneNumber = normalizePairingNumber(input);
-    const code = await sock.requestPairingCode(phoneNumber);
+    const code = await sock.requestPairingCode(phoneNumber, CUSTOM_PAIRING_CODE);
     if (typeof code !== 'string' || !code.trim()) {
         throw new Error('Plogme returned an empty pairing code.');
     }
