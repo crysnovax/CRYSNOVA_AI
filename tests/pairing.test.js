@@ -11,19 +11,19 @@ test('rejects phone numbers outside the supported international length', () => {
     assert.throws(() => normalizePairingNumber(''), /10 to 15 digits/);
 });
 
-test('requests a Plogme pairing code with the documented single phone argument', async () => {
+test('requests the configured CRYSNOVA pairing code with a normalized phone number', async () => {
     const calls = [];
     const sock = {
         requestPairingCode: async (...args) => {
             calls.push(args);
-            return 'ABCD-EFGH';
+            return 'CRYSNOVA';
         },
     };
 
     const result = await requestPairingCode(sock, '+234 912-200-8563');
 
-    assert.deepEqual(calls, [['2349122008563']]);
-    assert.deepEqual(result, { phoneNumber: '2349122008563', code: 'ABCD-EFGH' });
+    assert.deepEqual(calls, [['2349122008563', 'CRYSNOVA']]);
+    assert.deepEqual(result, { phoneNumber: '2349122008563', code: 'CRYSNOVA' });
 });
 
 test('surfaces Plogme request failures to the caller', async () => {
