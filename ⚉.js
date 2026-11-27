@@ -21,7 +21,7 @@ const {
     makeCacheableSignalKeyStore,
 } = require('plogme');
 
-const { normalizePairingNumber, requestPairingCode } = require('./library/pairing');
+const { normalizePairingNumber, requestPairingCode, waitForPairingReady } = require('./library/pairing');
 const { smsg }                   = require('./library/serialize');
 const { konek }                  = require('./library/connection/connection');
 const { loadCommands }           = require('./src/Plugin/crysLoadCmd');
@@ -163,6 +163,10 @@ const clientstart = async () => {
     // Store socket globally for API routes
     global.sock = sock;
     global.io   = io;
+    sock.pairingReady = false;
+    sock.pairingClosed = false;
+    sock.pairingWarmupTimer = null;
+    let terminalPairingRequested = false;
 
     // Bind store
     store.bind(sock.ev);
@@ -202,11 +206,40 @@ const clientstart = async () => {
 
         if (connection === 'connecting') {
             sock.connectionOpen = false;
+            sock.pairingClosed = false;
             writeLog('INFO', 'Connecting to WhatsApp transport...');
+
+            if (!sock.pairingWarmupTimer) {
+                sock.pairingWarmupTimer = setTimeout(() => {
+                    sock.pairingWarmupTimer = null;
+                    if (sock.pairingClosed) return;
+                    sock.pairingReady = true;
+
+                    if (pairingNumber && !terminalPairingRequested) {
+                        terminalPairingRequested = true;
+                        requestAndLogPairingCode(sock, pairingNumber, 'terminal')
+                            .then(code => {
+                                io.emit('pairing-code', { code, expiresIn: 300 });
+                                io.emit('pairing-status', {
+                                    status: 'Code Generated',
+                                    message: 'Enter this code on WhatsApp within 5 minutes',
+                                });
+                            })
+                            .catch(error => {
+                                terminalPairingRequested = false;
+                                io.emit('pairing-failed', { message: error.message || 'Failed to generate pairing code.' });
+                            });
+                    }
+                }, 1500);
+            }
         }
 
         if (connection === 'open') {
             sock.connectionOpen = true;
+            sock.pairingReady = true;
+            sock.pairingClosed = false;
+            if (sock.pairingWarmupTimer) clearTimeout(sock.pairingWarmupTimer);
+            sock.pairingWarmupTimer = null;
             pendingPairingNumber = null;
 
             writeLog('OK', 'WhatsApp session connected · account %s', sock.user?.id?.split(':')[0]);
@@ -258,12 +291,21 @@ const clientstart = async () => {
 
         if (connection === 'close') {
             sock.connectionOpen = false;
+            sock.pairingClosed = true;
+            sock.pairingReady = false;
+            if (sock.pairingWarmupTimer) clearTimeout(sock.pairingWarmupTimer);
+            sock.pairingWarmupTimer = null;
             const statusCode = lastDisconnect?.error?.output?.statusCode;
             const disconnectMessage = lastDisconnect?.error?.message || 'no error message';
             writeLog('WARN', 'WhatsApp connection closed · status %s · %s', statusCode || 'unknown', disconnectMessage);
             global.botInstances.delete(botInstanceId);
 
             if (statusCode === DisconnectReason.loggedOut) {
+                if (!state.creds.registered) {
+                    writeLog('WARN', 'Unpaired session was rejected before linking; keeping the host alive and retrying.');
+                    setTimeout(clientstart, 3000);
+                    return;
+                }
                 console.log(chalk.magenta('🚫 Logged out. Delete session folder and restart.'));
                 process.exit(1);
             }
@@ -275,20 +317,6 @@ const clientstart = async () => {
             } catch {}
         }
     });
-
-    if (pairingNumber) {
-        requestAndLogPairingCode(sock, pairingNumber, 'terminal')
-            .then(code => {
-                io.emit('pairing-code', { code, expiresIn: 300 });
-                io.emit('pairing-status', {
-                    status: 'Code Generated',
-                    message: 'Enter this code on WhatsApp within 5 minutes',
-                });
-            })
-            .catch(error => {
-                io.emit('pairing-failed', { message: error.message || 'Failed to generate pairing code.' });
-            });
-    }
 
     // ─── Message handler ───────────────────────────────────────────
     sock.ev.on('messages.upsert', async ({ messages }) => {
@@ -395,6 +423,7 @@ app.post('/api/request-pairing', async (req, res) => {
         }
 
         pendingPairingNumber = cleanNumber;
+        await waitForPairingReady(sock);
         const code = await requestAndLogPairingCode(sock, cleanNumber, 'dashboard');
 
         // Emit code via Socket.IO
