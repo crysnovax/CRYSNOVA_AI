@@ -21,7 +21,7 @@ const {
     makeCacheableSignalKeyStore,
 } = require('plogme');
 
-const { normalizePairingNumber, requestPairingCode, waitForPairingReady } = require('./library/pairing');
+const { normalizePairingNumber, requestPairingCode, waitForPairingReady, PAIRING_BROWSER } = require('./library/pairing');
 const { smsg }                   = require('./library/serialize');
 const { konek }                  = require('./library/connection/connection');
 const { loadCommands }           = require('./src/Plugin/crysLoadCmd');
@@ -85,6 +85,28 @@ const question = (prompt) => {
 
 let pendingPairingNumber = null;
 
+async function requestPairingCodeForSocket(sock, number, source) {
+    const phoneNumber = normalizePairingNumber(number);
+    if (sock.pairingCode && sock.pairingNumber !== phoneNumber) {
+        throw new Error('A WhatsApp pairing request is already waiting for confirmation.');
+    }
+    if (sock.pairingCode && sock.pairingNumber === phoneNumber) return sock.pairingCode;
+    if (sock.pairingRequestPromise) return sock.pairingRequestPromise;
+
+    sock.pairingNumber = phoneNumber;
+    sock.pairingRequested = true;
+    sock.pairingRequestPromise = requestAndLogPairingCode(sock, phoneNumber, source)
+        .then((code) => {
+            sock.pairingCode = code;
+            return code;
+        })
+        .finally(() => {
+            sock.pairingRequestPromise = null;
+        });
+
+    return sock.pairingRequestPromise;
+}
+
 async function requestAndLogPairingCode(sock, number, source) {
     const phoneNumber = normalizePairingNumber(number);
     writeLog('INFO', 'Requesting pairing code for %s via %s', phoneNumber, source);
@@ -139,16 +161,16 @@ const clientstart = async () => {
         writeLog('INFO', 'Non-interactive runtime detected · request a pairing code from the dashboard');
     }
 
-    // Create the socket with Plogme defaults, as in its documented quick start.
+    // WhatsApp validates the platform display used by phone pairing. Keep this
+    // tuple canonical; custom labels such as CODY produce dead codes in WA.
     const sock = makeWASocket({
         logger: pino({
             // Keep Baileys transport JSON out of hosted consoles by default; set LOG_LEVEL=info for protocol diagnostics.
             level: process.env.LOG_LEVEL || 'silent',
             timestamp: pino.stdTimeFunctions.isoTime,
         }),
-        printQRInTerminal: false,
         auth: state,
-        browser: ['CODY', 'Chrome', '1.0'],
+        browser: PAIRING_BROWSER,
         connectTimeoutMs: 60000,
         defaultQueryTimeoutMs: undefined,
         keepAliveIntervalMs: 10000,
@@ -165,8 +187,10 @@ const clientstart = async () => {
     global.io   = io;
     sock.pairingReady = false;
     sock.pairingClosed = false;
-    sock.pairingWarmupTimer = null;
-    let terminalPairingRequested = false;
+    sock.pairingRequestPromise = null;
+    sock.pairingCode = null;
+    sock.pairingNumber = null;
+    sock.pairingRequested = Boolean(pairingNumber);
 
     // Bind store
     store.bind(sock.ev);
@@ -202,35 +226,32 @@ const clientstart = async () => {
 
     // ─── Event: connection.update ──────────────────────────────────
     sock.ev.on('connection.update', async (update) => {
-        const { connection, lastDisconnect } = update;
+        const { connection, lastDisconnect, qr } = update;
 
         if (connection === 'connecting') {
             sock.connectionOpen = false;
             sock.pairingClosed = false;
+            sock.pairingReady = false;
             writeLog('INFO', 'Connecting to WhatsApp transport...');
+        }
 
-            if (!sock.pairingWarmupTimer) {
-                sock.pairingWarmupTimer = setTimeout(() => {
-                    sock.pairingWarmupTimer = null;
-                    if (sock.pairingClosed) return;
-                    sock.pairingReady = true;
-
-                    if (pairingNumber && !terminalPairingRequested) {
-                        terminalPairingRequested = true;
-                        requestAndLogPairingCode(sock, pairingNumber, 'terminal')
-                            .then(code => {
-                                io.emit('pairing-code', { code, expiresIn: 300 });
-                                io.emit('pairing-status', {
-                                    status: 'Code Generated',
-                                    message: 'Enter this code on WhatsApp within 5 minutes',
-                                });
-                            })
-                            .catch(error => {
-                                terminalPairingRequested = false;
-                                io.emit('pairing-failed', { message: error.message || 'Failed to generate pairing code.' });
-                            });
-                    }
-                }, 1500);
+        // Plogme emits qr when WhatsApp has sent the pair-device stanza. This
+        // is the real server-side readiness signal for requestPairingCode(); a
+        // fixed delay can return a code before the pairing socket exists.
+        if (qr) {
+            sock.pairingReady = true;
+            if (pairingNumber && !sock.pairingCode && !sock.pairingRequestPromise) {
+                requestPairingCodeForSocket(sock, pairingNumber, 'terminal')
+                    .then(code => {
+                        io.emit('pairing-code', { code, expiresIn: 300 });
+                        io.emit('pairing-status', {
+                            status: 'Code Generated',
+                            message: 'Enter this code on WhatsApp within 5 minutes',
+                        });
+                    })
+                    .catch(error => {
+                        io.emit('pairing-failed', { message: error.message || 'Failed to generate pairing code.' });
+                    });
             }
         }
 
@@ -238,8 +259,7 @@ const clientstart = async () => {
             sock.connectionOpen = true;
             sock.pairingReady = true;
             sock.pairingClosed = false;
-            if (sock.pairingWarmupTimer) clearTimeout(sock.pairingWarmupTimer);
-            sock.pairingWarmupTimer = null;
+            const pairedDuringThisFlow = sock.pairingRequested || Boolean(pairingNumber);
             pendingPairingNumber = null;
 
             writeLog('OK', 'WhatsApp session connected · account %s', sock.user?.id?.split(':')[0]);
@@ -249,6 +269,12 @@ const clientstart = async () => {
                 number: sock.user?.id?.split(':')[0],
                 name: sock.user?.name,
             });
+            if (pairedDuringThisFlow) {
+                io.emit('pairing-success', {
+                    number: sock.user?.id?.split(':')[0] || null,
+                    name: sock.user?.name || null,
+                });
+            }
 
             // Send connected message
             const config = getConfig();
@@ -293,8 +319,9 @@ const clientstart = async () => {
             sock.connectionOpen = false;
             sock.pairingClosed = true;
             sock.pairingReady = false;
-            if (sock.pairingWarmupTimer) clearTimeout(sock.pairingWarmupTimer);
-            sock.pairingWarmupTimer = null;
+            sock.pairingCode = null;
+            sock.pairingNumber = null;
+            sock.pairingRequested = false;
             const statusCode = lastDisconnect?.error?.output?.statusCode;
             const disconnectMessage = lastDisconnect?.error?.message || 'no error message';
             writeLog('WARN', 'WhatsApp connection closed · status %s · %s', statusCode || 'unknown', disconnectMessage);
@@ -421,23 +448,29 @@ app.post('/api/request-pairing', async (req, res) => {
         if (sock.user) {
             return res.json({ success: false, message: 'Bot is already connected to a WhatsApp account.' });
         }
+        if (sock.pairingCode && sock.pairingNumber !== cleanNumber) {
+            return res.status(409).json({
+                success: false,
+                message: 'A pairing code is already waiting for confirmation. Enter it on WhatsApp or wait for it to expire.',
+            });
+        }
 
         pendingPairingNumber = cleanNumber;
         await waitForPairingReady(sock);
-        const code = await requestAndLogPairingCode(sock, cleanNumber, 'dashboard');
+        const code = await requestPairingCodeForSocket(sock, cleanNumber, 'dashboard');
 
         // Emit code via Socket.IO
         sockIo.emit('pairing-code', { code, expiresIn: 300 });
         sockIo.emit('pairing-status', {
-            status: 'Code Generated',
-            message: 'Enter this code on WhatsApp within 5 minutes',
+            status: 'Waiting for WhatsApp',
+            message: 'Enter this code on WhatsApp within 5 minutes. The bot will confirm when linking succeeds.',
         });
 
         // Return via REST API as well
         return res.json({
             success: true,
             code,
-            message: 'Code generated! You have 5 minutes to pair.',
+            message: 'Code generated. Waiting for WhatsApp to complete linking.',
             expiresIn: 300,
         });
     } catch (error) {

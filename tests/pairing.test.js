@@ -1,6 +1,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { normalizePairingNumber, requestPairingCode, waitForPairingReady } = require('../library/pairing');
+const { normalizePairingNumber, requestPairingCode, waitForPairingReady, PAIRING_BROWSER } = require('../library/pairing');
+
+test('uses a canonical browser identity for WhatsApp phone pairing', () => {
+    assert.deepEqual(PAIRING_BROWSER, ['Ubuntu', 'Chrome', '22.04.4']);
+});
 
 test('normalizes international phone numbers to digits only', () => {
     assert.equal(normalizePairingNumber('+234 912-208-3563'), '2349122083563');

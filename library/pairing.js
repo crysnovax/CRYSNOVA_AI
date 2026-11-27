@@ -12,6 +12,7 @@ function normalizePairingNumber(input) {
 }
 
 const CUSTOM_PAIRING_CODE = 'CRYSNOVA';
+const PAIRING_BROWSER = ['Ubuntu', 'Chrome', '22.04.4'];
 
 function waitForPairingReady(sock, timeoutMs = 20000) {
     if (sock?.pairingReady) return Promise.resolve();
@@ -46,4 +47,4 @@ async function requestPairingCode(sock, input) {
     return { phoneNumber, code };
 }
 
-module.exports = { normalizePairingNumber, requestPairingCode, waitForPairingReady };
+module.exports = { normalizePairingNumber, requestPairingCode, waitForPairingReady, PAIRING_BROWSER };
