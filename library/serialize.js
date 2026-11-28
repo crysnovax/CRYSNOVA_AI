@@ -8,6 +8,77 @@ const {
     areJidsSameUser
 } = require("plogme")
 
+const ADMIN_CACHE_TTL_MS = 30_000;
+const ADMIN_ERROR_COOLDOWN_MS = 5_000;
+const ADMIN_RATE_LIMIT_COOLDOWN_MS = 60_000;
+const adminCacheBySocket = new WeakMap();
+
+const errorText = (error) => String(error?.message || error || '').toLowerCase();
+const isRateLimited = (error) => {
+    const message = errorText(error);
+    return message.includes('rate-overlimit') || message.includes('rate limit') ||
+        message.includes('too many requests') || error?.output?.statusCode === 429 ||
+        error?.statusCode === 429;
+};
+
+const jidNumber = (jid) => String(jid || '').split('@')[0].split(':')[0];
+
+const buildAdminStatus = (participants, senderJid, botJid) => ({
+    isAdmin: participants.some((participant) => {
+        const participantJid = participant?.id;
+        return jidNumber(participantJid) === jidNumber(senderJid) &&
+            (participant?.admin === 'admin' || participant?.admin === 'superadmin');
+    }),
+    isBotAdmin: participants.some((participant) => {
+        const participantJid = participant?.id;
+        return jidNumber(participantJid) === jidNumber(botJid) &&
+            (participant?.admin === 'admin' || participant?.admin === 'superadmin');
+    }),
+});
+
+async function getGroupAdminStatus(sock, chatId, senderJid) {
+    let cache = adminCacheBySocket.get(sock);
+    if (!cache) {
+        cache = new Map();
+        adminCacheBySocket.set(sock, cache);
+    }
+
+    const now = Date.now();
+    const cached = cache.get(chatId);
+    if (cached?.promise) {
+        const participants = await cached.promise;
+        return participants && buildAdminStatus(participants, senderJid, sock.user?.id);
+    }
+    if (cached && cached.expiresAt > now) {
+        return cached.participants && buildAdminStatus(cached.participants, senderJid, sock.user?.id);
+    }
+
+    const request = (async () => {
+        try {
+            const groupMetadata = await sock.groupMetadata(chatId);
+            const participants = Array.isArray(groupMetadata?.participants) ? groupMetadata.participants : [];
+            cache.set(chatId, { participants, expiresAt: Date.now() + ADMIN_CACHE_TTL_MS });
+            return participants;
+        } catch (error) {
+            const rateLimited = isRateLimited(error);
+            cache.set(chatId, {
+                participants: null,
+                expiresAt: Date.now() + (rateLimited ? ADMIN_RATE_LIMIT_COOLDOWN_MS : ADMIN_ERROR_COOLDOWN_MS),
+            });
+            if (rateLimited) {
+                console.warn('[ADMIN CHECK] WhatsApp rate limited group metadata; pausing admin checks for 60 seconds.');
+            } else {
+                console.error('[ADMIN CHECK ERROR]', error?.message || error);
+            }
+            return null;
+        }
+    })();
+
+    cache.set(chatId, { promise: request, expiresAt: now + ADMIN_ERROR_COOLDOWN_MS });
+    const participants = await request;
+    return participants && buildAdminStatus(participants, senderJid, sock.user?.id);
+}
+
 const smsg = async (sock, m, store) => {
     if (!m) return m
     
@@ -153,24 +224,12 @@ const smsg = async (sock, m, store) => {
     m.isBotAdmin = false;
     
     if (m.isGroup) {
-        try {
-            const groupMetadata = await sock.groupMetadata(m.chat);
-            const participants = groupMetadata.participants;
-            
-            const senderJid = m.sender;
-            const botJid = sock.user.id;
-            
-            m.isAdmin = participants.some(p => 
-                (p.id === senderJid || p.id.split('@')[0] === senderJid.split('@')[0]) && 
-                (p.admin === 'admin' || p.admin === 'superadmin')
-            );
-            
-            m.isBotAdmin = participants.some(p => 
-                (p.id === botJid || p.id.split('@')[0] === botJid.split('@')[0]) && 
-                (p.admin === 'admin' || p.admin === 'superadmin')
-            );
-        } catch (err) {
-            console.error('[ADMIN CHECK ERROR]', err.message);
+        // Reuse metadata briefly and share an in-flight request across messages.
+        // This prevents a WhatsApp rate-limit response from becoming a retry storm.
+        const adminStatus = await getGroupAdminStatus(sock, m.chat, m.sender);
+        if (adminStatus) {
+            m.isAdmin = adminStatus.isAdmin;
+            m.isBotAdmin = adminStatus.isBotAdmin;
         }
     }
 
@@ -291,4 +350,4 @@ const smsg = async (sock, m, store) => {
     return m
 }
 
-module.exports = { smsg }
+module.exports = { smsg, getGroupAdminStatus };
